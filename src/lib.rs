@@ -2,6 +2,7 @@ use std::{collections::HashMap, str::FromStr};
 
 use nom::bytes::take_until1;
 use nom::character::complete::u64 as parse_u64;
+use nom::combinator::map;
 use nom::sequence::delimited;
 use nom::{IResult, Parser, bytes::complete::tag, sequence::separated_pair};
 
@@ -42,30 +43,28 @@ struct InnerAuditMsg {
 
 fn parse_record_type(input: &str) -> IResult<&str, String> {
     delimited(tag("type="), take_until1(" "), tag(" "))
+        .map(ToString::to_string)
         .parse(input)
-        .map(|(reminder, record_type)| (reminder, record_type.to_string()))
 }
 
 /// Parses a timestamp in `1234.567` format, where the whole part
 /// are seconds and the decimal part are milliseconds.
 fn parse_timestamp(input: &str) -> IResult<&str, u64> {
     separated_pair(parse_u64, tag("."), parse_u64)
+        .map(|(seconds, milliseconds)| seconds * 1000 + milliseconds)
         .parse(input)
-        .map(|(reminder, (seconds, milliseconds))| (reminder, seconds * 1000 + milliseconds))
 }
 
 /// Parses a timestamp and a UID in `1234.567:89` format.
 fn parse_timestamp_and_uid(input: &str) -> IResult<&str, (u64, u64)> {
-    separated_pair(parse_timestamp, tag(":"), parse_u64)
-        .parse(input)
-        .map(|(reminder, (timestamp, uid))| (reminder, (timestamp, uid)))
+    separated_pair(parse_timestamp, tag(":"), parse_u64).parse(input)
 }
 
 /// Parses the `audit(1234.567:89)` part of the message.
 fn parse_audit_msg_value(input: &str) -> IResult<&str, InnerAuditMsg> {
     delimited(tag("audit("), parse_timestamp_and_uid, tag(")"))
+        .map(|(timestamp, uid)| InnerAuditMsg { timestamp, uid })
         .parse(input)
-        .map(|(reminder, (timestamp, uid))| (reminder, InnerAuditMsg { timestamp, uid }))
 }
 
 /// Parses the `msg=audit(1234.567:89): ` part of the message.
@@ -76,8 +75,8 @@ fn parse_audit_msg(input: &str) -> IResult<&str, InnerAuditMsg> {
 // TODO: return a Header Struct instead of a tuple
 fn parse_header(s: &str) -> IResult<&str, InnerHeader> {
     (parse_record_type, parse_audit_msg)
+        .map(|(record_type, msg)| InnerHeader { record_type, msg })
         .parse(s)
-        .map(|(reminder, (record_type, msg))| (reminder, InnerHeader { record_type, msg }))
 }
 
 fn parse_body(s: &str) -> IResult<&str, &str> {
