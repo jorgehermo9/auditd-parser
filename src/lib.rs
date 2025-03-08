@@ -1,10 +1,10 @@
 use std::{collections::HashMap, str::FromStr};
 
 use nom::branch::alt;
-use nom::bytes::complete::{tag, take, take_till1, take_until1, take_while1};
+use nom::bytes::complete::{tag, take, take_until1, take_while1};
 use nom::character::complete::{space1, u64 as parse_u64};
 use nom::multi::separated_list1;
-use nom::sequence::{delimited, separated_pair, terminated};
+use nom::sequence::{delimited, separated_pair};
 use nom::{AsChar, Finish};
 use nom::{IResult, Parser};
 
@@ -18,21 +18,21 @@ const ENRICHMENT_SEPARATOR: char = '\x1d';
 // Create an InterpretedAuditdRecord that transforms an AuditdRecord into a human-readable format
 
 #[derive(Debug)]
-struct AuditdRecord {
-    record_type: String,
+pub struct AuditdRecord {
+    pub record_type: String,
     // TODO: u64 or chrono::DateTime<chrono::Utc>?
     /// Unix timestamp in milliseconds
-    timestamp: u64,
+    pub timestamp: u64,
 
     // TODO: think of a better name
     /// Record unique identifier
-    uid: u64,
+    pub uid: u64,
 
     // TODO: create a FieldValue type and store it instead of Strings.
     // We could have hexadecimal, integer, string, and key-value types there
-    fields: HashMap<String, FieldValue>,
+    pub fields: HashMap<String, FieldValue>,
 
-    enrichment: HashMap<String, FieldValue>,
+    pub enrichment: HashMap<String, FieldValue>,
 }
 
 #[derive(Debug)]
@@ -55,7 +55,7 @@ struct InnerBody {
 
 // TODO: add an array variant for things like `grantors=pam_unix,pam_permit,pam_time`
 #[derive(Debug)]
-enum FieldValue {
+pub enum FieldValue {
     Hexadecimal(String),
     Integer(u64),
     String(String),
