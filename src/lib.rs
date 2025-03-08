@@ -54,6 +54,8 @@ struct InnerBody {
 }
 
 // TODO: add an array variant for things like `grantors=pam_unix,pam_permit,pam_time`
+// TODO: add hexadecimal variant? That hexadecimal should be decoded or leaved as-is? Maybe
+// we could interpret it in the interpret mode..?
 #[derive(Debug)]
 pub enum FieldValue {
     Hexadecimal(String),
@@ -113,39 +115,51 @@ fn parse_key(input: &str) -> IResult<&str, String> {
     take_until1("=").map(ToString::to_string).parse(input)
 }
 
+/// Parses a string value, which can be surrounded by single or double quotes.
 fn parse_string_value(input: &str) -> IResult<&str, &str> {
     alt((
         delimited(tag("\""), take_until1("\""), tag("\"")),
         delimited(tag("'"), take_until1("'"), tag("'")),
+        // If the value is not surrounded by quotes, take all the characters until a space or the enrichment separator is found.
+        // for example, in the `op` field of auditd records: `op=PAM:accounting`, where the value should be a string, but
+        // it is not surrounded by quotes.
+        take_while1(|c: char| !c.is_space() && c != ENRICHMENT_SEPARATOR),
     ))
     .parse(input)
 }
 
+/// Parses a map value, which is a string that contains a list of key-value pairs.
+/// For example, it can be found in the `msg` field of auditd records, surrounded by single quotes:
+///
+/// `msg='op=PAM:accounting grantors=pam_unix,pam_permit,pam_time acct="jorge" exe="/usr/bin/sudo" hostname=? addr=? terminal=/dev/pts/1 res=success'`
 fn parse_map_value(input: &str) -> IResult<&str, HashMap<String, FieldValue>> {
     parse_string_value
         .and_then(parse_key_value_list)
         .parse(input)
 }
 
+/// Parses the value part of a field, the right side of the `key=value` pair.
 fn parse_value(input: &str) -> IResult<&str, FieldValue> {
     alt((
         // TODO: check what happens if a value is `123hello`, does it get parsed as string or as u64?
         // Maybe we have first to parse_map,parse_string and the take_while, and if the take_while, then apply u64 parser
+        // ---> UPDATE: the parsing fails if a value starts with a number but continues with letters. If this is the case, this should
+        // be parsed as an string. We should add the parse_u64 one we took all the characters with the `take_while` of parse_string_value.
+        // We may have to take the `take_while` out of the `parse_string_value` and parse u64 and the `take_while` in a previous step to the `parse_string_value`,
+        // as for example, we don't want to parse `field="123"` as an integer, but as a string.
         parse_u64.map(FieldValue::Integer),
         parse_map_value.map(FieldValue::Map),
         parse_string_value.map(|s| FieldValue::String(s.to_string())),
-        // Take all the characters of the value until a space is found, as the space is the value separator
-        take_while1(|c: char| !c.is_space() && c != ENRICHMENT_SEPARATOR)
-            .map(ToString::to_string)
-            .map(FieldValue::String),
     ))
     .parse(input)
 }
 
+/// Parses a key-value pair
 fn parse_key_value(input: &str) -> IResult<&str, (String, FieldValue)> {
     separated_pair(parse_key, tag("="), parse_value).parse(input)
 }
 
+/// Parses a list of key-value pairs, separated by spaces
 fn parse_key_value_list(input: &str) -> IResult<&str, HashMap<String, FieldValue>> {
     separated_list1(space1, parse_key_value)
         .map(HashMap::from_iter)
