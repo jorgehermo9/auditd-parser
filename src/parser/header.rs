@@ -87,4 +87,40 @@ mod tests {
     fn test_parse_record_type_fails(#[case] input: &str) {
         assert!(parse_record_type(input).is_err());
     }
+
+    #[rstest]
+    #[case::regular("123", 123)]
+    #[case::leading_zeroes("001", 1)]
+    #[case::max_value("999", 999)]
+    #[case::min_value("000", 0)]
+    fn test_parse_timestamp_milliseconds(#[case] input: &str, #[case] expected: u64) {
+        let (_, result) = parse_timestamp_milliseconds(input).unwrap();
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::non_numeric("abc")]
+    #[case::less_than_3_digits("12")]
+    #[case::empty_input("")]
+    fn test_parse_timestamp_milliseconds_fail(#[case] input: &str) {
+        assert!(parse_timestamp_milliseconds(input).is_err());
+    }
+
+    #[rstest]
+    #[case::regular("123.456", 123456)]
+    #[case::leading_zeroes("001.234", 1234)]
+    #[case::zero_seconds("000.123", 123)]
+    fn test_parse_timestamp(#[case] input: &str, #[case] expected: u64) {
+        let (_, result) = parse_timestamp(input).unwrap();
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::non_numeric("abc")]
+    #[case::missing_dot("123")]
+    #[case::two_consecutive_dots("123..456")]
+    #[case::empty_input("")]
+    fn test_parse_timestamp_fails(#[case] input: &str) {
+        assert!(parse_timestamp(input).is_err());
+    }
 }
