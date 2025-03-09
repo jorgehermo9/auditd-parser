@@ -72,6 +72,17 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - run: just doc-test
+  deny-check:
+    name: deny-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@just
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@cargo-deny
+      - uses: Swatinem/rust-cache@v2
+      - run: just deny-check
   msrv:
     name: msrv
     runs-on: ubuntu-latest
@@ -80,5 +91,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: taiki-e/install-action@just
       - uses: dtolnay/rust-toolchain@stable
-      - run: cargo install cargo-msrv
+      - uses: taiki-e/install-action@cargo-binstall
+      - run: cargo binstall cargo-msrv
+      - uses: Swatinem/rust-cache@v2
       - run: just msrv-verify

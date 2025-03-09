@@ -1,4 +1,4 @@
-ci: fmt clippy test doc-test build msrv-verify
+ci: fmt clippy test doc-test build deny-check msrv-verify
 
 fmt:
  cargo fmt --check --all
@@ -6,6 +6,7 @@ fmt:
 clippy:
     cargo clippy --all-targets --all-features -- -Dwarnings -Dclippy::all -Dclippy::pedantic
 
+# https://github.com/nextest-rs/nextest
 test:
     cargo nextest run --locked --all-targets --all-features
 
@@ -15,5 +16,10 @@ doc-test:
 build:
     cargo build --all-targets --all-features --locked
 
+# https://github.com/EmbarkStudios/cargo-deny
+deny-check:
+    cargo deny check
+
+# https://github.com/foresterre/cargo-msrv
 msrv-verify:
     cargo msrv verify --all-features
