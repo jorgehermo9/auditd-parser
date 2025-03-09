@@ -206,7 +206,7 @@ fn parse_record(input: &str) -> IResult<&str, AuditdRecord> {
     .parse(input)
 }
 
-impl<'a> FromStr for AuditdRecord {
+impl FromStr for AuditdRecord {
     type Err = anyhow::Error;
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
