@@ -117,9 +117,9 @@ mod tests {
     }
 
     #[rstest]
-    #[case::non_numeric("abc")]
-    #[case::missing_dot("123")]
+    #[case::without_milliseconds("123")]
     #[case::two_consecutive_dots("123..456")]
+    #[case::non_numeric("abc")]
     #[case::empty_input("")]
     fn test_parse_timestamp_fails(#[case] input: &str) {
         assert!(parse_timestamp(input).is_err());
