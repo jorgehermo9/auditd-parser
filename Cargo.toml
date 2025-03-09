@@ -2,11 +2,7 @@
 name = "auditd-parser"
 version = "0.1.0"
 edition = "2024"
-# TODO: setup MSRV and add a CI check
-# inspire from:
-# https://github.com/dtolnay/unicode-ident/blob/93ab72c02e41056e63a3414d80878d18f2f7a962/Cargo.toml#L12
-# and
-# https://github.com/dtolnay/unicode-ident/blob/93ab72c02e41056e63a3414d80878d18f2f7a962/.github/workflows/ci.yml#L66
+rust-version = "1.85"
 
 [dependencies]
 anyhow = "1.0.97"
