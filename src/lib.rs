@@ -67,6 +67,6 @@ mod tests {
     #[test]
     fn parse() {
         let line = "type=USER_ACCT msg=audit(1725039526.208:52): pid=580903 uid=1000 auid=1000 ses=2 msg='op=PAM:accounting grantors=pam_unix,pam_permit,pam_time acct=\"jorge\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=/dev/pts/1 res=success'\u{1d}UID=\"jorge\" AUID=\"jorge\"";
-        dbg!(line.parse::<AuditdRecord>());
+        assert!(parser::parse_record(line).is_ok());
     }
 }

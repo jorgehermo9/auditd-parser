@@ -1,6 +1,6 @@
 use crate::FieldValue;
 use key::parse_key;
-use nom::bytes::complete::{tag, take_until1};
+use nom::bytes::complete::tag;
 use nom::character::complete::{char, space1};
 use nom::multi::separated_list1;
 use nom::sequence::separated_pair;
