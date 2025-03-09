@@ -52,10 +52,6 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: just build
   test:
-    strategy:
-      fail-fast: false
-      matrix:
-        rust: [stable, beta, nightly]
     name: test
     runs-on: ubuntu-latest
     timeout-minutes: 45
