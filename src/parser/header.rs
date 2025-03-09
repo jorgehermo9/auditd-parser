@@ -109,7 +109,7 @@ mod tests {
     }
 
     #[rstest]
-    #[case::regular("123.456", 123456)]
+    #[case::regular("123.456", 123_456)]
     #[case::leading_zeroes("001.234", 1234)]
     #[case::zero_seconds("000.123", 123)]
     #[case::min_value("000.000", 0)]
