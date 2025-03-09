@@ -22,5 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: extractions/setup-just@v2
-      - uses: dtolnay/rust-toolchain@rustfmt
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
       - run: just fmt
