@@ -1,0 +1,26 @@
+# Inspired from dtolnay's CI https://github.com/dtolnay/unicode-ident/blob/master/.github/workflows/ci.yml
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule: [cron: "0 0 * * 0"] # Once a week on Sunday at 00:00
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  fmt:
+    name: Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: extractions/setup-just@v2
+      - uses: dtolnay/rust-toolchain@rustfmt
+      - run: just fmt

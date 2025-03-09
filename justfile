@@ -1,10 +1,10 @@
-ci: format clippy test build
+ci: fmt clippy test build
 
-format:
+fmt:
  cargo fmt --check
 
 clippy:
-    cargo clippy --all-targets --all-features -- -D warnings -W clippy::pedantic
+    cargo clippy --all-targets --all-features -- -Dwarnings -Dclippy::all -Dclippy::pedantic
 
 test:
     cargo nextest run --locked
