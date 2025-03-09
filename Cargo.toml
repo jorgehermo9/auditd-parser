@@ -13,3 +13,6 @@ serde = { version = "1.0.219", features = ["derive"], optional = true }
 [features]
 default = ["serde"]
 serde = ["dep:serde"]
+
+[dev-dependencies]
+rstest = "0.25.0"

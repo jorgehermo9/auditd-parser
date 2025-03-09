@@ -1,7 +1,7 @@
-use nom::bytes::complete::{tag, take, take_until1};
+use nom::bytes::complete::{tag, take, take_while1};
 use nom::character::complete::u64 as parse_u64;
-use nom::sequence::{delimited, separated_pair};
-use nom::{IResult, Parser};
+use nom::sequence::{delimited, preceded, separated_pair};
+use nom::{AsChar, IResult, Parser};
 
 #[derive(Debug)]
 pub struct InnerHeader {
@@ -16,7 +16,7 @@ pub struct InnerAuditMsg {
 }
 
 fn parse_record_type(input: &str) -> IResult<&str, String> {
-    delimited(tag("type="), take_until1(" "), tag(" "))
+    preceded(tag("type="), take_while1(|c: char| !c.is_space()))
         .map(ToString::to_string)
         .parse(input)
 }
@@ -56,10 +56,35 @@ fn parse_audit_msg(input: &str) -> IResult<&str, InnerAuditMsg> {
 ///
 /// Example: `type=USER_ACCT msg=audit(1725039526.208:52): `
 pub fn parse_header(input: &str) -> IResult<&str, InnerHeader> {
-    (parse_record_type, parse_audit_msg)
+    separated_pair(parse_record_type, tag(" "), parse_audit_msg)
         .map(|(record_type, audit_msg)| InnerHeader {
             record_type,
             audit_msg,
         })
         .parse(input)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case::regular("type=USER_ACCT", "USER_ACCT")]
+    #[case::trailing_space("type=USER_ACCT ", "USER_ACCT")]
+    #[case::numeric("type=123", "123")]
+    #[case::special_chars("type=?USER_ACCT!", "?USER_ACCT!")]
+    fn test_parse_record_type(#[case] input: &str, #[case] expected: &str) {
+        let (_, result) = parse_record_type(input).unwrap();
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::no_key("USER_ACCT")]
+    #[case::no_value("type=")]
+    #[case::wrong_key("wrong_key=USER_ACCT")]
+    #[case::empty_input("")]
+    fn test_parse_record_type_fails(#[case] input: &str) {
+        assert!(parse_record_type(input).is_err());
+    }
 }
