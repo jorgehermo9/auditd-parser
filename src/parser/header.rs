@@ -85,6 +85,8 @@ mod tests {
     #[case::wrong_key("wrong_key=USER_ACCT")]
     #[case::empty_input("")]
     fn test_parse_record_type_fails(#[case] input: &str) {
+        // TODO: migrate all those assert is_err to `assert_matches` once it stabilizes
+        // https://github.com/rust-lang/rust/issues/82775
         assert!(parse_record_type(input).is_err());
     }
 

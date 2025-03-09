@@ -6,6 +6,7 @@ license = "MIT OR Apache-2.0"
 rust-version = "1.85"
 
 [dependencies]
+# TODO: should we allow for a more relaxing versioning? maybe using ^?
 anyhow = "1.0.97"
 nom = "8.0.0"
 serde = { version = "1.0.219", features = ["derive"], optional = true }
