@@ -1,0 +1,8 @@
+[graph]
+all-features = true
+no-default-features = false
+
+[licenses]
+# Unicode-3.0 is used by `unicode-ident` dependency of `serde`
+allow = ["MIT", "Apache-2.0", "Unicode-3.0"]
+confidence-threshold = 0.8
