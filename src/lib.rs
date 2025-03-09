@@ -4,7 +4,7 @@ use crate::utils::consume_all;
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take, take_until1, take_while1};
 use nom::character::complete::{char, space1, u64 as parse_u64};
-use nom::combinator::{all_consuming, recognize, success, value};
+use nom::combinator::all_consuming;
 use nom::multi::separated_list1;
 use nom::sequence::{delimited, separated_pair};
 use nom::{AsChar, Finish};
