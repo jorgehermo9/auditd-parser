@@ -107,7 +107,9 @@ fn parse_audit_msg(input: &str) -> IResult<&str, InnerAuditMsg> {
     delimited(tag("msg="), parse_audit_msg_value, tag(": ")).parse(input)
 }
 
-// TODO: return a Header Struct instead of a tuple
+/// Parses the header of the record, which contains the record type and the audit message part.
+///
+/// Example: `type=USER_ACCT msg=audit(1725039526.208:52): `
 fn parse_header(input: &str) -> IResult<&str, InnerHeader> {
     (parse_record_type, parse_audit_msg)
         .map(|(record_type, audit_msg)| InnerHeader {
@@ -130,14 +132,25 @@ fn parse_string_value(input: &str) -> IResult<&str, &str> {
     .parse(input)
 }
 
-/// Parses a map value, which is a string that contains a list of key-value pairs.
-/// For example, it can be found in the `msg` field of auditd records, surrounded by single quotes:
-///
-/// `msg='op=PAM:accounting grantors=pam_unix,pam_permit,pam_time acct="jorge" exe="/usr/bin/sudo" hostname=? addr=? terminal=/dev/pts/1 res=success'`
-fn parse_map_value(input: &str) -> IResult<&str, HashMap<String, FieldValue>> {
+fn parse_quoted_value(input: &str) -> IResult<&str, FieldValue> {
     parse_string_value
-        .and_then(parse_key_value_fields)
+        .and_then(alt((
+            // Parses a map value, which is a string that contains a list of key-value pairs.
+            // For example, it can be found in the `msg` field of auditd records, surrounded by single quotes:
+            // `msg='op=PAM:accounting grantors=pam_unix,pam_permit,pam_time acct="jorge" exe="/usr/bin/sudo" hostname=? addr=? terminal=/dev/pts/1 res=success'`
+            parse_key_value_fields.map(FieldValue::Map),
+            // Treat the quoted value as an string if the previous parsers did not succeed
+            // and return the input to this `alt` as-is
+            consume_all.map(|s| FieldValue::String(s.to_string())),
+        )))
         .parse(input)
+}
+
+fn parse_primitive_value(input: &str) -> IResult<&str, FieldValue> {
+    // TODO: add `null` variant
+    // TODO: add hexadecimal variant? Or maybe we should interpret it in a different step?
+    // based in field name
+    all_consuming(alt((parse_u64.map(FieldValue::Integer),))).parse(input)
 }
 
 fn parse_unquoted_value(input: &str) -> IResult<&str, FieldValue> {
@@ -146,7 +159,7 @@ fn parse_unquoted_value(input: &str) -> IResult<&str, FieldValue> {
     // it is not surrounded by quotes.
     take_while1(|c: char| !c.is_space() && c != ENRICHMENT_SEPARATOR)
         .and_then(alt((
-            all_consuming(parse_u64).map(FieldValue::Integer),
+            parse_primitive_value,
             // TODO: add a parse_hexadecimal parser?
             // TODO: add a parse_null parser? to parse things like `hostname=?`
             // Treat the unquoted value as an string if the previous parsers did not succeed
@@ -158,12 +171,7 @@ fn parse_unquoted_value(input: &str) -> IResult<&str, FieldValue> {
 
 /// Parses the value part of a field, the right side of the `key=value` pair.
 fn parse_value(input: &str) -> IResult<&str, FieldValue> {
-    alt((
-        parse_map_value.map(FieldValue::Map),
-        parse_string_value.map(|s| FieldValue::String(s.to_string())),
-        parse_unquoted_value,
-    ))
-    .parse(input)
+    alt((parse_quoted_value, parse_unquoted_value)).parse(input)
 }
 
 /// Parses a key-value pair
