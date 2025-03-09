@@ -136,7 +136,7 @@ fn parse_string_value(input: &str) -> IResult<&str, &str> {
 /// `msg='op=PAM:accounting grantors=pam_unix,pam_permit,pam_time acct="jorge" exe="/usr/bin/sudo" hostname=? addr=? terminal=/dev/pts/1 res=success'`
 fn parse_map_value(input: &str) -> IResult<&str, HashMap<String, FieldValue>> {
     parse_string_value
-        .and_then(parse_key_value_list)
+        .and_then(parse_key_value_fields)
         .parse(input)
 }
 
@@ -172,7 +172,7 @@ fn parse_key_value(input: &str) -> IResult<&str, (String, FieldValue)> {
 }
 
 /// Parses a list of key-value pairs, separated by spaces
-fn parse_key_value_list(input: &str) -> IResult<&str, HashMap<String, FieldValue>> {
+fn parse_key_value_fields(input: &str) -> IResult<&str, HashMap<String, FieldValue>> {
     separated_list1(space1, parse_key_value)
         .map(HashMap::from_iter)
         .parse(input)
@@ -180,26 +180,27 @@ fn parse_key_value_list(input: &str) -> IResult<&str, HashMap<String, FieldValue
 
 fn parse_body(input: &str) -> IResult<&str, InnerBody> {
     // TODO: enrichment should be optional
+    // maybe we should have something like
+    // alt(parse_key_value_list, separated_pair(...))
+    // we may have to move the `all_consuming` of the `parse_record` to this function
     separated_pair(
-        parse_key_value_list,
+        parse_key_value_fields,
         char(ENRICHMENT_SEPARATOR),
-        parse_key_value_list,
+        parse_key_value_fields,
     )
     .map(|(fields, enrichment)| InnerBody { fields, enrichment })
     .parse(input)
 }
 
 fn parse_record(input: &str) -> IResult<&str, AuditdRecord> {
-    // TODO: create a test that adds trailing data to the record, so all_consuming fails
     all_consuming(
         (parse_header, parse_body).map(|(header, body)| AuditdRecord {
             record_type: header.record_type,
             timestamp: header.audit_msg.timestamp,
             id: header.audit_msg.uid,
             fields: body.fields,
-            // TODO: we should lowercase the enrichment keys?, so they match the ones in the body
-            // Where should we modify it? Inside `parse_body` or here?
-            // I think it is better here so `parse_body` just returns it raw..
+            // TODO: we should lowercase the enrichment keys? Or leave it as is in a
+            // `RawAuditdRecord` and then have a `AuditdRecord` that merges enrichment and fields
             enrichment: body.enrichment,
         }),
     )
@@ -220,6 +221,8 @@ impl FromStr for AuditdRecord {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // TODO: create a test that adds trailing data to the record, so `all_consuming` of `parse_record` fails
 
     // TODO: create unit tests for each of the parsers.
 
