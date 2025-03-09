@@ -1,15 +1,18 @@
 use std::{collections::HashMap, str::FromStr};
 
+use crate::utils::consume_all;
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take, take_until1, take_while1};
-use nom::character::complete::{space1, u64 as parse_u64};
+use nom::character::complete::{char, space1, u64 as parse_u64};
 use nom::combinator::{all_consuming, recognize, success, value};
 use nom::multi::separated_list1;
 use nom::sequence::{delimited, separated_pair};
 use nom::{AsChar, Finish};
 use nom::{IResult, Parser};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
-use nom::character::complete::char;
+mod utils;
 
 const ENRICHMENT_SEPARATOR: char = '\x1d';
 
@@ -23,18 +26,15 @@ const ENRICHMENT_SEPARATOR: char = '\x1d';
 // Or maybe we should have a RawAuditd record
 
 #[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct AuditdRecord {
     pub record_type: String,
-    // TODO: u64 or chrono::DateTime<chrono::Utc>?
     /// Unix timestamp in milliseconds
     pub timestamp: u64,
 
-    // TODO: think of a better name
     /// Record identifier
     pub id: u64,
 
-    // TODO: create a FieldValue type and store it instead of Strings.
-    // We could have hexadecimal, integer, string, and key-value types there
     pub fields: HashMap<String, FieldValue>,
 
     pub enrichment: HashMap<String, FieldValue>,
@@ -63,8 +63,8 @@ struct InnerBody {
 // TODO: add hexadecimal variant? That hexadecimal should be decoded or leaved as-is? Maybe
 // we could interpret it in the interpret mode..?
 #[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum FieldValue {
-    Hexadecimal(String),
     Integer(u64),
     String(String),
     Map(HashMap<String, FieldValue>),
@@ -140,15 +140,6 @@ fn parse_map_value(input: &str) -> IResult<&str, HashMap<String, FieldValue>> {
         .parse(input)
 }
 
-// TODO: move this to a utils module
-/// Parser that simply consumes all of its input. It is useful for the last choice of an `alt` parser
-/// to leave the input untouched.
-///
-/// This funcion always succeeds.
-fn consume_all(input: &str) -> IResult<&str, &str> {
-    Ok(("", input))
-}
-
 fn parse_unquoted_value(input: &str) -> IResult<&str, FieldValue> {
     // If the value is not surrounded by quotes, take all the characters until a space or the enrichment separator is found.
     // For example, in the `op` field of auditd records: `op=PAM:accounting`, the value should be a string, but
@@ -156,6 +147,8 @@ fn parse_unquoted_value(input: &str) -> IResult<&str, FieldValue> {
     take_while1(|c: char| !c.is_space() && c != ENRICHMENT_SEPARATOR)
         .and_then(alt((
             all_consuming(parse_u64).map(FieldValue::Integer),
+            // TODO: add a parse_hexadecimal parser?
+            // TODO: add a parse_null parser? to parse things like `hostname=?`
             // Treat the unquoted value as an string if the previous parsers did not succeed
             // and return the input to this `alt` as-is
             consume_all.map(|s| FieldValue::String(s.to_string())),
@@ -233,9 +226,12 @@ mod tests {
     // TODO: add a test where one of the fields starts by a number but ends with chars, for example `pid=123abc`,
     // so we can test that the `parse_unquoted_value` parser does not parse partially as an integer
 
+    // TODO: snapshot testing with rstest cases, read cases from a file or
+    // have it hardcoded in this file?
+    // Those should be integration tests
     #[test]
     fn parse() {
-        let line = "type=USER_ACCT msg=audit(1725039526.208:52): pid=580903hello uid=1000 auid=1000 ses=2 msg='op=PAM:accounting grantors=pam_unix,pam_permit,pam_time acct=\"jorge\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=/dev/pts/1 res=success'\u{1d}UID=\"jorge\" AUID=\"jorge\"";
+        let line = "type=USER_ACCT msg=audit(1725039526.208:52): pid=580903 uid=1000 auid=1000 ses=2 msg='op=PAM:accounting grantors=pam_unix,pam_permit,pam_time acct=\"jorge\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=/dev/pts/1 res=success'\u{1d}UID=\"jorge\" AUID=\"jorge\"";
         dbg!(line.parse::<AuditdRecord>());
     }
 }
