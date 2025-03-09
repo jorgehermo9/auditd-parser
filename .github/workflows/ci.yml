@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   fmt:
-    name: Format
+    name: format
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -27,3 +27,15 @@ jobs:
         with:
           components: rustfmt
       - run: just fmt
+  clippy:
+    name: clippy
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: extractions/setup-just@v2
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: just clippy
