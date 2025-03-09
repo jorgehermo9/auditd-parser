@@ -3,6 +3,7 @@ use std::{collections::HashMap, str::FromStr};
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take, take_until1, take_while1};
 use nom::character::complete::{space1, u64 as parse_u64};
+use nom::combinator::{all_consuming, recognize, success, value};
 use nom::multi::separated_list1;
 use nom::sequence::{delimited, separated_pair};
 use nom::{AsChar, Finish};
@@ -17,6 +18,10 @@ const ENRICHMENT_SEPARATOR: char = '\x1d';
 // Example the `arch` field in https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/security_guide/sec-understanding_audit_log_files#sec-Understanding_Audit_Log_Files
 // Create an InterpretedAuditdRecord that transforms an AuditdRecord into a human-readable format
 
+// TODO: create an interpreted AuditdRecord that takes enrichment and replaces the raw fields with the enrichment?
+//
+// Or maybe we should have a RawAuditd record
+
 #[derive(Debug)]
 pub struct AuditdRecord {
     pub record_type: String,
@@ -25,8 +30,8 @@ pub struct AuditdRecord {
     pub timestamp: u64,
 
     // TODO: think of a better name
-    /// Record unique identifier
-    pub uid: u64,
+    /// Record identifier
+    pub id: u64,
 
     // TODO: create a FieldValue type and store it instead of Strings.
     // We could have hexadecimal, integer, string, and key-value types there
@@ -54,6 +59,7 @@ struct InnerBody {
 }
 
 // TODO: add an array variant for things like `grantors=pam_unix,pam_permit,pam_time`
+// TODO: add a null variant for things like `hostname=?`
 // TODO: add hexadecimal variant? That hexadecimal should be decoded or leaved as-is? Maybe
 // we could interpret it in the interpret mode..?
 #[derive(Debug)]
@@ -120,10 +126,6 @@ fn parse_string_value(input: &str) -> IResult<&str, &str> {
     alt((
         delimited(tag("\""), take_until1("\""), tag("\"")),
         delimited(tag("'"), take_until1("'"), tag("'")),
-        // If the value is not surrounded by quotes, take all the characters until a space or the enrichment separator is found.
-        // for example, in the `op` field of auditd records: `op=PAM:accounting`, where the value should be a string, but
-        // it is not surrounded by quotes.
-        take_while1(|c: char| !c.is_space() && c != ENRICHMENT_SEPARATOR),
     ))
     .parse(input)
 }
@@ -138,18 +140,35 @@ fn parse_map_value(input: &str) -> IResult<&str, HashMap<String, FieldValue>> {
         .parse(input)
 }
 
+// TODO: move this to a utils module
+/// Parser that simply consumes all of its input. It is useful for the last choice of an `alt` parser
+/// to leave the input untouched.
+///
+/// This funcion always succeeds.
+fn consume_all(input: &str) -> IResult<&str, &str> {
+    Ok(("", input))
+}
+
+fn parse_unquoted_value(input: &str) -> IResult<&str, FieldValue> {
+    // If the value is not surrounded by quotes, take all the characters until a space or the enrichment separator is found.
+    // For example, in the `op` field of auditd records: `op=PAM:accounting`, the value should be a string, but
+    // it is not surrounded by quotes.
+    take_while1(|c: char| !c.is_space() && c != ENRICHMENT_SEPARATOR)
+        .and_then(alt((
+            all_consuming(parse_u64).map(FieldValue::Integer),
+            // Treat the unquoted value as an string if the previous parsers did not succeed
+            // and return the input to this `alt` as-is
+            consume_all.map(|s| FieldValue::String(s.to_string())),
+        )))
+        .parse(input)
+}
+
 /// Parses the value part of a field, the right side of the `key=value` pair.
 fn parse_value(input: &str) -> IResult<&str, FieldValue> {
     alt((
-        // TODO: check what happens if a value is `123hello`, does it get parsed as string or as u64?
-        // Maybe we have first to parse_map,parse_string and the take_while, and if the take_while, then apply u64 parser
-        // ---> UPDATE: the parsing fails if a value starts with a number but continues with letters. If this is the case, this should
-        // be parsed as an string. We should add the parse_u64 one we took all the characters with the `take_while` of parse_string_value.
-        // We may have to take the `take_while` out of the `parse_string_value` and parse u64 and the `take_while` in a previous step to the `parse_string_value`,
-        // as for example, we don't want to parse `field="123"` as an integer, but as a string.
-        parse_u64.map(FieldValue::Integer),
         parse_map_value.map(FieldValue::Map),
         parse_string_value.map(|s| FieldValue::String(s.to_string())),
+        parse_unquoted_value,
     ))
     .parse(input)
 }
@@ -178,19 +197,20 @@ fn parse_body(input: &str) -> IResult<&str, InnerBody> {
 }
 
 fn parse_record(input: &str) -> IResult<&str, AuditdRecord> {
-    // TODO: remember to call `.finish()` at the end of the parsing
-    (parse_header, parse_body)
-        .map(|(header, body)| AuditdRecord {
+    // TODO: create a test that adds trailing data to the record, so all_consuming fails
+    all_consuming(
+        (parse_header, parse_body).map(|(header, body)| AuditdRecord {
             record_type: header.record_type,
             timestamp: header.audit_msg.timestamp,
-            uid: header.audit_msg.uid,
+            id: header.audit_msg.uid,
             fields: body.fields,
-            // TODO: we should lowercase the enrichment keys, so they match the ones in the body
+            // TODO: we should lowercase the enrichment keys?, so they match the ones in the body
             // Where should we modify it? Inside `parse_body` or here?
             // I think it is better here so `parse_body` just returns it raw..
             enrichment: body.enrichment,
-        })
-        .parse(input)
+        }),
+    )
+    .parse(input)
 }
 
 impl<'a> FromStr for AuditdRecord {
@@ -208,9 +228,14 @@ impl<'a> FromStr for AuditdRecord {
 mod tests {
     use super::*;
 
+    // TODO: create unit tests for each of the parsers.
+
+    // TODO: add a test where one of the fields starts by a number but ends with chars, for example `pid=123abc`,
+    // so we can test that the `parse_unquoted_value` parser does not parse partially as an integer
+
     #[test]
     fn parse() {
-        let line = "type=USER_ACCT msg=audit(1725039526.208:52): pid=580903 uid=1000 auid=1000 ses=2 msg='op=PAM:accounting grantors=pam_unix,pam_permit,pam_time acct=\"jorge\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=/dev/pts/1 res=success'\u{1d}UID=\"jorge\" AUID=\"jorge\"";
+        let line = "type=USER_ACCT msg=audit(1725039526.208:52): pid=580903hello uid=1000 auid=1000 ses=2 msg='op=PAM:accounting grantors=pam_unix,pam_permit,pam_time acct=\"jorge\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=/dev/pts/1 res=success'\u{1d}UID=\"jorge\" AUID=\"jorge\"";
         dbg!(line.parse::<AuditdRecord>());
     }
 }
