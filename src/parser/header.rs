@@ -1,5 +1,5 @@
 use nom::bytes::complete::{tag, take, take_while1};
-use nom::character::complete::u64 as parse_u64;
+use nom::character::complete::{space1, u64 as parse_u64};
 use nom::sequence::{delimited, preceded, separated_pair};
 use nom::{AsChar, IResult, Parser};
 
@@ -56,7 +56,7 @@ fn parse_audit_msg(input: &str) -> IResult<&str, InnerAuditMsg> {
 ///
 /// Example: `type=USER_ACCT msg=audit(1725039526.208:52): `
 pub fn parse_header(input: &str) -> IResult<&str, InnerHeader> {
-    separated_pair(parse_record_type, tag(" "), parse_audit_msg)
+    separated_pair(parse_record_type, space1, parse_audit_msg)
         .map(|(record_type, audit_msg)| InnerHeader {
             record_type,
             audit_msg,
