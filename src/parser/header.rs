@@ -4,12 +4,14 @@ use nom::sequence::{delimited, preceded, separated_pair};
 use nom::{AsChar, IResult, Parser};
 
 #[derive(Debug)]
+#[cfg_attr(test, derive(PartialEq))]
 pub struct InnerHeader {
     pub record_type: String,
     pub audit_msg: InnerAuditMsg,
 }
 
 #[derive(Debug)]
+#[cfg_attr(test, derive(PartialEq))]
 pub struct InnerAuditMsg {
     pub timestamp: u64,
     pub uid: u64,
@@ -125,5 +127,37 @@ mod tests {
     #[case::empty_input("")]
     fn test_parse_timestamp_fails(#[case] input: &str) {
         assert!(parse_timestamp(input).is_err());
+    }
+
+    #[rstest]
+    #[case::regular("123.456:789", (123_456, 789))]
+    fn test_parse_timestamp_and_uid(#[case] input: &str, #[case] expected: (u64, u64)) {
+        let (_, result) = parse_timestamp_and_uid(input).unwrap();
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::without_colon("123.456")]
+    #[case::non_numeric_id("123:def")]
+    #[case::non_numeric_timestamp("abc:789")]
+    #[case::empty_input("")]
+    fn test_parse_timestamp_and_uid_fails(#[case] input: &str) {
+        assert!(parse_timestamp_and_uid(input).is_err());
+    }
+
+    #[rstest]
+    #[case::regular("audit(123.456:789)", InnerAuditMsg { timestamp: 123_456, uid: 789 })]
+    fn test_parse_audit_msg_value(#[case] input: &str, #[case] expected: InnerAuditMsg) {
+        let (_, result) = parse_audit_msg_value(input).unwrap();
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::without_delimiters("123.456:789")]
+    #[case::without_closing_paren("audit(123.456:789")]
+    #[case::without_prefix("123.456:789)")]
+    #[case::empty_input("")]
+    fn test_parse_audit_msg_value_fails(#[case] input: &str) {
+        assert!(parse_audit_msg_value(input).is_err());
     }
 }
