@@ -12,7 +12,7 @@ pub fn parse_record(input: &str) -> Result<AuditdRecord, anyhow::Error> {
         (parse_header, parse_body).map(|(header, body)| AuditdRecord {
             record_type: header.record_type,
             timestamp: header.audit_msg.timestamp,
-            id: header.audit_msg.uid,
+            id: header.audit_msg.id,
             fields: body.fields,
             // TODO: we should lowercase the enrichment keys? Or leave it as is in a
             // `RawAuditdRecord` and then have a `AuditdRecord` that merges enrichment and fields

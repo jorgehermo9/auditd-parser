@@ -1,5 +1,5 @@
 use nom::bytes::complete::{tag, take, take_while1};
-use nom::character::complete::{space1, u64 as parse_u64};
+use nom::character::complete::{char, u64 as parse_u64};
 use nom::sequence::{delimited, preceded, separated_pair};
 use nom::{AsChar, IResult, Parser};
 
@@ -14,7 +14,7 @@ pub struct InnerHeader {
 #[cfg_attr(test, derive(PartialEq))]
 pub struct InnerAuditMsg {
     pub timestamp: u64,
-    pub uid: u64,
+    pub id: u64,
 }
 
 fn parse_record_type(input: &str) -> IResult<&str, String> {
@@ -45,12 +45,13 @@ fn parse_timestamp_and_uid(input: &str) -> IResult<&str, (u64, u64)> {
 /// Parses the `audit(1234.567:89)` part of the message.
 fn parse_audit_msg_value(input: &str) -> IResult<&str, InnerAuditMsg> {
     delimited(tag("audit("), parse_timestamp_and_uid, tag(")"))
-        .map(|(timestamp, uid)| InnerAuditMsg { timestamp, uid })
+        .map(|(timestamp, uid)| InnerAuditMsg { timestamp, id: uid })
         .parse(input)
 }
 
 /// Parses the `msg=audit(1234.567:89): ` part of the message.
 fn parse_audit_msg(input: &str) -> IResult<&str, InnerAuditMsg> {
+    // TODO: allow for ":" and ": "? (with and without trailing space)
     delimited(tag("msg="), parse_audit_msg_value, tag(": ")).parse(input)
 }
 
@@ -58,7 +59,7 @@ fn parse_audit_msg(input: &str) -> IResult<&str, InnerAuditMsg> {
 ///
 /// Example: `type=USER_ACCT msg=audit(1725039526.208:52): `
 pub fn parse_header(input: &str) -> IResult<&str, InnerHeader> {
-    separated_pair(parse_record_type, space1, parse_audit_msg)
+    separated_pair(parse_record_type, char(' '), parse_audit_msg)
         .map(|(record_type, audit_msg)| InnerHeader {
             record_type,
             audit_msg,
@@ -82,8 +83,8 @@ mod tests {
     }
 
     #[rstest]
-    #[case::no_key("USER_ACCT")]
-    #[case::no_value("type=")]
+    #[case::without_key("USER_ACCT")]
+    #[case::without_value("type=")]
     #[case::wrong_key("wrong_key=USER_ACCT")]
     #[case::empty_input("")]
     fn test_parse_record_type_fails(#[case] input: &str) {
@@ -121,6 +122,8 @@ mod tests {
     }
 
     #[rstest]
+    #[case::with_invalid_seconds("abc.123")]
+    #[case::with_invalid_milliseconds("123.abc")]
     #[case::without_milliseconds("123")]
     #[case::two_consecutive_dots("123..456")]
     #[case::non_numeric("abc")]
@@ -137,27 +140,68 @@ mod tests {
     }
 
     #[rstest]
-    #[case::without_colon("123.456")]
-    #[case::non_numeric_id("123:def")]
-    #[case::non_numeric_timestamp("abc:789")]
+    #[case::with_invalid_timestamp("abc:789")]
+    #[case::with_invalid_id("123:def")]
+    #[case::without_colon_separator("123.456")]
     #[case::empty_input("")]
     fn test_parse_timestamp_and_uid_fails(#[case] input: &str) {
         assert!(parse_timestamp_and_uid(input).is_err());
     }
 
     #[rstest]
-    #[case::regular("audit(123.456:789)", InnerAuditMsg { timestamp: 123_456, uid: 789 })]
+    #[case::regular("audit(123.456:789)", InnerAuditMsg { timestamp: 123_456, id: 789 })]
     fn test_parse_audit_msg_value(#[case] input: &str, #[case] expected: InnerAuditMsg) {
         let (_, result) = parse_audit_msg_value(input).unwrap();
         assert_eq!(result, expected);
     }
 
     #[rstest]
+    #[case::with_invalid_timestamp_and_uid("audit(123:abc)")]
     #[case::without_delimiters("123.456:789")]
-    #[case::without_closing_paren("audit(123.456:789")]
+    #[case::without_suffix("audit(123.456:789")]
     #[case::without_prefix("123.456:789)")]
+    #[case::non_numeric("abcdef")]
     #[case::empty_input("")]
     fn test_parse_audit_msg_value_fails(#[case] input: &str) {
         assert!(parse_audit_msg_value(input).is_err());
+    }
+
+    #[rstest]
+    #[case::regular("msg=audit(123.456:789): ", InnerAuditMsg { timestamp: 123_456, id: 789 })]
+    fn test_parse_audit_msg(#[case] input: &str, #[case] expected: InnerAuditMsg) {
+        let (_, result) = parse_audit_msg(input).unwrap();
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::with_invalid_audit_msg_value("msg=123.456:789): ")]
+    #[case::without_prefix_key("audit(123.456:789): ")]
+    #[case::without_suffix_trailing_space("msg=audit(123.456:789):")]
+    #[case::without_suffix_semicolon("msg=audit(123.456:789)")]
+    #[case::without_audit_msg_value("msg=")]
+    #[case::without_prefix_and_suffix("audit(123.456:789)")]
+    #[case::empty_input("")]
+    fn test_parse_audit_msg_fails(#[case] input: &str) {
+        assert!(parse_audit_msg(input).is_err());
+    }
+
+    #[rstest]
+    #[case::regular("type=USER_ACCT msg=audit(123.456:789): ", InnerHeader { record_type: "USER_ACCT".to_string(), audit_msg: InnerAuditMsg { timestamp: 123_456, id: 789 } })]
+    fn test_parse_header(#[case] input: &str, #[case] expected: InnerHeader) {
+        let (_, result) = parse_header(input).unwrap();
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::with_invalid_record_type("type= msg=audit(123.456:789): ")]
+    #[case::with_invalid_audit_msg("type=USER_ACCT msg=123.456:78): ")]
+    #[case::without_record_type("msg=audit(123.456:789): ")]
+    #[case::without_audit_msg("type=USER_ACCT")]
+    #[case::without_space_separator("type=USER_ACCTmsg=audit(123.456:789): ")]
+    #[case::with_two_spaces_separator("type=USER_ACCT  msg=audit(123.456:789): ")]
+    #[case::with_non_space_separator("type=USER_ACCT\tmsg=audit(123.456:789): ")]
+    #[case::empty_input("")]
+    fn test_parse_header_fails(#[case] input: &str) {
+        assert!(parse_header(input).is_err());
     }
 }
