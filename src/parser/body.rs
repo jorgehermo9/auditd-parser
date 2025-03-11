@@ -1,7 +1,7 @@
 use crate::FieldValue;
 use key::parse_key;
 use nom::bytes::complete::tag;
-use nom::character::complete::{char, space1};
+use nom::character::complete::char;
 use nom::multi::separated_list1;
 use nom::sequence::separated_pair;
 use nom::{IResult, Parser};
@@ -26,7 +26,7 @@ fn parse_key_value(input: &str) -> IResult<&str, (String, FieldValue)> {
 
 /// Parses a list of key-value pairs, separated by spaces
 fn parse_key_value_list(input: &str) -> IResult<&str, HashMap<String, FieldValue>> {
-    separated_list1(space1, parse_key_value)
+    separated_list1(char(' '), parse_key_value)
         .map(HashMap::from_iter)
         .parse(input)
 }
