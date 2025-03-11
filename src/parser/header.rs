@@ -55,6 +55,7 @@ fn parse_audit_msg(input: &str) -> IResult<&str, InnerAuditMsg> {
     delimited(tag("msg="), parse_audit_msg_value, tag(": ")).parse(input)
 }
 
+// TODO: parse `node` field of auditd records
 /// Parses the header of the record, which contains the record type and the audit message part.
 ///
 /// Example: `type=USER_ACCT msg=audit(1725039526.208:52): `
