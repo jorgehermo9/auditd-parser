@@ -17,8 +17,8 @@ fn parse_string_value(input: &str) -> IResult<&str, &str> {
     const DOUBLE_QUOTE: char = '"';
     const SINGLE_QUOTE: char = '\'';
 
-    // TODO: handle scaped double quote inside double quoted string with `scaped` parser
-    // TODO: handle scaped single quote inside single quoted string with `scaped` parser
+    // TODO: handle scaped double quote inside double quoted string with `escaped` parser
+    // TODO: handle scaped single quote inside single quoted string with `escaped` parser
     alt((
         delimited(
             char(DOUBLE_QUOTE),
@@ -85,6 +85,8 @@ mod tests {
     #[case::single_quoted("'foo'", "foo")]
     #[case::double_quoted_with_space("\"foo bar\"", "foo bar")]
     #[case::single_quoted_with_space("'foo bar'", "foo bar")]
+    #[case::double_quoted_with_single_quote_inside("\"foo'bar\"", "foo'bar")]
+    #[case::single_quoted_with_double_quote_inside("'foo\"bar'", "foo\"bar")]
     #[case::double_quoted_empty_string("\"\"", "")]
     #[case::single_quoted_empty_string("''", "")]
     fn test_parse_string_value(#[case] input: &str, #[case] expected: &str) {
@@ -97,7 +99,20 @@ mod tests {
     #[case::unquoted("foo")]
     #[case::unquoted_with_space("foo bar")]
     #[case::mixed_quotes("\"foo'")]
+    #[case::double_quoted_not_terminated("\"foo")]
+    #[case::single_quoted_not_terminated("'foo")]
+    #[case::double_quoted_not_preceded("foo\"")]
+    #[case::single_quoted_not_preceded("foo'")]
     fn test_parse_string_value_fails(#[case] input: &str) {
         assert!(parse_string_value(input).is_err());
+    }
+
+    // FIXME: this tests should not fail. We should treat escaped quotes properly
+    #[rstest]
+    #[case::escaped_double_quote(r#""foo\"bar""#, r#"foo"bar"#)]
+    #[case::escaped_single_quote(r#"'foo\'bar'"#, r#"foo'bar"#)]
+    fn fixme_parse_string_value(#[case] input: &str, #[case] expected: &str) {
+        let (_, result) = parse_string_value(input).unwrap();
+        assert_ne!(result, expected);
     }
 }
