@@ -1,5 +1,6 @@
 use nom::{IResult, Parser, bytes::complete::take_until1};
 
+/// Parses a key from a key-value pair which is separated by an equal sign.
 pub fn parse_key(input: &str) -> IResult<&str, String> {
     take_until1("=").map(ToString::to_string).parse(input)
 }
