@@ -43,6 +43,7 @@ pub enum FieldValue {
 }
 
 impl FromStr for AuditdRecord {
+    // TODO: use thiserror instead of anyhow (or use snafu)
     type Err = anyhow::Error;
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {

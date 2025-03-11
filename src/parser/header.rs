@@ -17,6 +17,8 @@ pub struct InnerAuditMsg {
     pub id: u64,
 }
 
+// TODO: reorder these functions so we go from high-level to low-level
+
 fn parse_record_type(input: &str) -> IResult<&str, String> {
     preceded(tag("type="), take_while1(|c: char| !c.is_space()))
         .map(ToString::to_string)
@@ -75,11 +77,12 @@ mod tests {
 
     #[rstest]
     #[case::regular("type=USER_ACCT", "USER_ACCT")]
-    #[case::trailing_space("type=USER_ACCT ", "USER_ACCT")]
+    #[case::quoted("type=\"USER_ACCT\"", "\"USER_ACCT\"")]
     #[case::numeric("type=123", "123")]
     #[case::special_chars("type=?USER_ACCT!", "?USER_ACCT!")]
     fn test_parse_record_type(#[case] input: &str, #[case] expected: &str) {
-        let (_, result) = parse_record_type(input).unwrap();
+        let (remaining, result) = parse_record_type(input).unwrap();
+        assert!(remaining.is_empty());
         assert_eq!(result, expected);
     }
 
@@ -100,7 +103,8 @@ mod tests {
     #[case::max_value("999", 999)]
     #[case::min_value("000", 0)]
     fn test_parse_timestamp_milliseconds(#[case] input: &str, #[case] expected: u64) {
-        let (_, result) = parse_timestamp_milliseconds(input).unwrap();
+        let (remaining, result) = parse_timestamp_milliseconds(input).unwrap();
+        assert!(remaining.is_empty());
         assert_eq!(result, expected);
     }
 
@@ -116,9 +120,11 @@ mod tests {
     #[case::regular("123.456", 123_456)]
     #[case::leading_zeroes("001.234", 1234)]
     #[case::zero_seconds("000.123", 123)]
+    #[case::zero_milliseconds("123.000", 123_000)]
     #[case::min_value("000.000", 0)]
     fn test_parse_timestamp(#[case] input: &str, #[case] expected: u64) {
-        let (_, result) = parse_timestamp(input).unwrap();
+        let (remaining, result) = parse_timestamp(input).unwrap();
+        assert!(remaining.is_empty());
         assert_eq!(result, expected);
     }
 
@@ -135,8 +141,10 @@ mod tests {
 
     #[rstest]
     #[case::regular("123.456:789", (123_456, 789))]
+    #[case::zero_milliseconds("123.000:789", (123_000, 789))]
     fn test_parse_timestamp_and_uid(#[case] input: &str, #[case] expected: (u64, u64)) {
-        let (_, result) = parse_timestamp_and_uid(input).unwrap();
+        let (remaining, result) = parse_timestamp_and_uid(input).unwrap();
+        assert!(remaining.is_empty());
         assert_eq!(result, expected);
     }
 
@@ -152,7 +160,8 @@ mod tests {
     #[rstest]
     #[case::regular("audit(123.456:789)", InnerAuditMsg { timestamp: 123_456, id: 789 })]
     fn test_parse_audit_msg_value(#[case] input: &str, #[case] expected: InnerAuditMsg) {
-        let (_, result) = parse_audit_msg_value(input).unwrap();
+        let (remaining, result) = parse_audit_msg_value(input).unwrap();
+        assert!(remaining.is_empty());
         assert_eq!(result, expected);
     }
 
@@ -170,7 +179,8 @@ mod tests {
     #[rstest]
     #[case::regular("msg=audit(123.456:789): ", InnerAuditMsg { timestamp: 123_456, id: 789 })]
     fn test_parse_audit_msg(#[case] input: &str, #[case] expected: InnerAuditMsg) {
-        let (_, result) = parse_audit_msg(input).unwrap();
+        let (remaining, result) = parse_audit_msg(input).unwrap();
+        assert!(remaining.is_empty());
         assert_eq!(result, expected);
     }
 
@@ -189,7 +199,8 @@ mod tests {
     #[rstest]
     #[case::regular("type=USER_ACCT msg=audit(123.456:789): ", InnerHeader { record_type: "USER_ACCT".to_string(), audit_msg: InnerAuditMsg { timestamp: 123_456, id: 789 } })]
     fn test_parse_header(#[case] input: &str, #[case] expected: InnerHeader) {
-        let (_, result) = parse_header(input).unwrap();
+        let (remaining, result) = parse_header(input).unwrap();
+        assert!(remaining.is_empty());
         assert_eq!(result, expected);
     }
 

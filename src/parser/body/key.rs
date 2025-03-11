@@ -11,19 +11,20 @@ mod tests {
     use rstest::rstest;
 
     #[rstest]
-    #[case::regular("key=value", "key")]
-    #[case::with_space("key =value", "key ")]
-    #[case::numeric("123=value", "123")]
-    #[case::quoted("\"key\"=value", "\"key\"")]
-    #[case::quoted_with_space("\"key with space\"=value", "\"key with space\"")]
+    #[case::regular("key=", "key")]
+    #[case::with_space("key =", "key ")]
+    #[case::numeric("123=", "123")]
+    #[case::quoted("\"key\"=", "\"key\"")]
+    #[case::quoted_with_space("\"key with space\"=", "\"key with space\"")]
     fn test_parse_key(#[case] input: &str, #[case] expected: &str) {
-        let (_, result) = parse_key(input).unwrap();
+        let (remaining, result) = parse_key(input).unwrap();
+        assert_eq!(remaining, "=");
         assert_eq!(result, expected);
     }
 
     #[rstest]
-    #[case::without_key("=value")]
-    #[case::without_separator("keyvalue")]
+    #[case::without_key("=")]
+    #[case::without_separator("key")]
     #[case::empty_input("")]
     fn test_parse_key_fails(#[case] input: &str) {
         assert!(parse_key(input).is_err());

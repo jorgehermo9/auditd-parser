@@ -10,6 +10,8 @@ use nom::{IResult, Parser};
 
 use super::{ENRICHMENT_SEPARATOR, parse_key_value_list};
 
+// TODO: reorder these functions so we go from high-level to low-level
+
 /// Parses a string value, which can be surrounded by single or double quotes.
 fn parse_string_value(input: &str) -> IResult<&str, &str> {
     alt((
@@ -60,3 +62,14 @@ fn parse_unquoted_value(input: &str) -> IResult<&str, FieldValue> {
 pub fn parse_value(input: &str) -> IResult<&str, FieldValue> {
     alt((parse_quoted_value, parse_unquoted_value)).parse(input)
 }
+
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//     use rstest::rstest;
+//     #[rstest]
+//     fn test_parse_string_value(#[case] input: &str, #[case] expected: &str) {
+//         let (_, result) = parse_string_value(input).unwrap();
+//         assert_eq!(result, expected);
+//     }
+// }
