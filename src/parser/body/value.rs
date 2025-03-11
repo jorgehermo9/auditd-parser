@@ -2,7 +2,7 @@ use crate::FieldValue;
 use crate::utils::burp;
 use nom::AsChar;
 use nom::branch::alt;
-use nom::bytes::complete::{tag, take_until1, take_while, take_while1};
+use nom::bytes::complete::{take_while, take_while1};
 use nom::character::complete::{char, u64 as parse_u64};
 use nom::combinator::all_consuming;
 use nom::sequence::delimited;
@@ -59,6 +59,7 @@ fn parse_unquoted_value(input: &str) -> IResult<&str, FieldValue> {
     // If the value is not surrounded by quotes, take all the characters until a space or the enrichment separator is found.
     // For example, in the `op` field of auditd records: `op=PAM:accounting`, the value should be a string, but
     // it is not surrounded by quotes.
+    // TODO: use take_while0?
     take_while1(|c: char| !c.is_space() && c != ENRICHMENT_SEPARATOR)
         .and_then(alt((
             parse_primitive_value,
@@ -80,6 +81,7 @@ pub fn parse_value(input: &str) -> IResult<&str, FieldValue> {
 mod tests {
     use super::*;
     use rstest::rstest;
+
     #[rstest]
     #[case::double_quoted("\"foo\"", "foo")]
     #[case::single_quoted("'foo'", "foo")]
@@ -111,7 +113,7 @@ mod tests {
     // FIXME: this tests should not fail. We should treat escaped quotes properly
     #[rstest]
     #[case::escaped_double_quote(r#""foo\"bar""#, r#"foo"bar"#)]
-    #[case::escaped_single_quote(r#"'foo\'bar'"#, r#"foo'bar"#)]
+    #[case::escaped_single_quote("'foo\'bar'", "foo'bar")]
     fn fixme_parse_string_value(#[case] input: &str, #[case] expected: &str) {
         let (_, result) = parse_string_value(input).unwrap();
         assert_ne!(result, expected);
