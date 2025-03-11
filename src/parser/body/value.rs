@@ -103,6 +103,7 @@ mod tests {
     #[case::single_quoted_not_terminated("'foo")]
     #[case::double_quoted_not_preceded("foo\"")]
     #[case::single_quoted_not_preceded("foo'")]
+    #[case::empty_input("")]
     fn test_parse_string_value_fails(#[case] input: &str) {
         assert!(parse_string_value(input).is_err());
     }
