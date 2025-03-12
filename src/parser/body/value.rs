@@ -135,4 +135,20 @@ mod tests {
     fn test_parse_quoted_value_fails(#[case] input: &str) {
         assert!(parse_quoted_value(input).is_err());
     }
+
+    #[rstest]
+    #[case::integer("123", 123.into())]
+    fn test_parse_primitive_value(#[case] input: &str, #[case] expected: FieldValue) {
+        let (remaining, result) = parse_primitive_value(input).unwrap();
+        assert!(remaining.is_empty());
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::terminated_with_non_numeric("123abc")]
+    #[case::non_numeric("abc")]
+    #[case::empty_input("")]
+    fn test_parse_primitive_value_fails(#[case] input: &str) {
+        assert!(parse_primitive_value(input).is_err());
+    }
 }
