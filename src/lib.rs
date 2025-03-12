@@ -34,12 +34,35 @@ pub struct AuditdRecord {
 // TODO: add a null variant for things like `hostname=?`
 // TODO: add hexadecimal variant? That hexadecimal should be decoded or leaved as-is? Maybe
 // we could interpret it in the interpret mode..?
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum FieldValue {
     Integer(u64),
     String(String),
     Map(HashMap<String, FieldValue>),
+}
+
+impl From<&str> for FieldValue {
+    fn from(s: &str) -> Self {
+        FieldValue::String(s.to_string())
+    }
+}
+impl From<String> for FieldValue {
+    fn from(s: String) -> Self {
+        FieldValue::String(s)
+    }
+}
+
+impl From<u64> for FieldValue {
+    fn from(i: u64) -> Self {
+        FieldValue::Integer(i)
+    }
+}
+
+impl From<HashMap<String, FieldValue>> for FieldValue {
+    fn from(map: HashMap<String, FieldValue>) -> Self {
+        FieldValue::Map(map)
+    }
 }
 
 impl FromStr for AuditdRecord {

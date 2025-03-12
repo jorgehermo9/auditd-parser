@@ -40,10 +40,10 @@ fn parse_quoted_value(input: &str) -> IResult<&str, FieldValue> {
             // Parses a map value, which is a string that contains a list of key-value pairs.
             // For example, it can be found in the `msg` field of auditd records, surrounded by single quotes:
             // `msg='op=PAM:accounting grantors=pam_unix,pam_permit,pam_time acct="jorge" exe="/usr/bin/sudo" hostname=? addr=? terminal=/dev/pts/1 res=success'`
-            parse_key_value_list.map(FieldValue::Map),
+            parse_key_value_list.map(FieldValue::from),
             // Treat the quoted value as an string if the previous parsers did not succeed
             // and return the input to this `alt` as-is
-            burp.map(|s| FieldValue::String(s.to_string())),
+            burp.map(FieldValue::from),
         )))
         .parse(input)
 }
@@ -52,7 +52,7 @@ fn parse_primitive_value(input: &str) -> IResult<&str, FieldValue> {
     // TODO: add `null` variant
     // TODO: add hexadecimal variant? Or maybe we should interpret it in a different step?
     // based in field name
-    all_consuming(alt((parse_u64.map(FieldValue::Integer),))).parse(input)
+    all_consuming(alt((parse_u64.map(FieldValue::from),))).parse(input)
 }
 
 fn parse_unquoted_value(input: &str) -> IResult<&str, FieldValue> {
@@ -67,7 +67,7 @@ fn parse_unquoted_value(input: &str) -> IResult<&str, FieldValue> {
             // TODO: add a parse_null parser? to parse things like `hostname=?`
             // Treat the unquoted value as an string if the previous parsers did not succeed
             // and return the input to this `alt` as-is
-            burp.map(|s| FieldValue::String(s.to_string())),
+            burp.map(FieldValue::from),
         )))
         .parse(input)
 }
@@ -79,6 +79,8 @@ pub fn parse_value(input: &str) -> IResult<&str, FieldValue> {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use super::*;
     use rstest::rstest;
 
@@ -91,6 +93,9 @@ mod tests {
     #[case::single_quoted_with_double_quote_inside("'foo\"bar'", "foo\"bar")]
     #[case::double_quoted_empty_string("\"\"", "")]
     #[case::single_quoted_empty_string("''", "")]
+    // FIXME: this tests should not fail. We should treat escaped quotes properly
+    // #[case::escaped_double_quote(r#""foo\"bar""#, r#"foo"bar"#)]
+    // #[case::escaped_single_quote("'foo\'bar'", "foo'bar")]
     fn test_parse_string_value(#[case] input: &str, #[case] expected: &str) {
         let (remaining, result) = parse_string_value(input).unwrap();
         assert!(remaining.is_empty());
@@ -110,12 +115,15 @@ mod tests {
         assert!(parse_string_value(input).is_err());
     }
 
-    // FIXME: this tests should not fail. We should treat escaped quotes properly
     #[rstest]
-    #[case::escaped_double_quote(r#""foo\"bar""#, r#"foo"bar"#)]
-    #[case::escaped_single_quote("'foo\'bar'", "foo'bar")]
-    fn fixme_parse_string_value(#[case] input: &str, #[case] expected: &str) {
-        let (_, result) = parse_string_value(input).unwrap();
-        assert_ne!(result, expected);
+    #[case::string("\"foo\"", "foo".into())]
+    #[case::map_single_entry("'key=value'",HashMap::from([("key".into(), "value".into())]).into())]
+    #[case::map_multiple_entries("'key1=value1 key2=value2 key3=value3'",
+        HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into()),
+        ("key3".into(), "value3".into())]).into())]
+    fn test_parse_quoted_value(#[case] input: &str, #[case] expected: FieldValue) {
+        let (remaining, result) = parse_quoted_value(input).unwrap();
+        assert!(remaining.is_empty());
+        assert_eq!(result, expected);
     }
 }
