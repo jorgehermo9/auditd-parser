@@ -151,4 +151,30 @@ mod tests {
     fn test_parse_primitive_value_fails(#[case] input: &str) {
         assert!(parse_primitive_value(input).is_err());
     }
+
+    #[rstest]
+    #[case::unquoted_string("foo", "foo".into())]
+    #[case::integer("123", 123.into())]
+    fn test_parse_unquoted_value(#[case] input: &str, #[case] expected: FieldValue) {
+        let (remaining, result) = parse_unquoted_value(input).unwrap();
+        assert!(remaining.is_empty());
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::space("foo bar", "foo".into(), ' ', " bar")]
+    #[case::enrichment_separator(&format!("foo{ENRICHMENT_SEPARATOR}bar"), "foo".into(),
+        ENRICHMENT_SEPARATOR, &format!("{ENRICHMENT_SEPARATOR}bar"))]
+    fn test_parse_unquoted_value_stops_at_delimiter(
+        #[case] input: &str,
+        #[case] expected: FieldValue,
+        #[case] delimiter: char,
+        #[case] expected_remaining: &str,
+    ) {
+        let (remaining, result) = parse_unquoted_value(input).unwrap();
+        let first_remaining_char = remaining.chars().next().expect("remaining is empty");
+        assert_eq!(first_remaining_char, delimiter);
+        assert_eq!(remaining, expected_remaining);
+        assert_eq!(result, expected);
+    }
 }
