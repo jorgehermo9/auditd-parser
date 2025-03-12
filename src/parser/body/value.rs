@@ -121,9 +121,18 @@ mod tests {
     #[case::map_multiple_entries("'key1=value1 key2=value2 key3=value3'",
         HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into()),
         ("key3".into(), "value3".into())]).into())]
+    #[case::double_quoted_map("\"key1=value1 key2=value2\"",
+        HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]).into())]
     fn test_parse_quoted_value(#[case] input: &str, #[case] expected: FieldValue) {
         let (remaining, result) = parse_quoted_value(input).unwrap();
         assert!(remaining.is_empty());
         assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::unquoted("foo")]
+    #[case::empty_input("")]
+    fn test_parse_quoted_value_fails(#[case] input: &str) {
+        assert!(parse_quoted_value(input).is_err());
     }
 }
