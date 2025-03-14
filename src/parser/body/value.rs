@@ -197,4 +197,12 @@ mod tests {
         assert!(remaining.is_empty());
         assert_eq!(result, expected);
     }
+
+    #[rstest]
+    #[case::empty_input("")]
+    #[case::only_space(" ")]
+    #[case::only_enrichment_separator(&ENRICHMENT_SEPARATOR.to_string())]
+    fn test_parse_value_fails(#[case] input: &str) {
+        assert!(parse_value(input).is_err());
+    }
 }
