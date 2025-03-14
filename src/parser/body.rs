@@ -44,3 +44,29 @@ pub fn parse_body(input: &str) -> IResult<&str, InnerBody> {
     .map(|(fields, enrichment)| InnerBody { fields, enrichment })
     .parse(input)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case("key=value", ("key", "value".into()))]
+    fn test_parse_key_value(#[case] input: &str, #[case] expected: (&str, FieldValue)) {
+        let (expected_key, expected_value) = expected;
+        let (remaining, (key, value)) = parse_key_value(input).unwrap();
+        assert!(remaining.is_empty());
+        assert_eq!(key, expected_key);
+        assert_eq!(value, expected_value);
+    }
+
+    #[rstest]
+    #[case::missing_separator("keyvalue")]
+    #[case::missing_key("=value")]
+    #[case::missing_value("key=")]
+    #[case::missing_key_and_value("=")]
+    #[case::empty("")]
+    fn test_parse_key_value_fails(#[case] input: &str) {
+        assert!(parse_key_value(input).is_err());
+    }
+}
