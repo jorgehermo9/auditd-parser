@@ -12,9 +12,9 @@ use super::ENRICHMENT_SEPARATOR;
 pub fn parse_key(input: &str) -> IResult<&str, String> {
     // Do not allow for invalid key characters such as spaces, enrichment separator,
     // or the equal sign which is the separator between the key and the value.
-    // TODO: this is duplicated from the `parse_unquoted_value`. Maybe we should
-    // factor that out into a common parser.
     terminated(
+        // TODO: this is duplicated from the `parse_unquoted_value`. Maybe we should
+        // factor that out into a common parser.
         take_while1(|c: char| c != '=' && !c.is_space() && c != ENRICHMENT_SEPARATOR),
         // Ensure that the parsed key terminates with an equal sign, but do not consume it
         peek(char('=')),
