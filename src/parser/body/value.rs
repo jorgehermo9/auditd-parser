@@ -179,6 +179,14 @@ mod tests {
     }
 
     #[rstest]
+    #[case::empty_input("")]
+    #[case::only_space(" ")]
+    #[case::only_enrichment_separator(&ENRICHMENT_SEPARATOR.to_string())]
+    fn test_parse_unquoted_value_fails(#[case] input: &str) {
+        assert!(parse_unquoted_value(input).is_err());
+    }
+
+    #[rstest]
     #[case::double_quoted_string("\"foo\"", "foo".into())]
     #[case::single_quoted_string("'foo'", "foo".into())]
     #[case::unquoted_string("foo", "foo".into())]

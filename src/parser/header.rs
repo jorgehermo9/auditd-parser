@@ -205,7 +205,7 @@ mod tests {
     }
 
     #[rstest]
-    #[case::with_invalid_record_type("type= msg=audit(123.456:789): ")]
+    #[case::without_record_type_value("type= msg=audit(123.456:789): ")]
     #[case::with_invalid_audit_msg("type=USER_ACCT msg=123.456:78): ")]
     #[case::without_record_type("msg=audit(123.456:789): ")]
     #[case::without_audit_msg("type=USER_ACCT")]
