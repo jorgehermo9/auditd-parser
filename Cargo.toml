@@ -12,7 +12,7 @@ nom = "8.0.0"
 serde = { version = "1.0.219", features = ["derive"], optional = true }
 
 [features]
-default = ["serde"]
+default = []
 serde = ["dep:serde"]
 
 [dev-dependencies]
