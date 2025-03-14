@@ -89,7 +89,6 @@ mod tests {
     #[case::missing_key_and_value("=")]
     #[case::empty("")]
     fn test_parse_key_value_list_fails(#[case] input: &str) {
-        dbg!(parse_key_value_list(input));
         assert!(parse_key_value_list(input).is_err());
     }
 }
