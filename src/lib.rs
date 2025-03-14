@@ -27,7 +27,7 @@ pub struct AuditdRecord {
 
     pub fields: HashMap<String, FieldValue>,
 
-    pub enrichment: HashMap<String, FieldValue>,
+    pub enrichment: Option<HashMap<String, FieldValue>>,
 }
 
 // TODO: add an array variant for things like `grantors=pam_unix,pam_permit,pam_time`

@@ -1,5 +1,6 @@
 use crate::FieldValue;
 use key::parse_key;
+use nom::branch::alt;
 use nom::character::complete::char;
 use nom::multi::separated_list1;
 use nom::sequence::separated_pair;
@@ -12,10 +13,10 @@ mod value;
 
 const ENRICHMENT_SEPARATOR: char = '\x1d';
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct InnerBody {
     pub fields: HashMap<String, FieldValue>,
-    pub enrichment: HashMap<String, FieldValue>,
+    pub enrichment: Option<HashMap<String, FieldValue>>,
 }
 
 /// Parses a key-value pair
@@ -30,18 +31,30 @@ fn parse_key_value_list(input: &str) -> IResult<&str, HashMap<String, FieldValue
         .parse(input)
 }
 
-pub fn parse_body(input: &str) -> IResult<&str, InnerBody> {
-    // TODO: enrichment should be optional
-    // maybe we should have something like
-    // alt(parse_key_value_list, separated_pair(...))
-    // we may have to move the `all_consuming` of the `parse_record` to this function
+fn parse_enriched_body(input: &str) -> IResult<&str, InnerBody> {
     separated_pair(
         parse_key_value_list,
         char(ENRICHMENT_SEPARATOR),
         parse_key_value_list,
     )
-    .map(|(fields, enrichment)| InnerBody { fields, enrichment })
+    .map(|(fields, enrichment)| InnerBody {
+        fields,
+        enrichment: Some(enrichment),
+    })
     .parse(input)
+}
+
+pub fn parse_unenriched_body(input: &str) -> IResult<&str, InnerBody> {
+    parse_key_value_list
+        .map(|fields| InnerBody {
+            fields,
+            enrichment: None,
+        })
+        .parse(input)
+}
+
+pub fn parse_body(input: &str) -> IResult<&str, InnerBody> {
+    alt((parse_enriched_body, parse_unenriched_body)).parse(input)
 }
 
 #[cfg(test)]
@@ -90,5 +103,18 @@ mod tests {
     #[case::empty("")]
     fn test_parse_key_value_list_fails(#[case] input: &str) {
         assert!(parse_key_value_list(input).is_err());
+    }
+
+    #[rstest]
+    #[case::regular(&format!("key1=value1 key2=value2{ENRICHMENT_SEPARATOR}enriched_key=enriched_value"),
+        InnerBody{
+            fields: HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
+            enrichment: Some(HashMap::from([("enriched_key".into(), "enriched_value".into())]))
+        }
+    )]
+    fn test_parse_enriched_body(#[case] input: &str, #[case] expected: InnerBody) {
+        let (remaining, result) = parse_body(input).unwrap();
+        assert!(remaining.is_empty());
+        assert_eq!(result, expected);
     }
 }
