@@ -125,7 +125,6 @@ mod tests {
     #[case::empty_enrichment_and_fields(&format!("{ENRICHMENT_SEPARATOR}"))]
     #[case::empty_input("")]
     fn test_parse_enriched_body_fails(#[case] input: &str) {
-        dbg!(parse_body(input));
         assert!(parse_body(input).is_err());
     }
 

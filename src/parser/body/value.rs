@@ -127,7 +127,6 @@ mod tests {
     #[case::double_quoted_map("\"key1=value1 key2=value2\"",
         HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]).into())]
     fn test_parse_quoted_value(#[case] input: &str, #[case] expected: FieldValue) {
-        dbg!(parse_quoted_value(input));
         let (remaining, result) = parse_quoted_value(input).unwrap();
         assert!(remaining.is_empty());
         assert_eq!(result, expected);
