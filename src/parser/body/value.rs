@@ -13,6 +13,7 @@ use super::{ENRICHMENT_SEPARATOR, parse_key_value_list};
 // TODO: reorder these functions so we go from high-level to low-level
 
 /// Parses a string value, which can be surrounded by single or double quotes.
+// TODO: create a parse_string method and use it also in the key parser?
 fn parse_string_value(input: &str) -> IResult<&str, &str> {
     const DOUBLE_QUOTE: char = '"';
     const SINGLE_QUOTE: char = '\'';
@@ -55,6 +56,8 @@ fn parse_primitive_value(input: &str) -> IResult<&str, FieldValue> {
     all_consuming(alt((parse_u64.map(FieldValue::from),))).parse(input)
 }
 
+// TODO: the maybe we have to make a parser out of the `take_while1(..)` as it is repeated
+// in parse_key.
 fn parse_unquoted_value(input: &str) -> IResult<&str, FieldValue> {
     // If the value is not surrounded by quotes, take all the characters until a space or the enrichment separator is found.
     // For example, in the `op` field of auditd records: `op=PAM:accounting`, the value should be a string, but
@@ -124,6 +127,7 @@ mod tests {
     #[case::double_quoted_map("\"key1=value1 key2=value2\"",
         HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]).into())]
     fn test_parse_quoted_value(#[case] input: &str, #[case] expected: FieldValue) {
+        dbg!(parse_quoted_value(input));
         let (remaining, result) = parse_quoted_value(input).unwrap();
         assert!(remaining.is_empty());
         assert_eq!(result, expected);

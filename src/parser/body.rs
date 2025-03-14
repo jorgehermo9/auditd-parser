@@ -2,6 +2,7 @@ use crate::FieldValue;
 use key::parse_key;
 use nom::branch::alt;
 use nom::character::complete::char;
+use nom::combinator::all_consuming;
 use nom::multi::separated_list1;
 use nom::sequence::separated_pair;
 use nom::{IResult, Parser};
@@ -54,7 +55,7 @@ pub fn parse_unenriched_body(input: &str) -> IResult<&str, InnerBody> {
 }
 
 pub fn parse_body(input: &str) -> IResult<&str, InnerBody> {
-    alt((parse_enriched_body, parse_unenriched_body)).parse(input)
+    all_consuming(alt((parse_enriched_body, parse_unenriched_body))).parse(input)
 }
 
 #[cfg(test)]
@@ -63,7 +64,7 @@ mod tests {
     use rstest::rstest;
 
     #[rstest]
-    #[case("key=value", ("key", "value".into()))]
+    #[case::regular("key=value", ("key", "value".into()))]
     fn test_parse_key_value(#[case] input: &str, #[case] expected: (&str, FieldValue)) {
         let (expected_key, expected_value) = expected;
         let (remaining, (key, value)) = parse_key_value(input).unwrap();
@@ -116,5 +117,15 @@ mod tests {
         let (remaining, result) = parse_body(input).unwrap();
         assert!(remaining.is_empty());
         assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::empty_enrichment(&format!("key1=value1 key2=value2{ENRICHMENT_SEPARATOR}"))]
+    #[case::empty_fields(&format!("{ENRICHMENT_SEPARATOR}enriched_key=enriched_value"))]
+    #[case::empty_enrichment_and_fields(&format!("{ENRICHMENT_SEPARATOR}"))]
+    #[case::empty_input("")]
+    fn test_parse_enriched_body_fails(#[case] input: &str) {
+        dbg!(parse_body(input));
+        assert!(parse_body(input).is_err());
     }
 }
