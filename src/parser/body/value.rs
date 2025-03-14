@@ -177,4 +177,16 @@ mod tests {
         assert_eq!(remaining, expected_remaining);
         assert_eq!(result, expected);
     }
+
+    #[rstest]
+    #[case::double_quoted_string("\"foo\"", "foo".into())]
+    #[case::single_quoted_string("'foo'", "foo".into())]
+    #[case::unquoted_string("foo", "foo".into())]
+    #[case::map("'key=value'",HashMap::from([("key".into(), "value".into())]).into())]
+    #[case::integer("123", 123.into())]
+    fn test_parse_value(#[case] input: &str, #[case] expected: FieldValue) {
+        let (remaining, result) = parse_value(input).unwrap();
+        assert!(remaining.is_empty());
+        assert_eq!(result, expected);
+    }
 }
