@@ -1,6 +1,5 @@
 use crate::FieldValue;
 use key::parse_key;
-use nom::bytes::complete::tag;
 use nom::character::complete::char;
 use nom::multi::separated_list1;
 use nom::sequence::separated_pair;
@@ -21,7 +20,7 @@ pub struct InnerBody {
 
 /// Parses a key-value pair
 fn parse_key_value(input: &str) -> IResult<&str, (String, FieldValue)> {
-    separated_pair(parse_key, tag("="), parse_value).parse(input)
+    separated_pair(parse_key, char('='), parse_value).parse(input)
 }
 
 /// Parses a list of key-value pairs, separated by spaces
@@ -68,5 +67,29 @@ mod tests {
     #[case::empty("")]
     fn test_parse_key_value_fails(#[case] input: &str) {
         assert!(parse_key_value(input).is_err());
+    }
+
+    #[rstest]
+    #[case::single("key1=value1", HashMap::from([("key1".into(), "value1".into())]))]
+    #[case::multiple("key1=value1 key2=value2 key3=value3",
+        HashMap::from([("key1".into(), "value1".into()),
+        ("key2".into(), "value2".into()),("key3".into(), "value3".into())]))]
+    fn test_parse_key_value_list(
+        #[case] input: &str,
+        #[case] expected: HashMap<String, FieldValue>,
+    ) {
+        let (remaining, result) = parse_key_value_list(input).unwrap();
+        assert!(remaining.is_empty());
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::missing_key("=value1 key2=value2")]
+    #[case::missing_value("key1= key2=value2")]
+    #[case::missing_key_and_value("=")]
+    #[case::empty("")]
+    fn test_parse_key_value_list_fails(#[case] input: &str) {
+        dbg!(parse_key_value_list(input));
+        assert!(parse_key_value_list(input).is_err());
     }
 }
