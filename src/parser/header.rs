@@ -90,7 +90,7 @@ mod tests {
     #[case::without_key("USER_ACCT")]
     #[case::without_value("type=")]
     #[case::wrong_key("wrong_key=USER_ACCT")]
-    #[case::empty_input("")]
+    #[case::empty("")]
     fn test_parse_record_type_fails(#[case] input: &str) {
         // TODO: migrate all those assert is_err to `assert_matches` once it stabilizes
         // https://github.com/rust-lang/rust/issues/82775
@@ -111,7 +111,7 @@ mod tests {
     #[rstest]
     #[case::non_numeric("abc")]
     #[case::less_than_3_digits("12")]
-    #[case::empty_input("")]
+    #[case::empty("")]
     fn test_parse_timestamp_milliseconds_fail(#[case] input: &str) {
         assert!(parse_timestamp_milliseconds(input).is_err());
     }
@@ -134,7 +134,7 @@ mod tests {
     #[case::without_milliseconds("123")]
     #[case::two_consecutive_dots("123..456")]
     #[case::non_numeric("abc")]
-    #[case::empty_input("")]
+    #[case::empty("")]
     fn test_parse_timestamp_fails(#[case] input: &str) {
         assert!(parse_timestamp(input).is_err());
     }
@@ -152,7 +152,7 @@ mod tests {
     #[case::with_invalid_timestamp("abc:789")]
     #[case::with_invalid_id("123:def")]
     #[case::without_colon_separator("123.456")]
-    #[case::empty_input("")]
+    #[case::empty("")]
     fn test_parse_timestamp_and_uid_fails(#[case] input: &str) {
         assert!(parse_timestamp_and_uid(input).is_err());
     }
@@ -171,7 +171,7 @@ mod tests {
     #[case::without_suffix("audit(123.456:789")]
     #[case::without_prefix("123.456:789)")]
     #[case::non_numeric("abcdef")]
-    #[case::empty_input("")]
+    #[case::empty("")]
     fn test_parse_audit_msg_value_fails(#[case] input: &str) {
         assert!(parse_audit_msg_value(input).is_err());
     }
@@ -191,7 +191,7 @@ mod tests {
     #[case::without_suffix_semicolon("msg=audit(123.456:789)")]
     #[case::without_audit_msg_value("msg=")]
     #[case::without_prefix_and_suffix("audit(123.456:789)")]
-    #[case::empty_input("")]
+    #[case::empty("")]
     fn test_parse_audit_msg_fails(#[case] input: &str) {
         assert!(parse_audit_msg(input).is_err());
     }
@@ -212,7 +212,7 @@ mod tests {
     #[case::without_space_separator("type=USER_ACCTmsg=audit(123.456:789): ")]
     #[case::with_two_spaces_separator("type=USER_ACCT  msg=audit(123.456:789): ")]
     #[case::with_non_space_separator("type=USER_ACCT\tmsg=audit(123.456:789): ")]
-    #[case::empty_input("")]
+    #[case::empty("")]
     fn test_parse_header_fails(#[case] input: &str) {
         assert!(parse_header(input).is_err());
     }

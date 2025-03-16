@@ -101,6 +101,7 @@ mod tests {
     #[case::missing_key("=value1 key2=value2")]
     #[case::missing_value("key1= key2=value2")]
     #[case::missing_key_and_value("=")]
+    #[case::missing_equal("foo")]
     #[case::empty("")]
     fn test_parse_key_value_list_fails(#[case] input: &str) {
         assert!(parse_key_value_list(input).is_err());
@@ -123,10 +124,57 @@ mod tests {
     #[case::empty_enrichment(&format!("key1=value1 key2=value2{ENRICHMENT_SEPARATOR}"))]
     #[case::empty_fields(&format!("{ENRICHMENT_SEPARATOR}enriched_key=enriched_value"))]
     #[case::empty_enrichment_and_fields(&format!("{ENRICHMENT_SEPARATOR}"))]
-    #[case::empty_input("")]
+    #[case::invalid_key_value("foo")]
+    #[case::empty("")]
     fn test_parse_enriched_body_fails(#[case] input: &str) {
         assert!(parse_body(input).is_err());
     }
 
-    // TODO: add tests for unenriched body & body
+    #[rstest]
+    #[case::regular("key1=value1 key2=value2",
+        InnerBody{
+            fields: HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
+            enrichment: None
+        }
+    )]
+    fn test_parse_unenriched_body(#[case] input: &str, #[case] expected: InnerBody) {
+        let (remaining, result) = parse_body(input).unwrap();
+        assert!(remaining.is_empty());
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::invalid_key_value("foo")]
+    #[case::empty("")]
+    fn test_parse_unenriched_body_fails(#[case] input: &str) {
+        assert!(parse_body(input).is_err());
+    }
+
+    #[rstest]
+    #[case::enriched(&format!("key1=value1 key2=value2{ENRICHMENT_SEPARATOR}enriched_key=enriched_value"),
+        InnerBody{
+            fields: HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
+            enrichment: Some(HashMap::from([("enriched_key".into(), "enriched_value".into())]))
+        }
+    )]
+    #[case::unenriched("key1=value1 key2=value2",
+        InnerBody{
+            fields: HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
+            enrichment: None
+        }
+    )]
+    fn test_parse_body(#[case] input: &str, #[case] expected: InnerBody) {
+        let (remaining, result) = parse_body(input).unwrap();
+        assert!(remaining.is_empty());
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::trailing_data("key1=value1 key2=value2 foo")]
+    #[case::invalid_key_value("foo")]
+    #[case::empty("")]
+    fn test_parse_body_fails(#[case] input: &str) {
+        dbg!(parse_body(input));
+        assert!(parse_body(input).is_err());
+    }
 }

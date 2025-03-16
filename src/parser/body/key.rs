@@ -41,7 +41,7 @@ mod tests {
     #[rstest]
     #[case::without_key("=")]
     #[case::without_separator("key")]
-    #[case::empty_input("")]
+    #[case::empty("")]
     // We do not allow for spaces in the key. The parsing is very similar
     // to what we have in `parse_unquoted_value`
     #[case::with_space("key =")]

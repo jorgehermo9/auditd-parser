@@ -113,7 +113,7 @@ mod tests {
     #[case::single_quoted_not_terminated("'foo")]
     #[case::double_quoted_not_preceded("foo\"")]
     #[case::single_quoted_not_preceded("foo'")]
-    #[case::empty_input("")]
+    #[case::empty("")]
     fn test_parse_string_value_fails(#[case] input: &str) {
         assert!(parse_string_value(input).is_err());
     }
@@ -134,7 +134,7 @@ mod tests {
 
     #[rstest]
     #[case::unquoted("foo")]
-    #[case::empty_input("")]
+    #[case::empty("")]
     fn test_parse_quoted_value_fails(#[case] input: &str) {
         assert!(parse_quoted_value(input).is_err());
     }
@@ -150,7 +150,7 @@ mod tests {
     #[rstest]
     #[case::terminated_with_non_numeric("123abc")]
     #[case::non_numeric("abc")]
-    #[case::empty_input("")]
+    #[case::empty("")]
     fn test_parse_primitive_value_fails(#[case] input: &str) {
         assert!(parse_primitive_value(input).is_err());
     }
@@ -182,7 +182,7 @@ mod tests {
     }
 
     #[rstest]
-    #[case::empty_input("")]
+    #[case::empty("")]
     #[case::only_space(" ")]
     #[case::only_enrichment_separator(&ENRICHMENT_SEPARATOR.to_string())]
     fn test_parse_unquoted_value_fails(#[case] input: &str) {
@@ -202,7 +202,7 @@ mod tests {
     }
 
     #[rstest]
-    #[case::empty_input("")]
+    #[case::empty("")]
     #[case::only_space(" ")]
     #[case::only_enrichment_separator(&ENRICHMENT_SEPARATOR.to_string())]
     fn test_parse_value_fails(#[case] input: &str) {
