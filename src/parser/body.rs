@@ -2,9 +2,10 @@ use crate::FieldValue;
 use key::parse_key;
 use nom::branch::alt;
 use nom::character::complete::char;
+use nom::character::complete::space0;
 use nom::combinator::all_consuming;
 use nom::multi::separated_list1;
-use nom::sequence::separated_pair;
+use nom::sequence::{preceded, separated_pair};
 use nom::{IResult, Parser};
 use std::collections::HashMap;
 use value::parse_value;
@@ -27,7 +28,10 @@ fn parse_key_value(input: &str) -> IResult<&str, (String, FieldValue)> {
 
 /// Parses a list of key-value pairs, separated by spaces
 fn parse_key_value_list(input: &str) -> IResult<&str, HashMap<String, FieldValue>> {
-    separated_list1(char(' '), parse_key_value)
+    // Workaround for https://github.com/linux-audit/audit-kernel/issues/169.
+    // Some auditd logs (for example, `type=SYSTEM_SHUTDOWN` logs) have a `msg` field that contains a preceeding space.
+    // we need to ignore this space to parse the key-value list
+    preceded(space0, separated_list1(char(' '), parse_key_value))
         .map(HashMap::from_iter)
         .parse(input)
 }
@@ -87,7 +91,11 @@ mod tests {
     #[case::single("key1=value1", HashMap::from([("key1".into(), "value1".into())]))]
     #[case::multiple("key1=value1 key2=value2 key3=value3",
         HashMap::from([("key1".into(), "value1".into()),
-        ("key2".into(), "value2".into()),("key3".into(), "value3".into())]))]
+            ("key2".into(), "value2".into()),("key3".into(), "value3".into())])
+    )]
+    #[case::preceding_space(" key1=value1 key2=value2",
+        HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())])
+    )]
     fn test_parse_key_value_list(
         #[case] input: &str,
         #[case] expected: HashMap<String, FieldValue>,
@@ -103,6 +111,7 @@ mod tests {
     #[case::missing_key_and_value("=")]
     #[case::missing_equal("foo")]
     #[case::empty("")]
+    #[case::space(" ")]
     fn test_parse_key_value_list_fails(#[case] input: &str) {
         assert!(parse_key_value_list(input).is_err());
     }
