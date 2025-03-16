@@ -35,7 +35,7 @@ mod tests {
     #[case::unenriched("type=foo msg=audit(1234.567:89): key1=value1 key2=value2",
         AuditdRecord {
             record_type: "foo".into(),
-            timestamp: 1234567,
+            timestamp: 1_234_567,
             id: 89,
             fields: HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
             enrichment: None,
@@ -44,7 +44,7 @@ mod tests {
     #[case::enriched(&format!("type=foo msg=audit(1234.567:89): key1=value1 key2=value2{ENRICHMENT_SEPARATOR}enriched_key=enriched_value"),
         AuditdRecord {
             record_type: "foo".into(),
-            timestamp: 1234567,
+            timestamp: 1_234_567,
             id: 89,
             fields: HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
             enrichment: Some(HashMap::from([("enriched_key".into(), "enriched_value".into())])),
