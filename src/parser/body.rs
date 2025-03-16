@@ -12,7 +12,7 @@ use value::parse_value;
 mod key;
 mod value;
 
-const ENRICHMENT_SEPARATOR: char = '\x1d';
+pub const ENRICHMENT_SEPARATOR: char = '\x1d';
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct InnerBody {

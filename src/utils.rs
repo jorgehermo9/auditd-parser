@@ -7,3 +7,13 @@ use nom::IResult;
 pub fn burp(input: &str) -> IResult<&str, &str> {
     Ok(("", input))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_burp() {
+        assert_eq!(burp("hello"), Ok(("", "hello")));
+    }
+}
