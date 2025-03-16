@@ -14,4 +14,4 @@
 - [ ] CLI binary to read auditd logs? Or at least, as an example of how to use the library
 
 # MSRV
-`rustc 1.65`
+`rustc 1.85`
