@@ -27,14 +27,14 @@ pub struct AuditdRecord {
 
     pub fields: HashMap<String, FieldValue>,
 
-    pub enrichment: HashMap<String, FieldValue>,
+    pub enrichment: Option<HashMap<String, FieldValue>>,
 }
 
 // TODO: add an array variant for things like `grantors=pam_unix,pam_permit,pam_time`
 // TODO: add a null variant for things like `hostname=?`
 // TODO: add hexadecimal variant? That hexadecimal should be decoded or leaved as-is? Maybe
 // we could interpret it in the interpret mode..?
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum FieldValue {
     Integer(u64),
@@ -42,7 +42,31 @@ pub enum FieldValue {
     Map(HashMap<String, FieldValue>),
 }
 
+impl From<&str> for FieldValue {
+    fn from(s: &str) -> Self {
+        FieldValue::String(s.to_string())
+    }
+}
+impl From<String> for FieldValue {
+    fn from(s: String) -> Self {
+        FieldValue::String(s)
+    }
+}
+
+impl From<u64> for FieldValue {
+    fn from(i: u64) -> Self {
+        FieldValue::Integer(i)
+    }
+}
+
+impl From<HashMap<String, FieldValue>> for FieldValue {
+    fn from(map: HashMap<String, FieldValue>) -> Self {
+        FieldValue::Map(map)
+    }
+}
+
 impl FromStr for AuditdRecord {
+    // TODO: use thiserror instead of anyhow (or use snafu)
     type Err = anyhow::Error;
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {

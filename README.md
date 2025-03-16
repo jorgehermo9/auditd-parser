@@ -3,8 +3,7 @@
 
 # TODOs
 - [ ] Add tests
-  - [ ] Header parser unit tests
-  - [ ] Body parser unit tests
+  - [ ] parse_record unit tests
   - [ ] Parser integration tests
   - [ ] Fuzz testing?
 - [ ] justfile to run CI
