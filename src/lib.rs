@@ -35,10 +35,11 @@ pub struct AuditdRecord {
 // TODO: add hexadecimal variant? That hexadecimal should be decoded or leaved as-is? Maybe
 // we could interpret it in the interpret mode..?
 #[derive(Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(untagged))]
 pub enum FieldValue {
     Integer(u64),
     String(String),
+    // TODO: use btreemap instead of hashmap? or use something like serde_json::Map type alias declared in this crate?
     Map(HashMap<String, FieldValue>),
 }
 
