@@ -15,7 +15,7 @@ mod utils;
 //
 // Or maybe we should have a RawAuditd record
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct AuditdRecord {
     pub record_type: String,
