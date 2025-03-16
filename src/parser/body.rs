@@ -174,7 +174,6 @@ mod tests {
     #[case::invalid_key_value("foo")]
     #[case::empty("")]
     fn test_parse_body_fails(#[case] input: &str) {
-        dbg!(parse_body(input));
         assert!(parse_body(input).is_err());
     }
 }
