@@ -5,6 +5,7 @@
 - [ ] Add tests
   - [ ] parse_record unit tests
   - [ ] Parser integration tests
+    - Add a test for SYSTEM_SHUTDOWN logs, see https://github.com/linux-audit/audit-kernel/issues/169
   - [ ] Fuzz testing?
 - [ ] justfile to run CI
 - [ ] Clippy pedantic lints
