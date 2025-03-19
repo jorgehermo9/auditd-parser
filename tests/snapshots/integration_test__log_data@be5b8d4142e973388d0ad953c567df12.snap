@@ -1,0 +1,38 @@
+---
+source: tests/integration_test.rs
+expression: record
+info: "type=SYSCALL msg=audit(1492000940.864:1095517): arch=c000003e syscall=62 success=yes exit=0 a0=1fde a1=1 a2=0 a3=8 items=0 ppid=1 pid=8158 auid=1000 uid=1000 gid=1001 euid=1000 suid=1000 fsuid=1000 egid=1001 sgid=1001 fsgid=1001 tty=(none) ses=790 comm=\"bash\" exe=\"/usr/bin/bash\" subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 key=\"kill_signals\""
+---
+{
+  "record_type": "SYSCALL",
+  "timestamp": 1492000940864,
+  "id": 1095517,
+  "fields": {
+    "a0": "1fde",
+    "a1": 1,
+    "a2": 0,
+    "a3": 8,
+    "arch": "c000003e",
+    "auid": 1000,
+    "comm": "bash",
+    "egid": 1001,
+    "euid": 1000,
+    "exe": "/usr/bin/bash",
+    "exit": 0,
+    "fsgid": 1001,
+    "fsuid": 1000,
+    "gid": 1001,
+    "items": 0,
+    "key": "kill_signals",
+    "pid": 8158,
+    "ppid": 1,
+    "ses": 790,
+    "sgid": 1001,
+    "subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
+    "success": "yes",
+    "suid": 1000,
+    "syscall": 62,
+    "tty": "(none)",
+    "uid": 1000
+  }
+}

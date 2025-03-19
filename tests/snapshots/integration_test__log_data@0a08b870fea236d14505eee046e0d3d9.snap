@@ -1,0 +1,13 @@
+---
+source: tests/integration_test.rs
+expression: record
+info: "type=SOCKADDR msg=audit(1481078424.953:688): saddr=02000050A9FEA9FE0000000000000000"
+---
+{
+  "record_type": "SOCKADDR",
+  "timestamp": 1481078424953,
+  "id": 688,
+  "fields": {
+    "saddr": "02000050A9FEA9FE0000000000000000"
+  }
+}

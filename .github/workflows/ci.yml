@@ -57,9 +57,11 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
       - uses: taiki-e/install-action@just
       - uses: taiki-e/install-action@nextest
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@cargo-binstall
+      - run: cargo binstall cargo-insta
       - uses: Swatinem/rust-cache@v2
       - run: just test
   doc-test:

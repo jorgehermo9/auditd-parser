@@ -1,0 +1,19 @@
+---
+source: tests/integration_test.rs
+expression: record
+info: "type=CONFIG_CHANGE msg=audit(1481077231.371:478): auid=1000 ses=3 subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 op=\"add_rule\" key=(null) list=4 res=1"
+---
+{
+  "record_type": "CONFIG_CHANGE",
+  "timestamp": 1481077231371,
+  "id": 478,
+  "fields": {
+    "auid": 1000,
+    "key": "(null)",
+    "list": 4,
+    "op": "add_rule",
+    "res": 1,
+    "ses": 3,
+    "subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023"
+  }
+}

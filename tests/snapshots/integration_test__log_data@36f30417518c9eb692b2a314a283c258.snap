@@ -1,0 +1,38 @@
+---
+source: tests/integration_test.rs
+expression: record
+info: "type=SYSCALL msg=audit(1490801406.273:512226): arch=c000003e syscall=42 success=no exit=-115 a0=6 a1=7ffeb50e4570 a2=10 a3=fe items=0 ppid=1 pid=1170 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"google_ip_forwa\" exe=2F7573722F62696E2F707974686F6E322E373B3538643163636662202864656C6574656429 subj=system_u:system_r:unconfined_service_t:s0 key=(null)"
+---
+{
+  "record_type": "SYSCALL",
+  "timestamp": 1490801406273,
+  "id": 512226,
+  "fields": {
+    "a0": 6,
+    "a1": "7ffeb50e4570",
+    "a2": 10,
+    "a3": "fe",
+    "arch": "c000003e",
+    "auid": 4294967295,
+    "comm": "google_ip_forwa",
+    "egid": 0,
+    "euid": 0,
+    "exe": "2F7573722F62696E2F707974686F6E322E373B3538643163636662202864656C6574656429",
+    "exit": "-115",
+    "fsgid": 0,
+    "fsuid": 0,
+    "gid": 0,
+    "items": 0,
+    "key": "(null)",
+    "pid": 1170,
+    "ppid": 1,
+    "ses": 4294967295,
+    "sgid": 0,
+    "subj": "system_u:system_r:unconfined_service_t:s0",
+    "success": "no",
+    "suid": 0,
+    "syscall": 42,
+    "tty": "(none)",
+    "uid": 0
+  }
+}

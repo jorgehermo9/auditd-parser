@@ -1,0 +1,20 @@
+---
+source: tests/integration_test.rs
+expression: record
+info: "type=EXECVE msg=audit(1491863086.221:1050925): argc=5 a0=\"grep\" a1=\"--color=auto\" a2=\"-e\" a3=\"[:alpha:]\" a4=\"/etc/passwd\""
+---
+{
+  "record_type": "EXECVE",
+  "timestamp": 1491863086221,
+  "id": 1050925,
+  "fields": {
+    "a0": "grep",
+    "a1": {
+      "--color": "auto"
+    },
+    "a2": "-e",
+    "a3": "[:alpha:]",
+    "a4": "/etc/passwd",
+    "argc": 5
+  }
+}

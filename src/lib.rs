@@ -1,5 +1,6 @@
-use std::{collections::HashMap, str::FromStr};
+use std::{collections::BTreeMap, str::FromStr};
 
+use parser::ParserError;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -25,9 +26,13 @@ pub struct AuditdRecord {
     /// Record identifier
     pub id: u64,
 
-    pub fields: HashMap<String, FieldValue>,
+    pub fields: BTreeMap<String, FieldValue>,
 
-    pub enrichment: Option<HashMap<String, FieldValue>>,
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, skip_serializing_if = "Option::is_none")
+    )]
+    pub enrichment: Option<BTreeMap<String, FieldValue>>,
 }
 
 // TODO: add an array variant for things like `grantors=pam_unix,pam_permit,pam_time`
@@ -39,8 +44,8 @@ pub struct AuditdRecord {
 pub enum FieldValue {
     Integer(u64),
     String(String),
-    // TODO: use btreemap instead of hashmap? or use something like serde_json::Map type alias declared in this crate?
-    Map(HashMap<String, FieldValue>),
+    // TODO: use btreemap instead of BTreeMap? or use something like serde_json::Map type alias declared in this crate?
+    Map(BTreeMap<String, FieldValue>),
 }
 
 impl From<&str> for FieldValue {
@@ -60,15 +65,15 @@ impl From<u64> for FieldValue {
     }
 }
 
-impl From<HashMap<String, FieldValue>> for FieldValue {
-    fn from(map: HashMap<String, FieldValue>) -> Self {
+impl From<BTreeMap<String, FieldValue>> for FieldValue {
+    fn from(map: BTreeMap<String, FieldValue>) -> Self {
         FieldValue::Map(map)
     }
 }
 
 impl FromStr for AuditdRecord {
     // TODO: use thiserror instead of anyhow (or use snafu)
-    type Err = anyhow::Error;
+    type Err = ParserError;
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         parser::parse_record(input)

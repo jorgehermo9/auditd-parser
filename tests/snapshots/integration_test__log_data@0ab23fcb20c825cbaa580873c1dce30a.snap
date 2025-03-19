@@ -1,0 +1,13 @@
+---
+source: tests/integration_test.rs
+expression: record
+info: "type=PROCTITLE msg=audit(1451781471.394:194433): proctitle=\"bash\""
+---
+{
+  "record_type": "PROCTITLE",
+  "timestamp": 1451781471394,
+  "id": 194433,
+  "fields": {
+    "proctitle": "bash"
+  }
+}

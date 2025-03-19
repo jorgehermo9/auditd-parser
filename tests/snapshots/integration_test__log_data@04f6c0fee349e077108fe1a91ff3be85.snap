@@ -1,0 +1,38 @@
+---
+source: tests/integration_test.rs
+expression: record
+info: "type=SYSCALL msg=audit(1451781471.394:194435): arch=c000003e syscall=23 success=yes exit=1 a0=c a1=56420184ade0 a2=564201867510 a3=0 items=0 ppid=1271 pid=1281 auid=1000 uid=1000 gid=1000 euid=1000 suid=1000 fsuid=1000 egid=1000 sgid=1000 fsgid=1000 tty=(none) ses=1 comm=\"sshd\" exe=\"/usr/sbin/sshd\" subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 key=(null)"
+---
+{
+  "record_type": "SYSCALL",
+  "timestamp": 1451781471394,
+  "id": 194435,
+  "fields": {
+    "a0": "c",
+    "a1": "56420184ade0",
+    "a2": 564201867510,
+    "a3": 0,
+    "arch": "c000003e",
+    "auid": 1000,
+    "comm": "sshd",
+    "egid": 1000,
+    "euid": 1000,
+    "exe": "/usr/sbin/sshd",
+    "exit": 1,
+    "fsgid": 1000,
+    "fsuid": 1000,
+    "gid": 1000,
+    "items": 0,
+    "key": "(null)",
+    "pid": 1281,
+    "ppid": 1271,
+    "ses": 1,
+    "sgid": 1000,
+    "subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
+    "success": "yes",
+    "suid": 1000,
+    "syscall": 23,
+    "tty": "(none)",
+    "uid": 1000
+  }
+}

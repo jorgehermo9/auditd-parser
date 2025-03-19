@@ -1,0 +1,26 @@
+---
+source: tests/integration_test.rs
+expression: record
+info: "type=USER_LOGOUT msg=audit(1481077049.033:424): pid=1298 uid=0 auid=1000 ses=1 subj=system_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=login id=1000 exe=\"/usr/sbin/sshd\" hostname=? addr=? terminal=/dev/pts/0 res=success'"
+---
+{
+  "record_type": "USER_LOGOUT",
+  "timestamp": 1481077049033,
+  "id": 424,
+  "fields": {
+    "auid": 1000,
+    "msg": {
+      "addr": "?",
+      "exe": "/usr/sbin/sshd",
+      "hostname": "?",
+      "id": 1000,
+      "op": "login",
+      "res": "success",
+      "terminal": "/dev/pts/0"
+    },
+    "pid": 1298,
+    "ses": 1,
+    "subj": "system_u:system_r:sshd_t:s0-s0:c0.c1023",
+    "uid": 0
+  }
+}

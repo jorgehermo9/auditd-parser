@@ -7,7 +7,7 @@ use nom::combinator::all_consuming;
 use nom::multi::separated_list1;
 use nom::sequence::{preceded, separated_pair};
 use nom::{IResult, Parser};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use value::parse_value;
 
 mod key;
@@ -17,8 +17,8 @@ pub const ENRICHMENT_SEPARATOR: char = '\x1d';
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct InnerBody {
-    pub fields: HashMap<String, FieldValue>,
-    pub enrichment: Option<HashMap<String, FieldValue>>,
+    pub fields: BTreeMap<String, FieldValue>,
+    pub enrichment: Option<BTreeMap<String, FieldValue>>,
 }
 
 /// Parses a key-value pair
@@ -27,12 +27,12 @@ fn parse_key_value(input: &str) -> IResult<&str, (String, FieldValue)> {
 }
 
 /// Parses a list of key-value pairs, separated by spaces
-fn parse_key_value_list(input: &str) -> IResult<&str, HashMap<String, FieldValue>> {
+fn parse_key_value_list(input: &str) -> IResult<&str, BTreeMap<String, FieldValue>> {
     // Workaround for https://github.com/linux-audit/audit-kernel/issues/169.
     // Some auditd logs (for example, `type=SYSTEM_SHUTDOWN` logs) have a `msg` field that contains a preceeding space.
     // we need to ignore this space to parse the key-value list
     preceded(space0, separated_list1(char(' '), parse_key_value))
-        .map(HashMap::from_iter)
+        .map(BTreeMap::from_iter)
         .parse(input)
 }
 
@@ -88,17 +88,17 @@ mod tests {
     }
 
     #[rstest]
-    #[case::single("key1=value1", HashMap::from([("key1".into(), "value1".into())]))]
+    #[case::single("key1=value1", BTreeMap::from([("key1".into(), "value1".into())]))]
     #[case::multiple("key1=value1 key2=value2 key3=value3",
-        HashMap::from([("key1".into(), "value1".into()),
+        BTreeMap::from([("key1".into(), "value1".into()),
             ("key2".into(), "value2".into()),("key3".into(), "value3".into())])
     )]
     #[case::preceding_space(" key1=value1 key2=value2",
-        HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())])
+        BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())])
     )]
     fn test_parse_key_value_list(
         #[case] input: &str,
-        #[case] expected: HashMap<String, FieldValue>,
+        #[case] expected: BTreeMap<String, FieldValue>,
     ) {
         let (remaining, result) = parse_key_value_list(input).unwrap();
         assert!(remaining.is_empty());
@@ -119,8 +119,8 @@ mod tests {
     #[rstest]
     #[case::regular(&format!("key1=value1 key2=value2{ENRICHMENT_SEPARATOR}enriched_key=enriched_value"),
         InnerBody{
-            fields: HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
-            enrichment: Some(HashMap::from([("enriched_key".into(), "enriched_value".into())]))
+            fields: BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
+            enrichment: Some(BTreeMap::from([("enriched_key".into(), "enriched_value".into())]))
         }
     )]
     fn test_parse_enriched_body(#[case] input: &str, #[case] expected: InnerBody) {
@@ -142,7 +142,7 @@ mod tests {
     #[rstest]
     #[case::regular("key1=value1 key2=value2",
         InnerBody{
-            fields: HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
+            fields: BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
             enrichment: None
         }
     )]
@@ -162,13 +162,13 @@ mod tests {
     #[rstest]
     #[case::enriched(&format!("key1=value1 key2=value2{ENRICHMENT_SEPARATOR}enriched_key=enriched_value"),
         InnerBody{
-            fields: HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
-            enrichment: Some(HashMap::from([("enriched_key".into(), "enriched_value".into())]))
+            fields: BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
+            enrichment: Some(BTreeMap::from([("enriched_key".into(), "enriched_value".into())]))
         }
     )]
     #[case::unenriched("key1=value1 key2=value2",
         InnerBody{
-            fields: HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
+            fields: BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
             enrichment: None
         }
     )]
