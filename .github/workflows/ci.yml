@@ -60,7 +60,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: taiki-e/install-action@just
       - uses: taiki-e/install-action@nextest
-      - uses: taiki-e/install-action@binstall
+      - uses: taiki-e/install-action@cargo-binstall
       - run: cargo binstall cargo-insta
       - uses: Swatinem/rust-cache@v2
       - run: just test
