@@ -27,13 +27,12 @@ fn parse_key_value(input: &str) -> IResult<&str, (String, FieldValue)> {
 }
 
 /// Parses a list of key-value pairs, separated by spaces
-
-fn parse_key_value_list(input: &str) -> IResult<&str, HashMap<String, FieldValue>> {
+fn parse_key_value_list(input: &str) -> IResult<&str, BTreeMap<String, FieldValue>> {
     // Workaround for https://github.com/linux-audit/audit-kernel/issues/169.
     // Some auditd logs (for example, `type=SYSTEM_SHUTDOWN` logs) have a `msg` field that contains a preceeding space.
     // we need to ignore this space to parse the key-value list
     preceded(space0, separated_list1(char(' '), parse_key_value))
-        .map(HashMap::from_iter)
+        .map(BTreeMap::from_iter)
         .parse(input)
 }
 
