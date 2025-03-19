@@ -1,4 +1,4 @@
-ci: fmt clippy test doc-test build deny-check msrv-verify
+ci $CI="true": fmt clippy test build deny-check msrv-verify
 
 fmt:
  cargo fmt --check --all
@@ -6,9 +6,15 @@ fmt:
 clippy:
     cargo clippy --all-targets --all-features -- -Dwarnings -Dclippy::all -Dclippy::pedantic
 
+test: unit-test integration-test doc-test
+
 # https://github.com/nextest-rs/nextest
-test:
-    cargo nextest run --locked --all-targets --all-features
+unit-test:
+    # --lib to just run unit tests
+    cargo nextest run --locked --all-targets --all-features --lib
+
+integration-test:
+    cargo insta test --test integration_test --all-features --unreferenced reject
 
 doc-test:
     cargo test --doc --all-features
@@ -23,3 +29,6 @@ deny-check:
 # https://github.com/foresterre/cargo-msrv
 msrv-verify:
     cargo msrv verify --all-features
+
+insta-test-review:
+    cargo insta test --test integration_test --all-features --review

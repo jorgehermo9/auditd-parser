@@ -1,0 +1,15 @@
+---
+source: tests/integration_test.rs
+expression: record
+info: "type=NETFILTER_CFG msg=audit(1481076984.827:17): table=filter family=2 entries=0"
+---
+{
+  "record_type": "NETFILTER_CFG",
+  "timestamp": 1481076984827,
+  "id": 17,
+  "fields": {
+    "entries": 0,
+    "family": 2,
+    "table": "filter"
+  }
+}

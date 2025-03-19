@@ -1,0 +1,22 @@
+---
+source: tests/integration_test.rs
+expression: record
+info: "type=PATH msg=audit(1481077231.371:479): item=0 name=\"/sbin/auditctl\" inode=17367907 dev=08:01 mode=0100750 ouid=0 ogid=0 rdev=00:00 obj=system_u:object_r:auditctl_exec_t:s0 objtype=NORMAL"
+---
+{
+  "record_type": "PATH",
+  "timestamp": 1481077231371,
+  "id": 479,
+  "fields": {
+    "dev": "08:01",
+    "inode": 17367907,
+    "item": 0,
+    "mode": 100750,
+    "name": "/sbin/auditctl",
+    "obj": "system_u:object_r:auditctl_exec_t:s0",
+    "objtype": "NORMAL",
+    "ogid": 0,
+    "ouid": 0,
+    "rdev": "00:00"
+  }
+}

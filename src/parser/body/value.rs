@@ -82,7 +82,7 @@ pub fn parse_value(input: &str) -> IResult<&str, FieldValue> {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
+    use std::collections::BTreeMap;
 
     use super::*;
     use rstest::rstest;
@@ -120,12 +120,12 @@ mod tests {
 
     #[rstest]
     #[case::string("\"foo\"", "foo".into())]
-    #[case::map_single_entry("'key=value'",HashMap::from([("key".into(), "value".into())]).into())]
+    #[case::map_single_entry("'key=value'",BTreeMap::from([("key".into(), "value".into())]).into())]
     #[case::map_multiple_entries("'key1=value1 key2=value2 key3=value3'",
-        HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into()),
+        BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into()),
         ("key3".into(), "value3".into())]).into())]
     #[case::double_quoted_map("\"key1=value1 key2=value2\"",
-        HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]).into())]
+        BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]).into())]
     fn test_parse_quoted_value(#[case] input: &str, #[case] expected: FieldValue) {
         let (remaining, result) = parse_quoted_value(input).unwrap();
         assert!(remaining.is_empty());
@@ -193,7 +193,7 @@ mod tests {
     #[case::double_quoted_string("\"foo\"", "foo".into())]
     #[case::single_quoted_string("'foo'", "foo".into())]
     #[case::unquoted_string("foo", "foo".into())]
-    #[case::map("'key=value'",HashMap::from([("key".into(), "value".into())]).into())]
+    #[case::map("'key=value'",BTreeMap::from([("key".into(), "value".into())]).into())]
     #[case::integer("123", 123.into())]
     fn test_parse_value(#[case] input: &str, #[case] expected: FieldValue) {
         let (remaining, result) = parse_value(input).unwrap();

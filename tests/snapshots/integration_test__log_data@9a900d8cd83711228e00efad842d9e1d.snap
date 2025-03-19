@@ -1,0 +1,38 @@
+---
+source: tests/integration_test.rs
+expression: record
+info: "type=SYSCALL msg=audit(1481076984.827:17): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=390 pid=391 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)"
+---
+{
+  "record_type": "SYSCALL",
+  "timestamp": 1481076984827,
+  "id": 17,
+  "fields": {
+    "a0": 0,
+    "a1": "41a15c",
+    "a2": 0,
+    "a3": 0,
+    "arch": "c000003e",
+    "auid": 4294967295,
+    "comm": "modprobe",
+    "egid": 0,
+    "euid": 0,
+    "exe": "/usr/bin/kmod",
+    "exit": 0,
+    "fsgid": 0,
+    "fsuid": 0,
+    "gid": 0,
+    "items": 0,
+    "key": "(null)",
+    "pid": 391,
+    "ppid": 390,
+    "ses": 4294967295,
+    "sgid": 0,
+    "subj": "system_u:system_r:insmod_t:s0",
+    "success": "yes",
+    "suid": 0,
+    "syscall": 313,
+    "tty": "(none)",
+    "uid": 0
+  }
+}

@@ -1,0 +1,19 @@
+---
+source: tests/integration_test.rs
+expression: record
+info: "type=CONFIG_CHANGE msg=audit(1492749467.018:1209): auid=4294967295 ses=4294967295 subj=system_u:system_r:unconfined_service_t:s0 op=\"add_rule\" key=\"pam\" list=4 res=1"
+---
+{
+  "record_type": "CONFIG_CHANGE",
+  "timestamp": 1492749467018,
+  "id": 1209,
+  "fields": {
+    "auid": 4294967295,
+    "key": "pam",
+    "list": 4,
+    "op": "add_rule",
+    "res": 1,
+    "ses": 4294967295,
+    "subj": "system_u:system_r:unconfined_service_t:s0"
+  }
+}

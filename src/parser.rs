@@ -1,13 +1,23 @@
 use body::parse_body;
 use header::parse_header;
 use nom::{Finish, Parser};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+use thiserror::Error;
 
 use crate::AuditdRecord;
 
 mod body;
 mod header;
 
-pub fn parse_record(input: &str) -> Result<AuditdRecord, anyhow::Error> {
+#[derive(Debug, Error)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub enum ParserError {
+    #[error("parsing error: {0}")]
+    Parse(String),
+}
+
+pub fn parse_record(input: &str) -> Result<AuditdRecord, ParserError> {
     (parse_header, parse_body)
         .map(|(header, body)| AuditdRecord {
             record_type: header.record_type,
@@ -21,7 +31,7 @@ pub fn parse_record(input: &str) -> Result<AuditdRecord, anyhow::Error> {
         .parse(input)
         .finish()
         .map(|(_, record)| record)
-        .map_err(|err| anyhow::anyhow!(err.to_string()))
+        .map_err(|err| ParserError::Parse(err.to_string()))
 }
 
 #[cfg(test)]
@@ -29,7 +39,7 @@ mod tests {
     use super::*;
     use body::ENRICHMENT_SEPARATOR;
     use rstest::rstest;
-    use std::collections::HashMap;
+    use std::collections::BTreeMap;
 
     #[rstest]
     #[case::unenriched("type=foo msg=audit(1234.567:89): key1=value1 key2=value2",
@@ -37,7 +47,7 @@ mod tests {
             record_type: "foo".into(),
             timestamp: 1_234_567,
             id: 89,
-            fields: HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
+            fields: BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
             enrichment: None,
         }
     )]
@@ -46,8 +56,8 @@ mod tests {
             record_type: "foo".into(),
             timestamp: 1_234_567,
             id: 89,
-            fields: HashMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
-            enrichment: Some(HashMap::from([("enriched_key".into(), "enriched_value".into())])),
+            fields: BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
+            enrichment: Some(BTreeMap::from([("enriched_key".into(), "enriched_value".into())])),
         }
     )]
     fn test_parse_record(#[case] input: &str, #[case] expected: AuditdRecord) {

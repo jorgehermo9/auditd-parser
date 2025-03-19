@@ -1,0 +1,27 @@
+---
+source: tests/integration_test.rs
+expression: record
+info: "type=CRED_ACQ msg=audit(1481077043.057:413): pid=1298 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=PAM:setcred grantors=pam_env,pam_unix acct=\"andrew_kroh\" exe=\"/usr/sbin/sshd\" hostname=pool-96-241-146-97.washdc.fios.verizon.net addr=96.241.146.97 terminal=ssh res=success'"
+---
+{
+  "record_type": "CRED_ACQ",
+  "timestamp": 1481077043057,
+  "id": 413,
+  "fields": {
+    "auid": 4294967295,
+    "msg": {
+      "acct": "andrew_kroh",
+      "addr": "96.241.146.97",
+      "exe": "/usr/sbin/sshd",
+      "grantors": "pam_env,pam_unix",
+      "hostname": "pool-96-241-146-97.washdc.fios.verizon.net",
+      "op": "PAM:setcred",
+      "res": "success",
+      "terminal": "ssh"
+    },
+    "pid": 1298,
+    "ses": 4294967295,
+    "subj": "system_u:system_r:sshd_t:s0-s0:c0.c1023",
+    "uid": 0
+  }
+}

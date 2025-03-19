@@ -1,0 +1,25 @@
+---
+source: tests/integration_test.rs
+expression: record
+info: "type=USER_LOGIN msg=audit(1492810797.778:12651): pid=11396 uid=0 auid=1001 ses=36 msg='op=login id=1001 exe=\"/usr/sbin/sshd\" hostname=72.83.230.100 addr=72.83.230.100 terminal=/dev/pts/1 res=success'"
+---
+{
+  "record_type": "USER_LOGIN",
+  "timestamp": 1492810797778,
+  "id": 12651,
+  "fields": {
+    "auid": 1001,
+    "msg": {
+      "addr": "72.83.230.100",
+      "exe": "/usr/sbin/sshd",
+      "hostname": "72.83.230.100",
+      "id": 1001,
+      "op": "login",
+      "res": "success",
+      "terminal": "/dev/pts/1"
+    },
+    "pid": 11396,
+    "ses": 36,
+    "uid": 0
+  }
+}
