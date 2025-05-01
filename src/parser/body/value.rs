@@ -1,20 +1,17 @@
-use crate::FieldValue;
-use crate::utils::burp;
 use nom::AsChar;
 use nom::branch::alt;
 use nom::bytes::complete::{take_while, take_while1};
-use nom::character::complete::{char, u64 as parse_u64};
-use nom::combinator::all_consuming;
+use nom::character::complete::char;
 use nom::sequence::delimited;
 use nom::{IResult, Parser};
 
-use super::{ENRICHMENT_SEPARATOR, parse_key_value_list};
+use super::ENRICHMENT_SEPARATOR;
 
 // TODO: reorder these functions so we go from high-level to low-level
 
 /// Parses a string value, which can be surrounded by single or double quotes.
 // TODO: create a parse_string method and use it also in the key parser?
-fn parse_string_value(input: &str) -> IResult<&str, &str> {
+fn parse_quoted_value(input: &str) -> IResult<&str, &str> {
     const DOUBLE_QUOTE: char = '"';
     const SINGLE_QUOTE: char = '\'';
 
@@ -35,55 +32,25 @@ fn parse_string_value(input: &str) -> IResult<&str, &str> {
     .parse(input)
 }
 
-fn parse_quoted_value(input: &str) -> IResult<&str, FieldValue> {
-    parse_string_value
-        .and_then(alt((
-            // Parses a map value, which is a string that contains a list of key-value pairs.
-            // For example, it can be found in the `msg` field of auditd records, surrounded by single quotes:
-            // `msg='op=PAM:accounting grantors=pam_unix,pam_permit,pam_time acct="jorge" exe="/usr/bin/sudo" hostname=? addr=? terminal=/dev/pts/1 res=success'`
-            parse_key_value_list.map(FieldValue::from),
-            // Treat the quoted value as an string if the previous parsers did not succeed
-            // and return the input to this `alt` as-is
-            burp.map(FieldValue::from),
-        )))
-        .parse(input)
-}
-
-fn parse_primitive_value(input: &str) -> IResult<&str, FieldValue> {
-    // TODO: add `null` variant
-    // TODO: add hexadecimal variant? Or maybe we should interpret it in a different step?
-    // based in field name
-    all_consuming(alt((parse_u64.map(FieldValue::from),))).parse(input)
-}
-
 // TODO: the maybe we have to make a parser out of the `take_while1(..)` as it is repeated
 // in parse_key.
-fn parse_unquoted_value(input: &str) -> IResult<&str, FieldValue> {
+fn parse_unquoted_value(input: &str) -> IResult<&str, &str> {
     // If the value is not surrounded by quotes, take all the characters until a space or the enrichment separator is found.
     // For example, in the `op` field of auditd records: `op=PAM:accounting`, the value should be a string, but
     // it is not surrounded by quotes.
     // TODO: use take_while0?
-    take_while1(|c: char| !c.is_space() && c != ENRICHMENT_SEPARATOR)
-        .and_then(alt((
-            parse_primitive_value,
-            // TODO: add a parse_hexadecimal parser?
-            // TODO: add a parse_null parser? to parse things like `hostname=?`
-            // Treat the unquoted value as an string if the previous parsers did not succeed
-            // and return the input to this `alt` as-is
-            burp.map(FieldValue::from),
-        )))
-        .parse(input)
+    take_while1(|c: char| !c.is_space() && c != ENRICHMENT_SEPARATOR).parse(input)
 }
 
 /// Parses the value part of a field, the right side of the `key=value` pair.
-pub fn parse_value(input: &str) -> IResult<&str, FieldValue> {
-    alt((parse_quoted_value, parse_unquoted_value)).parse(input)
+pub fn parse_value(input: &str) -> IResult<&str, String> {
+    alt((parse_quoted_value, parse_unquoted_value))
+        .map(ToString::to_string)
+        .parse(input)
 }
 
 #[cfg(test)]
 mod tests {
-    use std::collections::BTreeMap;
-
     use super::*;
     use rstest::rstest;
 
@@ -96,11 +63,17 @@ mod tests {
     #[case::single_quoted_with_double_quote_inside("'foo\"bar'", "foo\"bar")]
     #[case::double_quoted_empty_string("\"\"", "")]
     #[case::single_quoted_empty_string("''", "")]
+    #[case::map_single_entry("'key=value'", "key=value")]
+    #[case::map_multiple_entries(
+        "'key1=value1 key2=value2 key3=value3'",
+        "key1=value1 key2=value2 key3=value3"
+    )]
+    #[case::double_quoted_map("\"key1=value1 key2=value2\"", "key1=value1 key2=value2")]
     // FIXME: this tests should not fail. We should treat escaped quotes properly
     // #[case::escaped_double_quote(r#""foo\"bar""#, r#"foo"bar"#)]
     // #[case::escaped_single_quote("'foo\'bar'", "foo'bar")]
-    fn test_parse_string_value(#[case] input: &str, #[case] expected: &str) {
-        let (remaining, result) = parse_string_value(input).unwrap();
+    fn test_parse_quoted_value(#[case] input: &str, #[case] expected: &str) {
+        let (remaining, result) = parse_quoted_value(input).unwrap();
         assert!(remaining.is_empty());
         assert_eq!(result, expected);
     }
@@ -114,63 +87,26 @@ mod tests {
     #[case::double_quoted_not_preceded("foo\"")]
     #[case::single_quoted_not_preceded("foo'")]
     #[case::empty("")]
-    fn test_parse_string_value_fails(#[case] input: &str) {
-        assert!(parse_string_value(input).is_err());
-    }
-
-    #[rstest]
-    #[case::string("\"foo\"", "foo".into())]
-    #[case::map_single_entry("'key=value'",BTreeMap::from([("key".into(), "value".into())]).into())]
-    #[case::map_multiple_entries("'key1=value1 key2=value2 key3=value3'",
-        BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into()),
-        ("key3".into(), "value3".into())]).into())]
-    #[case::double_quoted_map("\"key1=value1 key2=value2\"",
-        BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]).into())]
-    fn test_parse_quoted_value(#[case] input: &str, #[case] expected: FieldValue) {
-        let (remaining, result) = parse_quoted_value(input).unwrap();
-        assert!(remaining.is_empty());
-        assert_eq!(result, expected);
-    }
-
-    #[rstest]
-    #[case::unquoted("foo")]
-    #[case::empty("")]
     fn test_parse_quoted_value_fails(#[case] input: &str) {
         assert!(parse_quoted_value(input).is_err());
     }
 
     #[rstest]
-    #[case::integer("123", 123.into())]
-    fn test_parse_primitive_value(#[case] input: &str, #[case] expected: FieldValue) {
-        let (remaining, result) = parse_primitive_value(input).unwrap();
-        assert!(remaining.is_empty());
-        assert_eq!(result, expected);
-    }
-
-    #[rstest]
-    #[case::terminated_with_non_numeric("123abc")]
-    #[case::non_numeric("abc")]
-    #[case::empty("")]
-    fn test_parse_primitive_value_fails(#[case] input: &str) {
-        assert!(parse_primitive_value(input).is_err());
-    }
-
-    #[rstest]
-    #[case::unquoted_string("foo", "foo".into())]
-    #[case::integer("123", 123.into())]
-    fn test_parse_unquoted_value(#[case] input: &str, #[case] expected: FieldValue) {
+    #[case::unquoted_string("foo", "foo")]
+    #[case::number("123", "123")]
+    fn test_parse_unquoted_value(#[case] input: &str, #[case] expected: &str) {
         let (remaining, result) = parse_unquoted_value(input).unwrap();
         assert!(remaining.is_empty());
         assert_eq!(result, expected);
     }
 
     #[rstest]
-    #[case::space("foo bar", "foo".into(), ' ', " bar")]
-    #[case::enrichment_separator(&format!("foo{ENRICHMENT_SEPARATOR}bar"), "foo".into(),
+    #[case::space("foo bar", "foo", ' ', " bar")]
+    #[case::enrichment_separator(&format!("foo{ENRICHMENT_SEPARATOR}bar"), "foo",
         ENRICHMENT_SEPARATOR, &format!("{ENRICHMENT_SEPARATOR}bar"))]
     fn test_parse_unquoted_value_stops_at_delimiter(
         #[case] input: &str,
-        #[case] expected: FieldValue,
+        #[case] expected: &str,
         #[case] delimiter: char,
         #[case] expected_remaining: &str,
     ) {
@@ -190,12 +126,12 @@ mod tests {
     }
 
     #[rstest]
-    #[case::double_quoted_string("\"foo\"", "foo".into())]
-    #[case::single_quoted_string("'foo'", "foo".into())]
-    #[case::unquoted_string("foo", "foo".into())]
-    #[case::map("'key=value'",BTreeMap::from([("key".into(), "value".into())]).into())]
-    #[case::integer("123", 123.into())]
-    fn test_parse_value(#[case] input: &str, #[case] expected: FieldValue) {
+    #[case::double_quoted_string("\"foo\"", "foo")]
+    #[case::single_quoted_string("'foo'", "foo")]
+    #[case::unquoted_string("foo", "foo")]
+    #[case::map("'key=value'", "key=value")]
+    #[case::number("123", "123")]
+    fn test_parse_value(#[case] input: &str, #[case] expected: &str) {
         let (remaining, result) = parse_value(input).unwrap();
         assert!(remaining.is_empty());
         assert_eq!(result, expected);

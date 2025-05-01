@@ -17,17 +17,17 @@ pub const ENRICHMENT_SEPARATOR: char = '\x1d';
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct InnerBody {
-    pub fields: BTreeMap<String, FieldValue>,
-    pub enrichment: Option<BTreeMap<String, FieldValue>>,
+    pub fields: BTreeMap<String, String>,
+    pub enrichment: Option<BTreeMap<String, String>>,
 }
 
 /// Parses a key-value pair
-fn parse_key_value(input: &str) -> IResult<&str, (String, FieldValue)> {
+fn parse_key_value(input: &str) -> IResult<&str, (String, String)> {
     separated_pair(parse_key, char('='), parse_value).parse(input)
 }
 
 /// Parses a list of key-value pairs, separated by spaces
-fn parse_key_value_list(input: &str) -> IResult<&str, BTreeMap<String, FieldValue>> {
+fn parse_key_value_list(input: &str) -> IResult<&str, BTreeMap<String, String>> {
     // Workaround for https://github.com/linux-audit/audit-kernel/issues/169.
     // Some auditd logs (for example, `type=SYSTEM_SHUTDOWN` logs) have a `msg` field that contains a preceeding space.
     // we need to ignore this space to parse the key-value list
@@ -68,8 +68,8 @@ mod tests {
     use rstest::rstest;
 
     #[rstest]
-    #[case::regular("key=value", ("key", "value".into()))]
-    fn test_parse_key_value(#[case] input: &str, #[case] expected: (&str, FieldValue)) {
+    #[case::regular("key=value", ("key", "value"))]
+    fn test_parse_key_value(#[case] input: &str, #[case] expected: (&str, &str)) {
         let (expected_key, expected_value) = expected;
         let (remaining, (key, value)) = parse_key_value(input).unwrap();
         assert!(remaining.is_empty());
@@ -96,10 +96,7 @@ mod tests {
     #[case::preceding_space(" key1=value1 key2=value2",
         BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())])
     )]
-    fn test_parse_key_value_list(
-        #[case] input: &str,
-        #[case] expected: BTreeMap<String, FieldValue>,
-    ) {
+    fn test_parse_key_value_list(#[case] input: &str, #[case] expected: BTreeMap<String, String>) {
         let (remaining, result) = parse_key_value_list(input).unwrap();
         assert!(remaining.is_empty());
         assert_eq!(result, expected);
