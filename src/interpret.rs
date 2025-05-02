@@ -49,6 +49,7 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
 }
 
 fn interpret_msg_field(field_value: String) -> FieldValue {
+    // TODO: fields inside msg should be interpreted aswell?
     let Ok((_, key_value_list)) =
         // TODO: maybe we should refactor this so this doesn't use parser module functions...
         all_consuming(parser::body::parse_key_value_list)
@@ -59,6 +60,7 @@ fn interpret_msg_field(field_value: String) -> FieldValue {
     // TODO: create a new parse_key_value_list here that returns NestedFieldValue itself...
     let nested_field_value_map: BTreeMap<String, NestedFieldValue> = key_value_list
         .into_iter()
+        // TODO: should we call interpret_field_value for nested fields inside the msg field?
         .map(|(key, val)| (key, NestedFieldValue::String(val)))
         .collect();
 
