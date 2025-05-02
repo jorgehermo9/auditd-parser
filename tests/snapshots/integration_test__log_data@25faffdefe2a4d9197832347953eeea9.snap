@@ -8,20 +8,11 @@ info: "type=USER_ACCT msg=audit(1481077043.052:410): pid=1298 uid=0 auid=4294967
   "timestamp": 1481077043052,
   "id": 410,
   "fields": {
-    "auid": 4294967295,
-    "msg": {
-      "acct": "andrew_kroh",
-      "addr": "96.241.146.97",
-      "exe": "/usr/sbin/sshd",
-      "grantors": "pam_unix,pam_localuser",
-      "hostname": "pool-96-241-146-97.washdc.fios.verizon.net",
-      "op": "PAM:accounting",
-      "res": "success",
-      "terminal": "ssh"
-    },
-    "pid": 1298,
-    "ses": 4294967295,
+    "auid": "4294967295",
+    "msg": "op=PAM:accounting grantors=pam_unix,pam_localuser acct=\"andrew_kroh\" exe=\"/usr/sbin/sshd\" hostname=pool-96-241-146-97.washdc.fios.verizon.net addr=96.241.146.97 terminal=ssh res=success",
+    "pid": "1298",
+    "ses": "4294967295",
     "subj": "system_u:system_r:sshd_t:s0-s0:c0.c1023",
-    "uid": 0
+    "uid": "0"
   }
 }

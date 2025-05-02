@@ -8,16 +8,11 @@ info: "type=USER_CMD msg=audit(1481077231.363:475): pid=1382 uid=1000 auid=1000 
   "timestamp": 1481077231363,
   "id": 475,
   "fields": {
-    "auid": 1000,
-    "msg": {
-      "cmd": "2E2F6D657472696362656174202D63206D622E6465762E796D6C",
-      "cwd": "/home/andrew_kroh",
-      "res": "success",
-      "terminal": "pts/0"
-    },
-    "pid": 1382,
-    "ses": 3,
+    "auid": "1000",
+    "msg": "cwd=\"/home/andrew_kroh\" cmd=2E2F6D657472696362656174202D63206D622E6465762E796D6C terminal=pts/0 res=success",
+    "pid": "1382",
+    "ses": "3",
     "subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
-    "uid": 1000
+    "uid": "1000"
   }
 }

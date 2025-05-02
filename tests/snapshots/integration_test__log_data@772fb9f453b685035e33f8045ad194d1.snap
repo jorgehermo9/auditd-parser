@@ -8,11 +8,11 @@ info: "type=USER_TTY msg=audit(1491922681.082:1065050): pid=28058 uid=0 auid=100
   "timestamp": 1491922681082,
   "id": 1065050,
   "fields": {
-    "auid": 1000,
+    "auid": "1000",
     "data": "7375202D20616E647265775F6B726F68",
-    "pid": 28058,
-    "ses": 762,
+    "pid": "28058",
+    "ses": "762",
     "subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
-    "uid": 0
+    "uid": "0"
   }
 }

@@ -9,12 +9,10 @@ info: "type=EXECVE msg=audit(1491863086.221:1050925): argc=5 a0=\"grep\" a1=\"--
   "id": 1050925,
   "fields": {
     "a0": "grep",
-    "a1": {
-      "--color": "auto"
-    },
+    "a1": "--color=auto",
     "a2": "-e",
     "a3": "[:alpha:]",
     "a4": "/etc/passwd",
-    "argc": 5
+    "argc": "5"
   }
 }
