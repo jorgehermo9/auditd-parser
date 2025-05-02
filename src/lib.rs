@@ -3,7 +3,6 @@ mod parser;
 mod record;
 pub use record::AuditdRecord;
 pub use record::FieldValue;
-use std::alloc::GlobalAlloc;
 
 #[cfg(test)]
 mod tests {
