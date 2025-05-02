@@ -1,8 +1,8 @@
-use crate::FieldValue;
 use key::parse_key;
 use nom::branch::alt;
 use nom::character::complete::char;
 use nom::character::complete::space0;
+use nom::character::complete::space1;
 use nom::combinator::all_consuming;
 use nom::multi::separated_list1;
 use nom::sequence::{preceded, separated_pair};
@@ -17,21 +17,18 @@ pub const ENRICHMENT_SEPARATOR: char = '\x1d';
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct InnerBody {
-    pub fields: BTreeMap<String, FieldValue>,
-    pub enrichment: Option<BTreeMap<String, FieldValue>>,
+    pub fields: BTreeMap<String, String>,
+    pub enrichment: Option<BTreeMap<String, String>>,
 }
 
 /// Parses a key-value pair
-fn parse_key_value(input: &str) -> IResult<&str, (String, FieldValue)> {
+fn parse_key_value(input: &str) -> IResult<&str, (String, String)> {
     separated_pair(parse_key, char('='), parse_value).parse(input)
 }
 
 /// Parses a list of key-value pairs, separated by spaces
-fn parse_key_value_list(input: &str) -> IResult<&str, BTreeMap<String, FieldValue>> {
-    // Workaround for https://github.com/linux-audit/audit-kernel/issues/169.
-    // Some auditd logs (for example, `type=SYSTEM_SHUTDOWN` logs) have a `msg` field that contains a preceeding space.
-    // we need to ignore this space to parse the key-value list
-    preceded(space0, separated_list1(char(' '), parse_key_value))
+fn parse_key_value_list(input: &str) -> IResult<&str, BTreeMap<String, String>> {
+    preceded(space0, separated_list1(space1, parse_key_value))
         .map(BTreeMap::from_iter)
         .parse(input)
 }
@@ -49,7 +46,7 @@ fn parse_enriched_body(input: &str) -> IResult<&str, InnerBody> {
     .parse(input)
 }
 
-pub fn parse_unenriched_body(input: &str) -> IResult<&str, InnerBody> {
+pub fn parse_not_enriched_body(input: &str) -> IResult<&str, InnerBody> {
     parse_key_value_list
         .map(|fields| InnerBody {
             fields,
@@ -59,7 +56,7 @@ pub fn parse_unenriched_body(input: &str) -> IResult<&str, InnerBody> {
 }
 
 pub fn parse_body(input: &str) -> IResult<&str, InnerBody> {
-    all_consuming(alt((parse_enriched_body, parse_unenriched_body))).parse(input)
+    all_consuming(alt((parse_enriched_body, parse_not_enriched_body))).parse(input)
 }
 
 #[cfg(test)]
@@ -68,8 +65,8 @@ mod tests {
     use rstest::rstest;
 
     #[rstest]
-    #[case::regular("key=value", ("key", "value".into()))]
-    fn test_parse_key_value(#[case] input: &str, #[case] expected: (&str, FieldValue)) {
+    #[case::regular("key=value", ("key", "value"))]
+    fn test_parse_key_value(#[case] input: &str, #[case] expected: (&str, &str)) {
         let (expected_key, expected_value) = expected;
         let (remaining, (key, value)) = parse_key_value(input).unwrap();
         assert!(remaining.is_empty());
@@ -93,13 +90,17 @@ mod tests {
         BTreeMap::from([("key1".into(), "value1".into()),
             ("key2".into(), "value2".into()),("key3".into(), "value3".into())])
     )]
-    #[case::preceding_space(" key1=value1 key2=value2",
-        BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())])
+    #[case::preceding_space(" key1=value1",
+        BTreeMap::from([("key1".into(), "value1".into())])
     )]
-    fn test_parse_key_value_list(
-        #[case] input: &str,
-        #[case] expected: BTreeMap<String, FieldValue>,
-    ) {
+    #[case::multiple_preceding_space("  key1=value1",
+        BTreeMap::from([("key1".into(), "value1".into())])
+    )]
+    #[case::multiple_space_separator("key1=value1   key2=value2   key3=value3",
+        BTreeMap::from([("key1".into(), "value1".into()),
+            ("key2".into(), "value2".into()),("key3".into(), "value3".into())])
+    )]
+    fn test_parse_key_value_list(#[case] input: &str, #[case] expected: BTreeMap<String, String>) {
         let (remaining, result) = parse_key_value_list(input).unwrap();
         assert!(remaining.is_empty());
         assert_eq!(result, expected);
@@ -166,7 +167,7 @@ mod tests {
             enrichment: Some(BTreeMap::from([("enriched_key".into(), "enriched_value".into())]))
         }
     )]
-    #[case::unenriched("key1=value1 key2=value2",
+    #[case::not_enriched("key1=value1 key2=value2",
         InnerBody{
             fields: BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
             enrichment: None
@@ -183,6 +184,15 @@ mod tests {
     #[case::invalid_key_value("foo")]
     #[case::empty("")]
     fn test_parse_body_fails(#[case] input: &str) {
-        assert!(parse_body(input).is_err());
+        assert!(dbg!(parse_body(input)).is_err());
+    }
+
+    #[test]
+    fn test_parse_body_all_consuming_fails() {
+        let line = format!(
+            "key=value{ENRICHMENT_SEPARATOR}enriched_key=enriched_value{ENRICHMENT_SEPARATOR}"
+        );
+
+        assert!(dbg!(parse_body(&line)).is_err());
     }
 }

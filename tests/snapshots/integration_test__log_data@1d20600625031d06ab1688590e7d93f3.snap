@@ -8,19 +8,11 @@ info: "type=USER_LOGIN msg=audit(1481077043.193:421): pid=1298 uid=0 auid=1000 s
   "timestamp": 1481077043193,
   "id": 421,
   "fields": {
-    "auid": 1000,
-    "msg": {
-      "addr": "96.241.146.97",
-      "exe": "/usr/sbin/sshd",
-      "hostname": "pool-96-241-146-97.washdc.fios.verizon.net",
-      "id": 1000,
-      "op": "login",
-      "res": "success",
-      "terminal": "/dev/pts/0"
-    },
-    "pid": 1298,
-    "ses": 1,
+    "auid": "1000",
+    "msg": "op=login id=1000 exe=\"/usr/sbin/sshd\" hostname=pool-96-241-146-97.washdc.fios.verizon.net addr=96.241.146.97 terminal=/dev/pts/0 res=success",
+    "pid": "1298",
+    "ses": "1",
     "subj": "system_u:system_r:sshd_t:s0-s0:c0.c1023",
-    "uid": 0
+    "uid": "0"
   }
 }

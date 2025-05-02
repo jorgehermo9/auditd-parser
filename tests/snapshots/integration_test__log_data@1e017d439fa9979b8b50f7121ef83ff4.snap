@@ -13,6 +13,6 @@ info: "type=EXECVE msg=audit(1507304439.922:1865): argc=5 a0=\"useradd\" a1=\"-u
     "a2": "3005",
     "a3": "-m",
     "a4": "trainer5",
-    "argc": 5
+    "argc": "5"
   }
 }
