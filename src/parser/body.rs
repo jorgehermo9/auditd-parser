@@ -2,6 +2,7 @@ use key::parse_key;
 use nom::branch::alt;
 use nom::character::complete::char;
 use nom::character::complete::space0;
+use nom::character::complete::space1;
 use nom::combinator::all_consuming;
 use nom::multi::separated_list1;
 use nom::sequence::{preceded, separated_pair};
@@ -27,11 +28,7 @@ fn parse_key_value(input: &str) -> IResult<&str, (String, String)> {
 
 /// Parses a list of key-value pairs, separated by spaces
 fn parse_key_value_list(input: &str) -> IResult<&str, BTreeMap<String, String>> {
-    // TODO: move preceded space0 to the interpreter. Raw auditd records does not have this issue.
-    // Workaround for https://github.com/linux-audit/audit-kernel/issues/169.
-    // Some auditd logs (for example, `type=SYSTEM_SHUTDOWN` logs) have a `msg` field that contains a preceeding space.
-    // we need to ignore this space to parse the key-value list
-    preceded(space0, separated_list1(char(' '), parse_key_value))
+    preceded(space0, separated_list1(space1, parse_key_value))
         .map(BTreeMap::from_iter)
         .parse(input)
 }
@@ -93,8 +90,15 @@ mod tests {
         BTreeMap::from([("key1".into(), "value1".into()),
             ("key2".into(), "value2".into()),("key3".into(), "value3".into())])
     )]
-    #[case::preceding_space(" key1=value1 key2=value2",
-        BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())])
+    #[case::preceding_space(" key1=value1",
+        BTreeMap::from([("key1".into(), "value1".into())])
+    )]
+    #[case::multiple_preceding_space("  key1=value1",
+        BTreeMap::from([("key1".into(), "value1".into())])
+    )]
+    #[case::multiple_space_separator("key1=value1   key2=value2   key3=value3",
+        BTreeMap::from([("key1".into(), "value1".into()),
+            ("key2".into(), "value2".into()),("key3".into(), "value3".into())])
     )]
     fn test_parse_key_value_list(#[case] input: &str, #[case] expected: BTreeMap<String, String>) {
         let (remaining, result) = parse_key_value_list(input).unwrap();
