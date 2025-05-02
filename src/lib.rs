@@ -1,7 +1,6 @@
 mod interpret;
 mod parser;
 mod record;
-mod utils;
 
 pub use record::AuditdRecord;
 pub use record::FieldValue;
