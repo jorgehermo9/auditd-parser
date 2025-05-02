@@ -41,7 +41,7 @@ impl From<RawAuditdRecord> for AuditdRecord {
     }
 }
 
-fn interpret_field_value(record_type: &str, field_name: &str, field_value: String) -> FieldValue {
+fn interpret_field_value(_record_type: &str, field_name: &str, field_value: String) -> FieldValue {
     match field_name {
         "msg" => interpret_msg_field(field_value),
         _ => FieldValue::String(field_value),
