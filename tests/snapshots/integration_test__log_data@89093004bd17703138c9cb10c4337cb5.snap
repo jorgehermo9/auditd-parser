@@ -9,7 +9,15 @@ info: "type=SERVICE_START msg=audit(1481076983.864:6): pid=1 uid=0 auid=42949672
   "id": 6,
   "fields": {
     "auid": "4294967295",
-    "msg": "unit=auditd comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success",
+    "msg": {
+      "addr": "?",
+      "comm": "systemd",
+      "exe": "/usr/lib/systemd/systemd",
+      "hostname": "?",
+      "res": "success",
+      "terminal": "?",
+      "unit": "auditd"
+    },
     "pid": "1",
     "ses": "4294967295",
     "subj": "system_u:system_r:init_t:s0",

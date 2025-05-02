@@ -7,7 +7,8 @@ use nom::{Finish, Parser};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-mod body;
+// TODO: remove pub(crate) once refactor `interpret_key_value_field`
+pub(crate) mod body;
 mod header;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -19,8 +20,10 @@ pub struct RawAuditdRecord {
     /// Record identifier
     pub id: u64,
 
+    // TODO: use index-ordered map?
     pub fields: BTreeMap<String, String>,
 
+    // TODO: use index-ordered map?
     pub enrichment: Option<BTreeMap<String, String>>,
 }
 

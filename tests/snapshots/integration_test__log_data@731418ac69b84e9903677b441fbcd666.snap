@@ -9,7 +9,15 @@ info: "type=ADD_GROUP msg=audit(1451781471.602:194894): pid=1321 uid=0 auid=1000
   "id": 194894,
   "fields": {
     "auid": "1000",
-    "msg": "op=add-group acct=\"frodo\" exe=\"/usr/sbin/useradd\" hostname=? addr=? terminal=pts/0 res=success",
+    "msg": {
+      "acct": "frodo",
+      "addr": "?",
+      "exe": "/usr/sbin/useradd",
+      "hostname": "?",
+      "op": "add-group",
+      "res": "success",
+      "terminal": "pts/0"
+    },
     "pid": "1321",
     "ses": "1",
     "subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",

@@ -27,7 +27,7 @@ fn parse_key_value(input: &str) -> IResult<&str, (String, String)> {
 }
 
 /// Parses a list of key-value pairs, separated by spaces
-fn parse_key_value_list(input: &str) -> IResult<&str, BTreeMap<String, String>> {
+pub fn parse_key_value_list(input: &str) -> IResult<&str, BTreeMap<String, String>> {
     preceded(space0, separated_list1(space1, parse_key_value))
         .map(BTreeMap::from_iter)
         .parse(input)
@@ -46,7 +46,7 @@ fn parse_enriched_body(input: &str) -> IResult<&str, InnerBody> {
     .parse(input)
 }
 
-pub fn parse_not_enriched_body(input: &str) -> IResult<&str, InnerBody> {
+fn parse_not_enriched_body(input: &str) -> IResult<&str, InnerBody> {
     parse_key_value_list
         .map(|fields| InnerBody {
             fields,
