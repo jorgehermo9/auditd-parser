@@ -28,6 +28,7 @@ fn parse_key_value(input: &str) -> IResult<&str, (String, String)> {
 
 /// Parses a list of key-value pairs, separated by spaces
 fn parse_key_value_list(input: &str) -> IResult<&str, BTreeMap<String, String>> {
+    // TODO: move this to the interpreter. Raw auditd records does not have this issue.
     // Workaround for https://github.com/linux-audit/audit-kernel/issues/169.
     // Some auditd logs (for example, `type=SYSTEM_SHUTDOWN` logs) have a `msg` field that contains a preceeding space.
     // we need to ignore this space to parse the key-value list
@@ -49,7 +50,7 @@ fn parse_enriched_body(input: &str) -> IResult<&str, InnerBody> {
     .parse(input)
 }
 
-pub fn parse_unenriched_body(input: &str) -> IResult<&str, InnerBody> {
+pub fn parse_not_enriched_body(input: &str) -> IResult<&str, InnerBody> {
     parse_key_value_list
         .map(|fields| InnerBody {
             fields,
@@ -59,7 +60,7 @@ pub fn parse_unenriched_body(input: &str) -> IResult<&str, InnerBody> {
 }
 
 pub fn parse_body(input: &str) -> IResult<&str, InnerBody> {
-    all_consuming(alt((parse_enriched_body, parse_unenriched_body))).parse(input)
+    all_consuming(alt((parse_enriched_body, parse_not_enriched_body))).parse(input)
 }
 
 #[cfg(test)]
@@ -163,7 +164,7 @@ mod tests {
             enrichment: Some(BTreeMap::from([("enriched_key".into(), "enriched_value".into())]))
         }
     )]
-    #[case::unenriched("key1=value1 key2=value2",
+    #[case::not_enriched("key1=value1 key2=value2",
         InnerBody{
             fields: BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
             enrichment: None

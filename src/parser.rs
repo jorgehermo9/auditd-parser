@@ -38,8 +38,6 @@ pub fn parse_record(input: &str) -> Result<RawAuditdRecord, ParserError> {
             timestamp: header.audit_msg.timestamp,
             id: header.audit_msg.id,
             fields: body.fields,
-            // TODO: we should lowercase the enrichment keys? Or leave it as is in a
-            // `RawAuditdRecord` and then have a `AuditdRecord` that merges enrichment and fields
             enrichment: body.enrichment,
         })
         .parse(input)
@@ -56,7 +54,7 @@ mod tests {
     use std::collections::BTreeMap;
 
     #[rstest]
-    #[case::unenriched("type=foo msg=audit(1234.567:89): key1=value1 key2=value2",
+    #[case::not_enriched("type=foo msg=audit(1234.567:89): key1=value1 key2=value2",
         RawAuditdRecord {
             record_type: "foo".into(),
             timestamp: 1_234_567,
