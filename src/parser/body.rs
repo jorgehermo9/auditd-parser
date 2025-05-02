@@ -1,4 +1,3 @@
-use crate::FieldValue;
 use key::parse_key;
 use nom::branch::alt;
 use nom::character::complete::char;
