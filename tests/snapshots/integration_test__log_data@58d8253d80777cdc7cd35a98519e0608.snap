@@ -9,13 +9,9 @@ info: "type=EXECVE msg=audit(1491930997.196:1068053): argc=4 a0=\"cat\" a1=\"bte
   "id": 1068053,
   "fields": {
     "a0": "cat",
-    "a1": {
-      "btest": "test"
-    },
+    "a1": "btest=test",
     "a2": "-f",
-    "a3": {
-      "regex": 8
-    },
-    "argc": 4
+    "a3": "regex=8",
+    "argc": "4"
   }
 }

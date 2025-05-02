@@ -9,13 +9,13 @@ info: "type=PATH msg=audit(1170021493.977:293): item=0 name=\"maildrop\" inode=1
   "id": 293,
   "fields": {
     "dev": "03:07",
-    "inode": 14911367,
-    "item": 0,
-    "mode": 40730,
+    "inode": "14911367",
+    "item": "0",
+    "mode": "040730",
     "name": "maildrop",
     "obj": "system_u:object_r:postfix_spool_maildrop_t:s0",
-    "ogid": 891,
-    "ouid": 890,
+    "ogid": "891",
+    "ouid": "890",
     "rdev": "00:00"
   }
 }

@@ -13,7 +13,7 @@ info: "type=AVC msg=audit(1524662933.080:61207): apparmor=\"DENIED\" operation=\
     "denied_mask": "trace",
     "operation": "ptrace",
     "peer": "unconfined",
-    "pid": 5571,
+    "pid": "5571",
     "profile": "docker-default",
     "requested_mask": "trace"
   }

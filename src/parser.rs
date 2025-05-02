@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use body::parse_body;
 use header::parse_header;
 use nom::{Finish, Parser};
@@ -5,10 +7,22 @@ use nom::{Finish, Parser};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::AuditdRecord;
-
 mod body;
 mod header;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RawAuditdRecord {
+    pub record_type: String,
+    /// Unix timestamp in milliseconds
+    pub timestamp: u64,
+
+    /// Record identifier
+    pub id: u64,
+
+    pub fields: BTreeMap<String, String>,
+
+    pub enrichment: Option<BTreeMap<String, String>>,
+}
 
 #[derive(Debug, Error)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -17,15 +31,13 @@ pub enum ParserError {
     Parse(String),
 }
 
-pub fn parse_record(input: &str) -> Result<AuditdRecord, ParserError> {
+pub fn parse_record(input: &str) -> Result<RawAuditdRecord, ParserError> {
     (parse_header, parse_body)
-        .map(|(header, body)| AuditdRecord {
+        .map(|(header, body)| RawAuditdRecord {
             record_type: header.record_type,
             timestamp: header.audit_msg.timestamp,
             id: header.audit_msg.id,
             fields: body.fields,
-            // TODO: we should lowercase the enrichment keys? Or leave it as is in a
-            // `RawAuditdRecord` and then have a `AuditdRecord` that merges enrichment and fields
             enrichment: body.enrichment,
         })
         .parse(input)
@@ -42,8 +54,8 @@ mod tests {
     use std::collections::BTreeMap;
 
     #[rstest]
-    #[case::unenriched("type=foo msg=audit(1234.567:89): key1=value1 key2=value2",
-        AuditdRecord {
+    #[case::not_enriched("type=foo msg=audit(1234.567:89): key1=value1 key2=value2",
+        RawAuditdRecord {
             record_type: "foo".into(),
             timestamp: 1_234_567,
             id: 89,
@@ -52,7 +64,7 @@ mod tests {
         }
     )]
     #[case::enriched(&format!("type=foo msg=audit(1234.567:89): key1=value1 key2=value2{ENRICHMENT_SEPARATOR}enriched_key=enriched_value"),
-        AuditdRecord {
+        RawAuditdRecord {
             record_type: "foo".into(),
             timestamp: 1_234_567,
             id: 89,
@@ -60,7 +72,7 @@ mod tests {
             enrichment: Some(BTreeMap::from([("enriched_key".into(), "enriched_value".into())])),
         }
     )]
-    fn test_parse_record(#[case] input: &str, #[case] expected: AuditdRecord) {
+    fn test_parse_record(#[case] input: &str, #[case] expected: RawAuditdRecord) {
         assert_eq!(parse_record(input).unwrap(), expected);
     }
 

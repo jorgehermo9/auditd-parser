@@ -1,0 +1,13 @@
+---
+source: tests/integration_test.rs
+expression: record
+info: "type=CWD msg=audit(1500661699.656:1208725):  cwd=2F746D702F6120622063"
+---
+{
+  "record_type": "CWD",
+  "timestamp": 1500661699656,
+  "id": 1208725,
+  "fields": {
+    "cwd": "2F746D702F6120622063"
+  }
+}
