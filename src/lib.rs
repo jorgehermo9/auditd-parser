@@ -1,6 +1,8 @@
 mod interpret;
-mod parser;
+// TODO: remove this pub(crate) once refactor `interpret_key_value_field`
+pub(crate) mod parser;
 mod record;
+
 pub use record::AuditdRecord;
 pub use record::FieldValue;
 

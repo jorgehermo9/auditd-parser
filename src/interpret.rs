@@ -1,4 +1,12 @@
-use crate::{AuditdRecord, FieldValue, parser::RawAuditdRecord};
+use std::collections::BTreeMap;
+
+use nom::{Parser, combinator::all_consuming};
+
+use crate::{
+    AuditdRecord, FieldValue,
+    parser::{self, RawAuditdRecord},
+    record::NestedFieldValue,
+};
 
 impl From<RawAuditdRecord> for AuditdRecord {
     // TODO: implement this propertly. We should interpret the field names
@@ -8,7 +16,12 @@ impl From<RawAuditdRecord> for AuditdRecord {
         let fields = value
             .fields
             .into_iter()
-            .map(|(key, val)| (key, FieldValue::String(val)))
+            .map(|(field_name, field_value)| {
+                let field_value =
+                    interpret_field_value(&value.record_type, &field_name, field_value);
+
+                (field_name, field_value)
+            })
             .collect();
 
         let enrichment = value.enrichment.map(|enrichment| {
@@ -26,4 +39,28 @@ impl From<RawAuditdRecord> for AuditdRecord {
             enrichment,
         }
     }
+}
+
+fn interpret_field_value(record_type: &str, field_name: &str, field_value: String) -> FieldValue {
+    match field_name {
+        "msg" => interpret_msg_field(field_value),
+        _ => FieldValue::String(field_value),
+    }
+}
+
+fn interpret_msg_field(field_value: String) -> FieldValue {
+    let Ok((_, key_value_list)) =
+        // TODO: maybe we should refactor this so this doesn't use parser module functions...
+        all_consuming(parser::body::parse_key_value_list)
+            .parse(field_value.as_str())
+    else {
+        return FieldValue::String(field_value);
+    };
+    // TODO: create a new parse_key_value_list here that returns NestedFieldValue itself...
+    let nested_field_value_map: BTreeMap<String, NestedFieldValue> = key_value_list
+        .into_iter()
+        .map(|(key, val)| (key, NestedFieldValue::String(val)))
+        .collect();
+
+    FieldValue::Map(nested_field_value_map)
 }

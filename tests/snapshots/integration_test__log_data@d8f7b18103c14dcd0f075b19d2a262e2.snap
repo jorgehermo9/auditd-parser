@@ -9,7 +9,16 @@ info: "type=CRED_REFR msg=audit(1489640461.198:480): pid=1402 uid=0 auid=0 ses=2
   "id": 480,
   "fields": {
     "auid": "0",
-    "msg": "op=PAM:setcred grantors=pam_env,pam_unix acct=\"root\" exe=\"/usr/sbin/crond\" hostname=? addr=? terminal=cron res=success",
+    "msg": {
+      "acct": "root",
+      "addr": "?",
+      "exe": "/usr/sbin/crond",
+      "grantors": "pam_env,pam_unix",
+      "hostname": "?",
+      "op": "PAM:setcred",
+      "res": "success",
+      "terminal": "cron"
+    },
     "pid": "1402",
     "ses": "2",
     "subj": "system_u:system_r:crond_t:s0-s0:c0.c1023",

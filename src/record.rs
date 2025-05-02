@@ -15,12 +15,14 @@ pub struct AuditdRecord {
     /// Record identifier
     pub id: u64,
 
+    // TODO: use index-ordered map?
     pub fields: BTreeMap<String, FieldValue>,
 
     #[cfg_attr(
         feature = "serde",
         serde(default, skip_serializing_if = "Option::is_none")
     )]
+    // TODO: use index-ordered map?
     pub enrichment: Option<BTreeMap<String, FieldValue>>,
 }
 
@@ -33,30 +35,14 @@ pub struct AuditdRecord {
 pub enum FieldValue {
     Integer(u64),
     String(String),
-    Map(BTreeMap<String, FieldValue>),
+    // TODO: use index-ordered map?
+    Map(BTreeMap<String, NestedFieldValue>),
 }
 
-impl From<&str> for FieldValue {
-    fn from(s: &str) -> Self {
-        FieldValue::String(s.to_string())
-    }
-}
-impl From<String> for FieldValue {
-    fn from(s: String) -> Self {
-        FieldValue::String(s)
-    }
-}
-
-impl From<u64> for FieldValue {
-    fn from(i: u64) -> Self {
-        FieldValue::Integer(i)
-    }
-}
-
-impl From<BTreeMap<String, FieldValue>> for FieldValue {
-    fn from(map: BTreeMap<String, FieldValue>) -> Self {
-        FieldValue::Map(map)
-    }
+#[derive(Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(untagged))]
+pub enum NestedFieldValue {
+    String(String),
 }
 
 impl FromStr for AuditdRecord {

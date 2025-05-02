@@ -9,7 +9,14 @@ info: "type=SYSTEM_BOOT msg=audit(1481076983.876:7): pid=273 uid=0 auid=42949672
   "id": 7,
   "fields": {
     "auid": "4294967295",
-    "msg": " comm=\"systemd-update-utmp\" exe=\"/usr/lib/systemd/systemd-update-utmp\" hostname=? addr=? terminal=? res=success",
+    "msg": {
+      "addr": "?",
+      "comm": "systemd-update-utmp",
+      "exe": "/usr/lib/systemd/systemd-update-utmp",
+      "hostname": "?",
+      "res": "success",
+      "terminal": "?"
+    },
     "pid": "273",
     "ses": "4294967295",
     "subj": "system_u:system_r:init_t:s0",
