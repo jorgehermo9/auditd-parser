@@ -28,7 +28,7 @@ fn parse_key_value(input: &str) -> IResult<&str, (String, String)> {
 
 /// Parses a list of key-value pairs, separated by spaces
 fn parse_key_value_list(input: &str) -> IResult<&str, BTreeMap<String, String>> {
-    // TODO: move this to the interpreter. Raw auditd records does not have this issue.
+    // TODO: move preceded space0 to the interpreter. Raw auditd records does not have this issue.
     // Workaround for https://github.com/linux-audit/audit-kernel/issues/169.
     // Some auditd logs (for example, `type=SYSTEM_SHUTDOWN` logs) have a `msg` field that contains a preceeding space.
     // we need to ignore this space to parse the key-value list
@@ -181,6 +181,15 @@ mod tests {
     #[case::invalid_key_value("foo")]
     #[case::empty("")]
     fn test_parse_body_fails(#[case] input: &str) {
-        assert!(parse_body(input).is_err());
+        assert!(dbg!(parse_body(input)).is_err());
+    }
+
+    #[test]
+    fn test_parse_body_all_consuming_fails() {
+        let line = format!(
+            "key=value{ENRICHMENT_SEPARATOR}enriched_key=enriched_value{ENRICHMENT_SEPARATOR}"
+        );
+
+        assert!(dbg!(parse_body(&line)).is_err());
     }
 }

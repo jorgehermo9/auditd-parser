@@ -114,15 +114,6 @@ mod tests {
     use super::*;
 
     // TODO: create a test that adds trailing data to the record, so `all_consuming` of `parse_record` fails
-
-    // TODO: create unit tests for each of the parsers.
-
-    // TODO: add a test where one of the fields starts by a number but ends with chars, for example `pid=123abc`,
-    // so we can test that the `parse_unquoted_value` parser does not parse partially as an integer
-
-    // TODO: snapshot testing with rstest cases, read cases from a file or
-    // have it hardcoded in this file?
-    // Those should be integration tests
     #[test]
     fn parse() {
         let line = "type=USER_ACCT msg=audit(1725039526.208:52): pid=580903 uid=1000 auid=1000 ses=2 msg='op=PAM:accounting grantors=pam_unix,pam_permit,pam_time acct=\"jorge\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=/dev/pts/1 res=success'\u{1d}UID=\"jorge\" AUID=\"jorge\"";
