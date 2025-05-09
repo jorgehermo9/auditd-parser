@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 
+use field_type::FieldType;
 use nom::{Parser, combinator::all_consuming};
 
 use crate::{
@@ -8,6 +9,7 @@ use crate::{
 };
 
 mod constants;
+mod field_type;
 
 impl From<RawAuditdRecord> for AuditdRecord {
     // TODO: implement this propertly. We should interpret the field names
@@ -43,18 +45,18 @@ impl From<RawAuditdRecord> for AuditdRecord {
 }
 
 fn interpret_field_value(_record_type: &str, field_name: &str, field_value: String) -> FieldValue {
-    if field_name == "msg" {
-        return interpret_msg_field(field_value);
-    }
+    let Some(field_type) = FieldType::resolve(field_name) else {
+        // Defaults to leave the field uninterpreted
+        return FieldValue::String(field_value);
+    };
 
-    if constants::ENCODED_FIELD_NAMES.contains(&field_name) {
-        return interpret_encoded_field(field_value);
+    match field_type {
+        FieldType::Escaped => interpret_escaped_field(field_value),
+        FieldType::Map => interpret_map_field(field_value),
     }
-
-    return FieldValue::String(field_value);
 }
 
-fn interpret_msg_field(field_value: String) -> FieldValue {
+fn interpret_map_field(field_value: String) -> FieldValue {
     // TODO: fields inside msg should be interpreted aswell?
     let Ok((_, key_value_list)) =
         // TODO: maybe we should refactor this so this doesn't use parser module functions...
@@ -73,10 +75,12 @@ fn interpret_msg_field(field_value: String) -> FieldValue {
 }
 
 // https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/lib/audit_logging.c#L103
-fn interpret_encoded_field(field_value: String) -> FieldValue {
-    let decoded =
+fn interpret_escaped_field(field_value: String) -> FieldValue {
+    // TODO handle `au_unescape` correctly (for example, see the parenthesis and (null))
+    // https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/auparse/interpret.c#L343
+    let hex_decoded =
         hex::decode(&field_value).map(|bytes| String::from_utf8_lossy(&bytes).to_string());
-    FieldValue::String(decoded.unwrap_or(field_value))
+    FieldValue::String(hex_decoded.unwrap_or(field_value))
 }
 
 #[cfg(test)]
@@ -86,11 +90,11 @@ mod tests {
     use super::*;
 
     #[rstest]
-    #[case::encoded("666f6f", FieldValue::String("foo".to_string()))]
+    #[case::hex_encoded("666f6f", FieldValue::String("foo".to_string()))]
     #[case::not_encoded_fallback_to_input("foo", FieldValue::String("foo".to_string()))]
-    #[case::encoded_with_trailing_data_fallback_to_input("666f6fbar", FieldValue::String("666f6fbar".to_string()))]
-    fn test_interpret_encoded_field(#[case] input: &str, #[case] expected: FieldValue) {
-        let result = interpret_encoded_field(input.to_string());
+    #[case::hex_encoded_with_trailing_data_fallback_to_input("666f6fbar", FieldValue::String("666f6fbar".to_string()))]
+    fn test_interpret_escaped_field(#[case] input: &str, #[case] expected: FieldValue) {
+        let result = interpret_escaped_field(input.to_string());
         assert_eq!(result, expected);
     }
 }

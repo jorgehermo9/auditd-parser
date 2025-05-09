@@ -17,7 +17,7 @@ info: "type=SYSCALL msg=audit(1490801406.273:512226): arch=c000003e syscall=42 s
     "comm": "google_ip_forwa",
     "egid": "0",
     "euid": "0",
-    "exe": "2F7573722F62696E2F707974686F6E322E373B3538643163636662202864656C6574656429",
+    "exe": "/usr/bin/python2.7;58d1ccfb (deleted)",
     "exit": "-115",
     "fsgid": "0",
     "fsuid": "0",
