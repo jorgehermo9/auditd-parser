@@ -36,13 +36,7 @@ pub enum FieldValue {
     Integer(u64),
     String(String),
     // TODO: use index-ordered map?
-    Map(BTreeMap<String, NestedFieldValue>),
-}
-
-#[derive(Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(untagged))]
-pub enum NestedFieldValue {
-    String(String),
+    Map(BTreeMap<String, String>),
 }
 
 impl FromStr for AuditdRecord {

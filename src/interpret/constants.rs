@@ -1,0 +1,35 @@
+// The constants of this file are extracted from
+// https://github.com/linux-audit/audit-documentation/blob/main/specs/fields/field-dictionary.csv
+
+// TODO: interpret a[[:digit:]+]\[.*\]
+pub const ENCODED_FIELD_NAMES: [&str; 29] = [
+    "acct",
+    "addr",
+    "apparmor",
+    "cgroup",
+    "cmd",
+    "comm",
+    "cwd",
+    "data",
+    "device",
+    "dir",
+    "exe",
+    "file",
+    "grp",
+    "invalid_context",
+    "key",
+    "name",
+    "new-chardev",
+    "new-fs",
+    "new-net",
+    "new-rng",
+    "ocomm",
+    "old-chardev",
+    "old-disk",
+    "old-fs",
+    "old-net",
+    "old-rng",
+    "path",
+    "proctitle",
+    "saddr",
+];
