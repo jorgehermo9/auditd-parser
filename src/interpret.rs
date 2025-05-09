@@ -52,11 +52,11 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
 
     match field_type {
         FieldType::Escaped => interpret_escaped_field(field_value),
-        FieldType::Map => interpret_map_field(field_value),
+        FieldType::Msg => interpret_msg_field(field_value),
     }
 }
 
-fn interpret_map_field(field_value: String) -> FieldValue {
+fn interpret_msg_field(field_value: String) -> FieldValue {
     // TODO: fields inside msg should be interpreted aswell?
     let Ok((_, key_value_list)) =
         // TODO: maybe we should refactor this so this doesn't use parser module functions...

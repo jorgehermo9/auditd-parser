@@ -11,7 +11,7 @@ test: unit-test integration-test doc-test
 # https://github.com/nextest-rs/nextest
 unit-test:
     # --lib to just run unit tests
-    cargo nextest run --locked --all-targets --all-features --lib
+    cargo nextest run --locked --all-features --lib
 
 integration-test:
     cargo insta test --test integration_test --all-features --unreferenced reject
