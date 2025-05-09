@@ -18,7 +18,7 @@ default = ["serde"]
 serde = ["dep:serde"]
 
 [dev-dependencies]
-insta = { version = "1.43.0", features = ["json"] }
+insta = { version = "1.43.1", features = ["json"] }
 md5 = "0.7.0"
 rstest = "0.25.0"
 
