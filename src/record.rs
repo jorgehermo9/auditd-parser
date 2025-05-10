@@ -35,6 +35,9 @@ pub struct AuditdRecord {
 pub enum FieldValue {
     Number(Number),
     String(String),
+    // TODO: Vec<String> or Vec<FieldValue>? is there any case
+    // where we need an array of anything other than strings?
+    Array(Vec<String>),
     // TODO: use index-ordered map?
     Map(BTreeMap<String, String>),
 }

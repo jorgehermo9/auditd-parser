@@ -1,12 +1,13 @@
 use super::constants;
 
 pub enum FieldType {
-    Escaped,
     // Change to `MaybeMap`?
     Msg,
+    Exit,
+    Escaped,
     Uid,
     Gid,
-    Exit,
+    CapabilityBitmap,
 }
 
 impl FieldType {
@@ -29,6 +30,10 @@ impl FieldType {
 
         if constants::GID_FIELD_NAMES.contains(&field_name) {
             return Some(Self::Gid);
+        }
+
+        if constants::CAP_BITMAP_FIELD_NAMES.contains(&field_name) {
+            return Some(Self::CapabilityBitmap);
         }
 
         None

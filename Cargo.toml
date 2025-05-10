@@ -11,6 +11,7 @@ rust-version = "1.85"
 hex = "0.4.3"
 nom = "8.0.0"
 serde = { version = "1.0.219", features = ["derive"], optional = true }
+static_assertions = "1.1.0"
 thiserror = "2.0.12"
 
 [features]
