@@ -14,7 +14,7 @@ info: "type=PATH msg=audit(1521758453.536:1428931): item=0 name=2F73686172652F67
     "mode": "042775",
     "name": "/share/general/path_redacted",
     "nametype": "NORMAL",
-    "ogid": "7003",
+    "ogid": 7003,
     "ouid": 10067,
     "rdev": "00:00"
   }

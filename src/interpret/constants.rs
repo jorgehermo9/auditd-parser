@@ -58,3 +58,15 @@ pub const UID_FIELD_NAMES: [&str; 13] = [
     "sauid",
     "obj_uid",
 ];
+
+pub const GID_FIELD_NAMES: [&str; 9] = [
+    "obj_gid",
+    "gid",
+    "egid",
+    "sgid",
+    "fsgid",
+    "ogid",
+    "igid",
+    "inode_gid",
+    "new_gid",
+];
