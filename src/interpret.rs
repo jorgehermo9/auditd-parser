@@ -9,6 +9,7 @@ use crate::{
     record::Number,
 };
 
+mod capability;
 mod constants;
 mod field_type;
 
@@ -53,6 +54,7 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
         FieldType::Msg => interpret_msg_field(field_value),
         FieldType::Uid | FieldType::Gid => interpret_unsigned_integer_field(field_value),
         FieldType::Exit => interpret_signed_integer_field(field_value),
+        FieldType::CapabilityBitmap => interpret_cap_bitmap_field(field_value),
     }
 }
 
@@ -95,6 +97,17 @@ fn interpret_signed_integer_field(field_value: String) -> FieldValue {
         |_| FieldValue::String(field_value),
         |val| FieldValue::Number(Number::SignedInteger(val)),
     )
+}
+
+fn interpret_cap_bitmap_field(field_value: String) -> FieldValue {
+    // Capabilities are encoded as a 64-bit hexadecimal string
+    let Ok(cap_bitmap) = u64::from_str_radix(&field_value, 16) else {
+        return FieldValue::String(field_value);
+    };
+
+    let capabilities = capability::resolve_capability_bitmap(cap_bitmap);
+
+    FieldValue::Array(capabilities)
 }
 
 #[cfg(test)]
