@@ -1,5 +1,3 @@
-use static_assertions::const_assert;
-
 // Capabilities are extracted from https://github.com/torvalds/linux/blob/master/include/uapi/linux/capability.h
 // We should mantain these in sync with the kernel version.
 pub const CAPABILITIES: [&str; 41] = [
@@ -47,17 +45,20 @@ pub const CAPABILITIES: [&str; 41] = [
     "checkpoint_restore",
 ];
 
-pub fn resolve_capability_bitmap(cap_bitmap: u64) -> Vec<String> {
-    // Note that the size of capabilities bitmap (and therefore, the number
-    // of capabilities) should be at most 64.
-    const_assert!(CAPABILITIES.len() <= 64);
+const UNKNOWN_CAPABILITY: &str = "UNKNOWN";
 
-    CAPABILITIES
-        .iter()
-        .enumerate()
-        .filter_map(|(i, cap_name)| {
-            if (cap_bitmap >> i) & 1 == 1 {
-                Some(cap_name)
+/// Note that the size of capabilities bitmap (and therefore, the number
+/// of capabilities) should be at most 64.
+///
+/// If a capability name is not found in the CAPABILITIES array, it will be
+/// resolved as `UNKNOWN`.
+pub fn resolve_capability_bitmap(cap_bitmap: u64) -> Vec<String> {
+    let bits = std::mem::size_of_val(&cap_bitmap) * 8;
+    (0..bits)
+        .filter_map(|i| {
+            if ((cap_bitmap >> i) & 1) == 1 {
+                let capability = CAPABILITIES.get(i).copied().unwrap_or(UNKNOWN_CAPABILITY);
+                Some(capability)
             } else {
                 None
             }
@@ -82,10 +83,31 @@ mod tests {
         case(0b100, vec!["dac_read_search"]),
         case(0b1010_1010, vec!["dac_override","fowner","kill","setuid"]),
         case(0b1_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111, CAPABILITIES.to_vec()),
-        case(u64::MAX, CAPABILITIES.to_vec())
     )]
     fn test_resolve_capability_bitmap(input: u64, expected: Vec<&str>) {
         let result = resolve_capability_bitmap(input);
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_resolve_capability_bitmap_with_unknown_capability() {
+        let result =
+            resolve_capability_bitmap(0b11_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111);
+        let mut expected = CAPABILITIES.to_vec();
+        expected.push(UNKNOWN_CAPABILITY);
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_resolve_capability_bitmap_with_all_bits_set() {
+        let result = resolve_capability_bitmap(u64::MAX);
+        let num_capabilities = CAPABILITIES.len();
+        let max_unknown_capabilities = 64 - num_capabilities;
+
+        let mut expected = CAPABILITIES.to_vec();
+        expected.append(&mut vec![UNKNOWN_CAPABILITY; max_unknown_capabilities]);
+
         assert_eq!(result, expected);
     }
 }
