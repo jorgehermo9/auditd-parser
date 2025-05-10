@@ -70,3 +70,8 @@ pub const GID_FIELD_NAMES: [&str; 9] = [
     "inode_gid",
     "new_gid",
 ];
+
+pub const CAP_BITMAP_FIELD_NAMES: [&str; 19] = [
+    "cap_pi", "cap_pe", "cap_pp", "cap_pa", "cap_fi", "cap_fp", "fp", "fi", "old_pp", "old_pi",
+    "old_pe", "old_pa", "new_pp", "new_pi", "new_pe", "pp", "pi", "pe", "pa",
+];
