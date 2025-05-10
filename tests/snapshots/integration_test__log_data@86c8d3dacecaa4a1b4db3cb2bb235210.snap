@@ -18,7 +18,7 @@ info: "type=SYSCALL msg=audit(1490995752.404:20614537): arch=c000003e syscall=44
     "egid": 0,
     "euid": 0,
     "exe": "/usr/libexec/strongswan/charon (deleted)",
-    "exit": "464",
+    "exit": 464,
     "fsgid": 0,
     "fsuid": 0,
     "gid": 0,

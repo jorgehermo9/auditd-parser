@@ -18,7 +18,7 @@ info: "type=SYSCALL msg=audit(1481076984.827:17): arch=c000003e syscall=313 succ
     "egid": 0,
     "euid": 0,
     "exe": "/usr/bin/kmod",
-    "exit": "0",
+    "exit": 0,
     "fsgid": 0,
     "fsuid": 0,
     "gid": 0,
