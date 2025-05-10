@@ -3,7 +3,7 @@
 // Right now, capability format is the same as in kubernetes (CAP_XX in kernel-> XX in this parser)
 // Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-capabilities-for-a-container
 pub const CAPABILITIES: [&str; 41] = [
-    // TODO: uppercase, lowercase (whtout CAP_) or should we output `CAP_CHOWN` as they are named in the kernel?
+    // TODO: uppercase, lowercase (without CAP_) or should we output `CAP_CHOWN` as they are named in the kernel?
     // or as they are output in `capsh --decode=0000001fffffffff``? (e.g. `cap_chown`)
     "CHOWN",
     "DAC_OVERRIDE",
