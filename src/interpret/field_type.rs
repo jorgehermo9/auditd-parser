@@ -5,6 +5,7 @@ pub enum FieldType {
     // Change to `MaybeMap`?
     Msg,
     Uid,
+    Gid,
 }
 
 impl FieldType {
@@ -19,6 +20,10 @@ impl FieldType {
 
         if constants::UID_FIELD_NAMES.contains(&field_name) {
             return Some(Self::Uid);
+        }
+
+        if constants::GID_FIELD_NAMES.contains(&field_name) {
+            return Some(Self::Gid);
         }
 
         None

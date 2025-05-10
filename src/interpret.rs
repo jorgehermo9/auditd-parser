@@ -50,7 +50,7 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
     match field_type {
         FieldType::Escaped => interpret_escaped_field(field_value),
         FieldType::Msg => interpret_msg_field(field_value),
-        FieldType::Uid => interpret_integer_field(field_value),
+        FieldType::Uid | FieldType::Gid => interpret_integer_field(field_value),
     }
 }
 
