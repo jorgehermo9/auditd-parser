@@ -2,6 +2,7 @@
 // We should mantain these in sync with the kernel version.
 pub const CAPABILITIES: [&str; 41] = [
     // TODO: lowercase or should we output `CAP_CHOWN` as they are named in the kernel?
+    // or as they are output in `capsh --decode=0000001fffffffff``? (e.g. `cap_chown`)
     "chown",
     "dac_override",
     "dac_read_search",
