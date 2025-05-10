@@ -4,6 +4,7 @@ pub enum FieldType {
     Escaped,
     // Change to `MaybeMap`?
     Msg,
+    Uid,
 }
 
 impl FieldType {
@@ -14,6 +15,10 @@ impl FieldType {
 
         if constants::ESCAPED_FIELD_NAMES.contains(&field_name) {
             return Some(Self::Escaped);
+        }
+
+        if constants::UID_FIELD_NAMES.contains(&field_name) {
+            return Some(Self::Uid);
         }
 
         None

@@ -8,7 +8,7 @@ info: "type=GRP_MGMT msg=audit(1481076992.419:386): pid=1235 uid=0 auid=42949672
   "timestamp": 1481076992419,
   "id": 386,
   "fields": {
-    "auid": "4294967295",
+    "auid": 4294967295,
     "msg": {
       "addr": "?",
       "exe": "/usr/sbin/groupadd",
@@ -21,6 +21,6 @@ info: "type=GRP_MGMT msg=audit(1481076992.419:386): pid=1235 uid=0 auid=42949672
     "pid": "1235",
     "ses": "4294967295",
     "subj": "system_u:system_r:unconfined_service_t:s0",
-    "uid": "0"
+    "uid": 0
   }
 }

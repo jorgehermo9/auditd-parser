@@ -13,14 +13,14 @@ info: "type=SYSCALL msg=audit(1490995752.404:20614537): arch=c000003e syscall=44
     "a2": "1d0",
     "a3": "0",
     "arch": "c000003e",
-    "auid": "4294967295",
+    "auid": 4294967295,
     "comm": "charon",
     "egid": "0",
-    "euid": "0",
+    "euid": 0,
     "exe": "/usr/libexec/strongswan/charon (deleted)",
     "exit": "464",
     "fsgid": "0",
-    "fsuid": "0",
+    "fsuid": 0,
     "gid": "0",
     "items": "0",
     "key": "(null)",
@@ -29,9 +29,9 @@ info: "type=SYSCALL msg=audit(1490995752.404:20614537): arch=c000003e syscall=44
     "ses": "4294967295",
     "sgid": "0",
     "success": "yes",
-    "suid": "0",
+    "suid": 0,
     "syscall": "44",
     "tty": "(none)",
-    "uid": "0"
+    "uid": 0
   }
 }

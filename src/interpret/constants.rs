@@ -42,3 +42,19 @@ pub const ESCAPED_FIELD_NAMES: [&str; 36] = [
     "sw",
     "root_dir",
 ];
+
+pub const UID_FIELD_NAMES: [&str; 13] = [
+    "auid",
+    "uid",
+    "euid",
+    "suid",
+    "fsuid",
+    "ouid",
+    "oauid",
+    "old-auid",
+    "iuid",
+    "id",
+    "inode_uid",
+    "sauid",
+    "obj_uid",
+];

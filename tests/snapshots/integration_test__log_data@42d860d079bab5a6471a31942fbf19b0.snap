@@ -8,7 +8,7 @@ info: "type=USER_MGMT msg=audit(1481076992.521:393): pid=1264 uid=0 auid=4294967
   "timestamp": 1481076992521,
   "id": 393,
   "fields": {
-    "auid": "4294967295",
+    "auid": 4294967295,
     "msg": {
       "addr": "?",
       "exe": "/usr/sbin/useradd",
@@ -21,6 +21,6 @@ info: "type=USER_MGMT msg=audit(1481076992.521:393): pid=1264 uid=0 auid=4294967
     "pid": "1264",
     "ses": "4294967295",
     "subj": "system_u:system_r:unconfined_service_t:s0",
-    "uid": "0"
+    "uid": 0
   }
 }

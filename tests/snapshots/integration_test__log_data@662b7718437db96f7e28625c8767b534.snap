@@ -9,7 +9,7 @@ info: "type=SECCOMP msg=audit(1433785727.186:10262): auid=20003 uid=22 gid=22 se
   "id": 10262,
   "fields": {
     "arch": "40000003",
-    "auid": "20003",
+    "auid": 20003,
     "code": "0x0",
     "comm": "sshd",
     "compat": "0",
@@ -20,6 +20,6 @@ info: "type=SECCOMP msg=audit(1433785727.186:10262): auid=20003 uid=22 gid=22 se
     "ses": "21",
     "sig": "31",
     "syscall": "132",
-    "uid": "22"
+    "uid": 22
   }
 }

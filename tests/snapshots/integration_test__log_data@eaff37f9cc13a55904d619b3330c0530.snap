@@ -13,14 +13,14 @@ info: "type=SYSCALL msg=audit(1170021493.977:293): arch=c000003e syscall=2 succe
     "a2": "5555665d91b8",
     "a3": "0",
     "arch": "c000003e",
-    "auid": "4294967295",
+    "auid": 4294967295,
     "comm": "pickup",
     "egid": "890",
-    "euid": "890",
+    "euid": 890,
     "exe": "/usr/libexec/postfix/pickup",
     "exit": "-13",
     "fsgid": "890",
-    "fsuid": "890",
+    "fsuid": 890,
     "gid": "890",
     "items": "1",
     "key": "(null)",
@@ -29,9 +29,9 @@ info: "type=SYSCALL msg=audit(1170021493.977:293): arch=c000003e syscall=2 succe
     "sgid": "890",
     "subj": "system_u:system_r:postfix_pickup_t:s0",
     "success": "no",
-    "suid": "890",
+    "suid": 890,
     "syscall": "2",
     "tty": "(none)",
-    "uid": "890"
+    "uid": 890
   }
 }

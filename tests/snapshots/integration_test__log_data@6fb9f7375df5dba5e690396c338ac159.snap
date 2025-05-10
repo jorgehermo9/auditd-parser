@@ -13,14 +13,14 @@ info: "type=SYSCALL msg=audit(1515619721.392:106081): arch=c000003e syscall=59 s
     "a2": "55df1048ec58",
     "a3": "1",
     "arch": "c000003e",
-    "auid": "4294967295",
+    "auid": 4294967295,
     "comm": "grep",
     "egid": "0",
-    "euid": "0",
+    "euid": 0,
     "exe": "/bin/grep",
     "exit": "0",
     "fsgid": "0",
-    "fsuid": "0",
+    "fsuid": 0,
     "gid": "0",
     "items": "2",
     "key": "65786563013634626974\"",
@@ -29,9 +29,9 @@ info: "type=SYSCALL msg=audit(1515619721.392:106081): arch=c000003e syscall=59 s
     "ses": "4294967295",
     "sgid": "0",
     "success": "yes",
-    "suid": "0",
+    "suid": 0,
     "syscall": "59",
     "tty": "(none)",
-    "uid": "0"
+    "uid": 0
   }
 }

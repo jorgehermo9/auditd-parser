@@ -13,14 +13,14 @@ info: "type=SYSCALL msg=audit(1451781471.394:194436): arch=c000003e syscall=13 s
     "a2": "0",
     "a3": "8",
     "arch": "c000003e",
-    "auid": "1000",
+    "auid": 1000,
     "comm": "bash",
     "egid": "0",
-    "euid": "0",
+    "euid": 0,
     "exe": "/usr/bin/bash",
     "exit": "0",
     "fsgid": "0",
-    "fsuid": "0",
+    "fsuid": 0,
     "gid": "0",
     "items": "0",
     "key": "(null)",
@@ -30,9 +30,9 @@ info: "type=SYSCALL msg=audit(1451781471.394:194436): arch=c000003e syscall=13 s
     "sgid": "0",
     "subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
     "success": "yes",
-    "suid": "0",
+    "suid": 0,
     "syscall": "13",
     "tty": "pts0",
-    "uid": "0"
+    "uid": 0
   }
 }

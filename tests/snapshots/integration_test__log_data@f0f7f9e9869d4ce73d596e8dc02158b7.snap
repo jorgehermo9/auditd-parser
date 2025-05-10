@@ -8,7 +8,7 @@ info: "type=USER_ERR msg=audit(1489641207.587:518): pid=1560 uid=0 auid=42949672
   "timestamp": 1489641207587,
   "id": 518,
   "fields": {
-    "auid": "4294967295",
+    "auid": 4294967295,
     "msg": {
       "acct": "?",
       "addr": "190.48.233.76",
@@ -22,6 +22,6 @@ info: "type=USER_ERR msg=audit(1489641207.587:518): pid=1560 uid=0 auid=42949672
     "pid": "1560",
     "ses": "4294967295",
     "subj": "system_u:system_r:sshd_t:s0-s0:c0.c1023",
-    "uid": "0"
+    "uid": 0
   }
 }

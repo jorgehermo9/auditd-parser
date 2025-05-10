@@ -8,7 +8,7 @@ info: "type=ADD_GROUP msg=audit(1481076992.414:385): pid=1235 uid=0 auid=4294967
   "timestamp": 1481076992414,
   "id": 385,
   "fields": {
-    "auid": "4294967295",
+    "auid": 4294967295,
     "msg": {
       "addr": "?",
       "exe": "/usr/sbin/groupadd",
@@ -21,6 +21,6 @@ info: "type=ADD_GROUP msg=audit(1481076992.414:385): pid=1235 uid=0 auid=4294967
     "pid": "1235",
     "ses": "4294967295",
     "subj": "system_u:system_r:unconfined_service_t:s0",
-    "uid": "0"
+    "uid": 0
   }
 }

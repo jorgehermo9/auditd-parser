@@ -8,7 +8,7 @@ info: "type=SYSTEM_BOOT msg=audit(1481076983.876:7): pid=273 uid=0 auid=42949672
   "timestamp": 1481076983876,
   "id": 7,
   "fields": {
-    "auid": "4294967295",
+    "auid": 4294967295,
     "msg": {
       "addr": "?",
       "comm": "systemd-update-utmp",
@@ -20,6 +20,6 @@ info: "type=SYSTEM_BOOT msg=audit(1481076983.876:7): pid=273 uid=0 auid=42949672
     "pid": "273",
     "ses": "4294967295",
     "subj": "system_u:system_r:init_t:s0",
-    "uid": "0"
+    "uid": 0
   }
 }

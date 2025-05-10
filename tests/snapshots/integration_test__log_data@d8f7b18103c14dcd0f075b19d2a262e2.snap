@@ -8,7 +8,7 @@ info: "type=CRED_REFR msg=audit(1489640461.198:480): pid=1402 uid=0 auid=0 ses=2
   "timestamp": 1489640461198,
   "id": 480,
   "fields": {
-    "auid": "0",
+    "auid": 0,
     "msg": {
       "acct": "root",
       "addr": "?",
@@ -22,6 +22,6 @@ info: "type=CRED_REFR msg=audit(1489640461.198:480): pid=1402 uid=0 auid=0 ses=2
     "pid": "1402",
     "ses": "2",
     "subj": "system_u:system_r:crond_t:s0-s0:c0.c1023",
-    "uid": "0"
+    "uid": 0
   }
 }

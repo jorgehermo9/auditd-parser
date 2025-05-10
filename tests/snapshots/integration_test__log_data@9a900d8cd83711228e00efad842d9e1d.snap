@@ -13,14 +13,14 @@ info: "type=SYSCALL msg=audit(1481076984.827:17): arch=c000003e syscall=313 succ
     "a2": "0",
     "a3": "0",
     "arch": "c000003e",
-    "auid": "4294967295",
+    "auid": 4294967295,
     "comm": "modprobe",
     "egid": "0",
-    "euid": "0",
+    "euid": 0,
     "exe": "/usr/bin/kmod",
     "exit": "0",
     "fsgid": "0",
-    "fsuid": "0",
+    "fsuid": 0,
     "gid": "0",
     "items": "0",
     "key": "(null)",
@@ -30,9 +30,9 @@ info: "type=SYSCALL msg=audit(1481076984.827:17): arch=c000003e syscall=313 succ
     "sgid": "0",
     "subj": "system_u:system_r:insmod_t:s0",
     "success": "yes",
-    "suid": "0",
+    "suid": 0,
     "syscall": "313",
     "tty": "(none)",
-    "uid": "0"
+    "uid": 0
   }
 }

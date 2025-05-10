@@ -13,14 +13,14 @@ info: "type=SYSCALL msg=audit(1490801406.273:512226): arch=c000003e syscall=42 s
     "a2": "10",
     "a3": "fe",
     "arch": "c000003e",
-    "auid": "4294967295",
+    "auid": 4294967295,
     "comm": "google_ip_forwa",
     "egid": "0",
-    "euid": "0",
+    "euid": 0,
     "exe": "/usr/bin/python2.7;58d1ccfb (deleted)",
     "exit": "-115",
     "fsgid": "0",
-    "fsuid": "0",
+    "fsuid": 0,
     "gid": "0",
     "items": "0",
     "key": "(null)",
@@ -30,9 +30,9 @@ info: "type=SYSCALL msg=audit(1490801406.273:512226): arch=c000003e syscall=42 s
     "sgid": "0",
     "subj": "system_u:system_r:unconfined_service_t:s0",
     "success": "no",
-    "suid": "0",
+    "suid": 0,
     "syscall": "42",
     "tty": "(none)",
-    "uid": "0"
+    "uid": 0
   }
 }

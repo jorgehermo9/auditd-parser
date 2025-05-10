@@ -8,7 +8,7 @@ info: "type=ADD_USER msg=audit(1481076992.488:389): pid=1264 uid=0 auid=42949672
   "timestamp": 1481076992488,
   "id": 389,
   "fields": {
-    "auid": "4294967295",
+    "auid": 4294967295,
     "msg": {
       "addr": "?",
       "exe": "/usr/sbin/useradd",
@@ -21,6 +21,6 @@ info: "type=ADD_USER msg=audit(1481076992.488:389): pid=1264 uid=0 auid=42949672
     "pid": "1264",
     "ses": "4294967295",
     "subj": "system_u:system_r:unconfined_service_t:s0",
-    "uid": "0"
+    "uid": 0
   }
 }
