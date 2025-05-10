@@ -80,11 +80,11 @@ mod tests {
         input,
         expected,
         case(0b0, vec![]),
-        case(0b1, vec!["chown"]),
-        case(0b10, vec!["dac_override"]),
-        case(0b11, vec!["chown", "dac_override"]),
-        case(0b100, vec!["dac_read_search"]),
-        case(0b1010_1010, vec!["dac_override","fowner","kill","setuid"]),
+        case(0b1, vec!["CHOWN"]),
+        case(0b10, vec!["DAC_OVERRIDE"]),
+        case(0b11, vec!["CHOWN", "DAC_OVERRIDE"]),
+        case(0b100, vec!["DAC_READ_SEARCH"]),
+        case(0b1010_1010, vec!["DAC_OVERRIDE","FOWNER","KILL","SETUID"]),
         case(0b1_1111_1111_1111_1111_1111_1111_1111_1111_1111_1111, CAPABILITIES.to_vec()),
     )]
     fn test_resolve_capability_bitmap(input: u64, expected: Vec<&str>) {
