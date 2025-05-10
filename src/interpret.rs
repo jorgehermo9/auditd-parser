@@ -6,6 +6,7 @@ use nom::{Parser, combinator::all_consuming};
 use crate::{
     AuditdRecord, FieldValue,
     parser::{self, RawAuditdRecord},
+    record::Number,
 };
 
 mod constants;
@@ -50,7 +51,8 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
     match field_type {
         FieldType::Escaped => interpret_escaped_field(field_value),
         FieldType::Msg => interpret_msg_field(field_value),
-        FieldType::Uid | FieldType::Gid => interpret_integer_field(field_value),
+        FieldType::Uid | FieldType::Gid => interpret_unsigned_integer_field(field_value),
+        FieldType::Exit => interpret_signed_integer_field(field_value),
     }
 }
 
@@ -81,10 +83,18 @@ fn interpret_escaped_field(field_value: String) -> FieldValue {
     FieldValue::String(hex_decoded.unwrap_or(field_value))
 }
 
-fn interpret_integer_field(field_value: String) -> FieldValue {
-    field_value
-        .parse()
-        .map_or_else(|_| FieldValue::String(field_value), FieldValue::Integer)
+fn interpret_unsigned_integer_field(field_value: String) -> FieldValue {
+    field_value.parse().map_or_else(
+        |_| FieldValue::String(field_value),
+        |val| FieldValue::Number(Number::UnsignedInteger(val)),
+    )
+}
+
+fn interpret_signed_integer_field(field_value: String) -> FieldValue {
+    field_value.parse().map_or_else(
+        |_| FieldValue::String(field_value),
+        |val| FieldValue::Number(Number::SignedInteger(val)),
+    )
 }
 
 #[cfg(test)]
@@ -103,10 +113,20 @@ mod tests {
     }
 
     #[rstest]
-    #[case::integer("123", FieldValue::Integer(123))]
+    #[case::positive_integer("123", FieldValue::Number(Number::UnsignedInteger(123)))]
+    #[case::negative_integer("-123", FieldValue::String("-123".to_string()))]
     #[case::not_integer_fallbacks_to_input("foo", FieldValue::String("foo".to_string()))]
     fn test_interpret_integer_field(#[case] input: &str, #[case] expected: FieldValue) {
-        let result = interpret_integer_field(input.to_string());
+        let result = interpret_unsigned_integer_field(input.to_string());
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::integer("123", FieldValue::Number(Number::SignedInteger(123)))]
+    #[case::negative_integer("-123", FieldValue::Number(Number::SignedInteger(-123)))]
+    #[case::not_integer_fallbacks_to_input("foo", FieldValue::String("foo".to_string()))]
+    fn test_interpret_signed_integer_field(#[case] input: &str, #[case] expected: FieldValue) {
+        let result = interpret_signed_integer_field(input.to_string());
         assert_eq!(result, expected);
     }
 }

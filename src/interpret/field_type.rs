@@ -6,12 +6,17 @@ pub enum FieldType {
     Msg,
     Uid,
     Gid,
+    Exit,
 }
 
 impl FieldType {
     pub fn resolve(field_name: &str) -> Option<Self> {
         if field_name == "msg" {
             return Some(Self::Msg);
+        }
+
+        if field_name == "exit" {
+            return Some(Self::Exit);
         }
 
         if constants::ESCAPED_FIELD_NAMES.contains(&field_name) {

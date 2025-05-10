@@ -33,10 +33,17 @@ pub struct AuditdRecord {
 #[derive(Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(untagged))]
 pub enum FieldValue {
-    Integer(u64),
+    Number(Number),
     String(String),
     // TODO: use index-ordered map?
     Map(BTreeMap<String, String>),
+}
+
+#[derive(Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(untagged))]
+pub enum Number {
+    UnsignedInteger(u64),
+    SignedInteger(i64),
 }
 
 impl FromStr for AuditdRecord {

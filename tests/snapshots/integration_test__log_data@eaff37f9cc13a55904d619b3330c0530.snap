@@ -18,7 +18,7 @@ info: "type=SYSCALL msg=audit(1170021493.977:293): arch=c000003e syscall=2 succe
     "egid": 890,
     "euid": 890,
     "exe": "/usr/libexec/postfix/pickup",
-    "exit": "-13",
+    "exit": -13,
     "fsgid": 890,
     "fsuid": 890,
     "gid": 890,

@@ -18,7 +18,7 @@ info: "type=SYSCALL msg=audit(1490801406.273:512226): arch=c000003e syscall=42 s
     "egid": 0,
     "euid": 0,
     "exe": "/usr/bin/python2.7;58d1ccfb (deleted)",
-    "exit": "-115",
+    "exit": -115,
     "fsgid": 0,
     "fsuid": 0,
     "gid": 0,
