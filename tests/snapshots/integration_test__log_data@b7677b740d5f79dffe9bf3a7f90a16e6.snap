@@ -8,7 +8,7 @@ info: "type=USER_LOGIN msg=audit(1492896301.818:19955): pid=12635 uid=0 auid=429
   "timestamp": 1492896301818,
   "id": 19955,
   "fields": {
-    "auid": "4294967295",
+    "auid": 4294967295,
     "msg": {
       "acct": "28696E76616C6964207573657229",
       "addr": "179.38.151.221",
@@ -20,6 +20,6 @@ info: "type=USER_LOGIN msg=audit(1492896301.818:19955): pid=12635 uid=0 auid=429
     },
     "pid": "12635",
     "ses": "4294967295",
-    "uid": "0"
+    "uid": 0
   }
 }

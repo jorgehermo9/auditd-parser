@@ -12,9 +12,6 @@ mod constants;
 mod field_type;
 
 impl From<RawAuditdRecord> for AuditdRecord {
-    // TODO: implement this propertly. We should interpret the field names
-    // from the raw audit record to parse the auditd fields propertly.
-    // Doing type checking and etc
     fn from(value: RawAuditdRecord) -> Self {
         let fields = value
             .fields
@@ -53,6 +50,7 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
     match field_type {
         FieldType::Escaped => interpret_escaped_field(field_value),
         FieldType::Msg => interpret_msg_field(field_value),
+        FieldType::Uid => interpret_integer_field(field_value),
     }
 }
 
@@ -83,6 +81,12 @@ fn interpret_escaped_field(field_value: String) -> FieldValue {
     FieldValue::String(hex_decoded.unwrap_or(field_value))
 }
 
+fn interpret_integer_field(field_value: String) -> FieldValue {
+    field_value
+        .parse()
+        .map_or_else(|_| FieldValue::String(field_value), FieldValue::Integer)
+}
+
 #[cfg(test)]
 mod tests {
     use rstest::rstest;
@@ -91,10 +95,18 @@ mod tests {
 
     #[rstest]
     #[case::hex_encoded("666f6f", FieldValue::String("foo".to_string()))]
-    #[case::not_encoded_fallback_to_input("foo", FieldValue::String("foo".to_string()))]
-    #[case::hex_encoded_with_trailing_data_fallback_to_input("666f6fbar", FieldValue::String("666f6fbar".to_string()))]
+    #[case::not_encoded_fallbacks_to_input("foo", FieldValue::String("foo".to_string()))]
+    #[case::hex_encoded_with_trailing_data_fallbacks_to_input("666f6fbar", FieldValue::String("666f6fbar".to_string()))]
     fn test_interpret_escaped_field(#[case] input: &str, #[case] expected: FieldValue) {
         let result = interpret_escaped_field(input.to_string());
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::integer("123", FieldValue::Integer(123))]
+    #[case::not_integer_fallbacks_to_input("foo", FieldValue::String("foo".to_string()))]
+    fn test_interpret_integer_field(#[case] input: &str, #[case] expected: FieldValue) {
+        let result = interpret_integer_field(input.to_string());
         assert_eq!(result, expected);
     }
 }

@@ -8,7 +8,7 @@ info: "type=USER_LOGIN msg=audit(1492810797.778:12651): pid=11396 uid=0 auid=100
   "timestamp": 1492810797778,
   "id": 12651,
   "fields": {
-    "auid": "1001",
+    "auid": 1001,
     "msg": {
       "addr": "72.83.230.100",
       "exe": "/usr/sbin/sshd",
@@ -20,6 +20,6 @@ info: "type=USER_LOGIN msg=audit(1492810797.778:12651): pid=11396 uid=0 auid=100
     },
     "pid": "11396",
     "ses": "36",
-    "uid": "0"
+    "uid": 0
   }
 }

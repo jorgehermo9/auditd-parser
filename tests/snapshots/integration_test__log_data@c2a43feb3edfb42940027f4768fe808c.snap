@@ -13,14 +13,14 @@ info: "type=SYSCALL msg=audit(1451781471.394:194440): arch=c000003e syscall=228 
     "a2": "564201867510",
     "a3": "8",
     "arch": "c000003e",
-    "auid": "1000",
+    "auid": 1000,
     "comm": "sshd",
     "egid": "1000",
-    "euid": "1000",
+    "euid": 1000,
     "exe": "/usr/sbin/sshd",
     "exit": "0",
     "fsgid": "1000",
-    "fsuid": "1000",
+    "fsuid": 1000,
     "gid": "1000",
     "items": "0",
     "key": "(null)",
@@ -30,9 +30,9 @@ info: "type=SYSCALL msg=audit(1451781471.394:194440): arch=c000003e syscall=228 
     "sgid": "1000",
     "subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
     "success": "yes",
-    "suid": "1000",
+    "suid": 1000,
     "syscall": "228",
     "tty": "(none)",
-    "uid": "1000"
+    "uid": 1000
   }
 }

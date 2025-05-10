@@ -8,7 +8,7 @@ info: "type=USER_LOGOUT msg=audit(1481077049.033:424): pid=1298 uid=0 auid=1000 
   "timestamp": 1481077049033,
   "id": 424,
   "fields": {
-    "auid": "1000",
+    "auid": 1000,
     "msg": {
       "addr": "?",
       "exe": "/usr/sbin/sshd",
@@ -21,6 +21,6 @@ info: "type=USER_LOGOUT msg=audit(1481077049.033:424): pid=1298 uid=0 auid=1000 
     "pid": "1298",
     "ses": "1",
     "subj": "system_u:system_r:sshd_t:s0-s0:c0.c1023",
-    "uid": "0"
+    "uid": 0
   }
 }

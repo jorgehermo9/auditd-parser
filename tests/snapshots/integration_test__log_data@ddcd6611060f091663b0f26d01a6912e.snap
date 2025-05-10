@@ -8,13 +8,13 @@ info: "type=LOGIN msg=audit(1481077043.057:414): pid=1298 uid=0 subj=system_u:sy
   "timestamp": 1481077043057,
   "id": 414,
   "fields": {
-    "auid": "1000",
-    "old-auid": "4294967295",
+    "auid": 1000,
+    "old-auid": 4294967295,
     "old-ses": "4294967295",
     "pid": "1298",
     "res": "1",
     "ses": "1",
     "subj": "system_u:system_r:sshd_t:s0-s0:c0.c1023",
-    "uid": "0"
+    "uid": 0
   }
 }

@@ -8,7 +8,7 @@ info: "type=CONFIG_CHANGE msg=audit(1481077231.371:478): auid=1000 ses=3 subj=un
   "timestamp": 1481077231371,
   "id": 478,
   "fields": {
-    "auid": "1000",
+    "auid": 1000,
     "key": "(null)",
     "list": "4",
     "op": "add_rule",
