@@ -18,7 +18,7 @@ info: "type=SYSCALL msg=audit(1451781471.394:194437): arch=c000003e syscall=14 s
     "egid": 1000,
     "euid": 1000,
     "exe": "/usr/sbin/sshd",
-    "exit": "0",
+    "exit": 0,
     "fsgid": 1000,
     "fsuid": 1000,
     "gid": 1000,
