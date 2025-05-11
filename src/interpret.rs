@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 
+use bytes::Bytes;
 use field_type::FieldType;
 use nom::{Parser, combinator::all_consuming};
 
@@ -12,6 +13,7 @@ use crate::{
 mod capability;
 mod constants;
 mod field_type;
+mod socket;
 
 impl From<RawAuditdRecord> for AuditdRecord {
     fn from(value: RawAuditdRecord) -> Self {
@@ -55,6 +57,7 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
         FieldType::Uid | FieldType::Gid => interpret_unsigned_integer_field(field_value),
         FieldType::Exit => interpret_signed_integer_field(field_value),
         FieldType::CapabilityBitmap => interpret_cap_bitmap_field(field_value),
+        FieldType::SocketAddr => interpret_socket_addr_field(field_value),
     }
 }
 
@@ -108,6 +111,16 @@ fn interpret_cap_bitmap_field(field_value: String) -> FieldValue {
     let capabilities = capability::resolve_capability_bitmap(cap_bitmap);
 
     FieldValue::Array(capabilities)
+}
+
+fn interpret_socket_addr_field(field_value: String) -> FieldValue {
+    let Ok(byte_vec) = hex::decode(&field_value) else {
+        return FieldValue::String(field_value);
+    };
+    let bytes = Bytes::from(byte_vec);
+
+    let result = socket::parse_sockaddr(bytes).unwrap_or(field_value);
+    FieldValue::String(result)
 }
 
 #[cfg(test)]

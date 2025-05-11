@@ -8,6 +8,7 @@ pub enum FieldType {
     Uid,
     Gid,
     CapabilityBitmap,
+    SocketAddr,
 }
 
 impl FieldType {
@@ -18,6 +19,10 @@ impl FieldType {
 
         if field_name == "exit" {
             return Some(Self::Exit);
+        }
+
+        if field_name == "saddr" {
+            return Some(Self::SocketAddr);
         }
 
         if constants::ESCAPED_FIELD_NAMES.contains(&field_name) {
