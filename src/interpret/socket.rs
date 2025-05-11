@@ -44,7 +44,7 @@ fn parse_af_local(bytes: Bytes) -> String {
 // Parses a `sockaddr_in` struct memory layout.
 // Ref: https://github.com/torvalds/linux/blob/cd802e7e5f1e77ae68cd98653fb70a97189eb937/include/uapi/linux/in.h#L260
 fn parse_af_inet(mut bytes: Bytes) -> Option<String> {
-    // Ensure that there are at lesat 6 bytes remaining in the buffer
+    // Ensure that there are at least 6 bytes remaining in the buffer
     if bytes.remaining() < 6 {
         return None;
     }
@@ -68,6 +68,11 @@ fn parse_af_inet(mut bytes: Bytes) -> Option<String> {
 // Parses a `sockaddr_in6` struct memory layout.
 // Ref: https://github.com/torvalds/linux/blob/cd802e7e5f1e77ae68cd98653fb70a97189eb937/include/uapi/linux/in6.h#L50
 fn parse_af_inet6(mut bytes: Bytes) -> Option<String> {
+    // Ensure that there are at least 26 bytes remaining in the buffer
+    if bytes.remaining() < 26 {
+        return None;
+    }
+
     // The `sin6_port` field is a 16-bit big-endian integer
     let port = bytes.get_u16();
 
@@ -178,5 +183,12 @@ mod tests {
         let bytes = Bytes::from(hex::decode(input).unwrap());
         let result = parse_af_inet6(bytes).unwrap();
         assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_parse_af_inet6_fails_not_enough_bytes() {
+        let bytes = Bytes::from(vec![0x12u8, 0x34u8]);
+        let result = parse_af_inet6(bytes);
+        assert_eq!(result, None);
     }
 }
