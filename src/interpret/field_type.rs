@@ -1,7 +1,7 @@
 // The constants of this file are extracted from
 // https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/auparse/typetab.h#L75
 
-pub const ESCAPED_FIELD_NAMES: [&str; 36] = [
+const ESCAPED_FIELD_NAMES: [&str; 36] = [
     "path",
     "comm",
     "exe",
@@ -40,7 +40,7 @@ pub const ESCAPED_FIELD_NAMES: [&str; 36] = [
     "root_dir",
 ];
 
-pub const UID_FIELD_NAMES: [&str; 13] = [
+const UID_FIELD_NAMES: [&str; 13] = [
     "auid",
     "uid",
     "euid",
@@ -56,7 +56,7 @@ pub const UID_FIELD_NAMES: [&str; 13] = [
     "obj_uid",
 ];
 
-pub const GID_FIELD_NAMES: [&str; 9] = [
+const GID_FIELD_NAMES: [&str; 9] = [
     "obj_gid",
     "gid",
     "egid",
@@ -68,7 +68,7 @@ pub const GID_FIELD_NAMES: [&str; 9] = [
     "new_gid",
 ];
 
-pub const CAP_BITMAP_FIELD_NAMES: [&str; 19] = [
+const CAP_BITMAP_FIELD_NAMES: [&str; 19] = [
     "cap_pi", "cap_pe", "cap_pp", "cap_pa", "cap_fi", "cap_fp", "fp", "fi", "old_pp", "old_pi",
     "old_pe", "old_pa", "new_pp", "new_pi", "new_pe", "pp", "pi", "pe", "pa",
 ];
