@@ -5,19 +5,24 @@ use bytes::{Buf, Bytes};
 const AF_LOCAL: u16 = 1;
 const AF_INET: u16 = 2;
 const AF_INET6: u16 = 10;
+// TODO: print AF_NETLINK like `ss -f netlink` does
+const AF_NETLINK: u16 = 16;
 
 // We will parse the `sockaddr` struct memory layout.
 // This parsing will be very sensitive of the host machine's endianness.
 // Therefore, we will assume that the machine's endianness is little-endian (it is the most common one)
 // Ref: https://github.com/torvalds/linux/blob/cd802e7e5f1e77ae68cd98653fb70a97189eb937/include/linux/socket.h#L35
 pub fn parse_sockaddr(mut bytes: Bytes) -> Option<String> {
+    if bytes.remaining() < 2 {
+        return None;
+    }
+
     // The first field is the `sa_family` field, of type `sa_family_t`,
     // which is defined as an `unsigned short` in the kernel (https://github.com/torvalds/linux/blob/cd802e7e5f1e77ae68cd98653fb70a97189eb937/include/uapi/linux/socket.h#L10)
     // We will assume that `unsigned short` is 16-bit in size (it is the most common)
     // Also, the endianness of this field is not defined in sourcecode,
     // so we will assume that it is little-endian.
     // Ref: https://github.com/torvalds/linux/blob/cd802e7e5f1e77ae68cd98653fb70a97189eb937/include/linux/socket.h#L29
-
     let family = bytes.get_u16_le();
 
     match family {
@@ -44,7 +49,6 @@ fn parse_af_local(bytes: Bytes) -> String {
 // Parses a `sockaddr_in` struct memory layout.
 // Ref: https://github.com/torvalds/linux/blob/cd802e7e5f1e77ae68cd98653fb70a97189eb937/include/uapi/linux/in.h#L260
 fn parse_af_inet(mut bytes: Bytes) -> Option<String> {
-    // Ensure that there are at least 6 bytes remaining in the buffer
     if bytes.remaining() < 6 {
         return None;
     }
@@ -68,7 +72,6 @@ fn parse_af_inet(mut bytes: Bytes) -> Option<String> {
 // Parses a `sockaddr_in6` struct memory layout.
 // Ref: https://github.com/torvalds/linux/blob/cd802e7e5f1e77ae68cd98653fb70a97189eb937/include/uapi/linux/in6.h#L50
 fn parse_af_inet6(mut bytes: Bytes) -> Option<String> {
-    // Ensure that there are at least 26 bytes remaining in the buffer
     if bytes.remaining() < 26 {
         return None;
     }
@@ -121,6 +124,13 @@ mod tests {
     fn test_parse_sockaddr_fails_unknown_famly() {
         let input = "FFFF0050A9FEA9FE";
         let bytes = Bytes::from(hex::decode(input).unwrap());
+        let result = parse_sockaddr(bytes);
+        assert_eq!(result, None);
+    }
+
+    #[test]
+    fn test_parse_sockaddr_fails_not_enough_bytes() {
+        let bytes = Bytes::from(vec![0x12u8]);
         let result = parse_sockaddr(bytes);
         assert_eq!(result, None);
     }
