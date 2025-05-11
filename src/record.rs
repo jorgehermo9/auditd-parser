@@ -8,6 +8,7 @@ use crate::parser::{self, ParserError};
 #[derive(Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct AuditdRecord {
+    // TODO: rename `record_type` to `type`?
     pub record_type: String,
     /// Unix timestamp in milliseconds
     pub timestamp: u64,
