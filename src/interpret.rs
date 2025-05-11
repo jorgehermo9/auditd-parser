@@ -11,7 +11,6 @@ use crate::{
 };
 
 mod capability;
-mod constants;
 mod field_type;
 mod socket;
 
