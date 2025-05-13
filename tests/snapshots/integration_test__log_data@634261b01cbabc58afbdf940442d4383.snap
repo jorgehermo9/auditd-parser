@@ -10,7 +10,7 @@ info: "type=SOCKADDR msg=audit(1490816924.990:517643): saddr=1000000000000000000
   "fields": {
     "saddr": {
       "family": "AF_NETLINK",
-      "groups": 0,
+      "multicast_groups_mask": 0,
       "port_id": 0
     }
   }

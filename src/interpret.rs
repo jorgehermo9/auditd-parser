@@ -152,8 +152,10 @@ fn interpret_socket_addr_field(field_value: String) -> FieldValue {
                 FieldValue::Number(Number::UnsignedInteger(u64::from(netlink_address.port_id))),
             );
             map.insert(
-                "groups".into(),
-                FieldValue::Number(Number::UnsignedInteger(u64::from(netlink_address.groups))),
+                "multicast_groups_mask".into(),
+                FieldValue::Number(Number::UnsignedInteger(u64::from(
+                    netlink_address.multicast_groups_mask,
+                ))),
             );
         }
     }

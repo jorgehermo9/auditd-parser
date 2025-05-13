@@ -34,7 +34,7 @@ pub struct SocketAddrLocal {
 #[derive(Debug, PartialEq)]
 pub struct SocketAddrNetlink {
     pub port_id: u32,
-    pub groups: u32,
+    pub multicast_groups_mask: u32,
 }
 
 // We will parse the `sockaddr` struct memory layout.
@@ -147,7 +147,10 @@ fn parse_af_netlink(mut bytes: Bytes) -> Option<SocketAddrNetlink> {
     // how to interpret it like we do in the capabilities. We leave it as an integer for now.
     let groups = bytes.get_u32_le();
 
-    Some(SocketAddrNetlink { port_id, groups })
+    Some(SocketAddrNetlink {
+        port_id,
+        multicast_groups_mask: groups,
+    })
 }
 
 #[cfg(test)]
@@ -195,7 +198,7 @@ mod tests {
         "0A0000160000000020010DC8E0040001000000000000F00A00000000",
         "[2001:dc8:e004:1::f00a]:22"
     )]
-    #[case::af_netlink("100000001000000001000000", SocketAddr::Netlink(SocketAddrNetlink { port_id: 16, groups: 1 }))]
+    #[case::af_netlink("100000001000000001000000", SocketAddr::Netlink(SocketAddrNetlink { port_id: 16, multicast_groups_mask: 1 }))]
     fn test_parse_sockaddr(#[case] input: &str, #[case] expected: SocketAddr) {
         let bytes = Bytes::from(hex::decode(input).unwrap());
         let result = parse_sockaddr(bytes).unwrap();
@@ -291,12 +294,12 @@ mod tests {
     }
 
     #[rstest]
-    #[case::all_zeros("00000000000000000000", SocketAddrNetlink { port_id: 0, groups: 0 })]
-    #[case::with_groups("00000000000078563412", SocketAddrNetlink { port_id: 0, groups: 0x12_345_678 })]
-    #[case::with_port_id("00007856341200000000", SocketAddrNetlink { port_id: 0x12_345_678, groups: 0 })]
+    #[case::all_zeros("00000000000000000000", SocketAddrNetlink { port_id: 0, multicast_groups_mask: 0 })]
+    #[case::with_groups("00000000000078563412", SocketAddrNetlink { port_id: 0, multicast_groups_mask: 0x12_345_678 })]
+    #[case::with_port_id("00007856341200000000", SocketAddrNetlink { port_id: 0x12_345_678, multicast_groups_mask: 0 })]
     #[case::with_port_id_and_groups(
         "00007856341278563412",
-        SocketAddrNetlink { port_id: 0x12_345_678, groups: 0x12_345_678 }
+        SocketAddrNetlink { port_id: 0x12_345_678, multicast_groups_mask: 0x12_345_678 }
     )]
     fn test_parse_af_netlink(#[case] input: &str, #[case] expected: SocketAddrNetlink) {
         let bytes = Bytes::from(hex::decode(input).unwrap());
