@@ -13,6 +13,7 @@ mod header;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RawAuditdRecord {
+    // TODO: rename `record_type` to `type`?
     pub record_type: String,
     /// Unix timestamp in milliseconds
     pub timestamp: u64,
