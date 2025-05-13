@@ -8,6 +8,10 @@ info: "type=SOCKADDR msg=audit(1490816924.990:517643): saddr=1000000000000000000
   "timestamp": 1490816924990,
   "id": 517643,
   "fields": {
-    "saddr": "100000000000000000000000"
+    "saddr": {
+      "family": "AF_NETLINK",
+      "groups": 0,
+      "port_id": 0
+    }
   }
 }

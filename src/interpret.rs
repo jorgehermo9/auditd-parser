@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
 
 use bytes::Bytes;
 use field_type::FieldType;
@@ -149,11 +149,11 @@ fn interpret_socket_addr_field(field_value: String) -> FieldValue {
         SocketAddr::Netlink(netlink_address) => {
             map.insert(
                 "port_id".into(),
-                FieldValue::Number(Number::UnsignedInteger(netlink_address.port_id as u64)),
+                FieldValue::Number(Number::UnsignedInteger(u64::from(netlink_address.port_id))),
             );
             map.insert(
                 "groups".into(),
-                FieldValue::Number(Number::UnsignedInteger(netlink_address.groups as u64)),
+                FieldValue::Number(Number::UnsignedInteger(u64::from(netlink_address.groups))),
             );
         }
     }
@@ -166,6 +166,8 @@ mod tests {
     use rstest::rstest;
 
     use super::*;
+
+    // TODO: add tests for interpret_msg_field
 
     #[rstest]
     #[case::hex_encoded("666f6f", FieldValue::String("foo".to_string()))]
@@ -193,4 +195,8 @@ mod tests {
         let result = interpret_signed_integer_field(input.to_string());
         assert_eq!(result, expected);
     }
+
+    // TODO: add tests for interpret_socket_addr_field.
+    // Use https://docs.rs/maplit/latest/maplit/macro.btreemap.html as a test dependency
+    // to create BTreeMaps in the test cases
 }

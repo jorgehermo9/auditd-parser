@@ -5,6 +5,7 @@
 pub const CAPABILITIES: [&str; 41] = [
     // TODO: uppercase, lowercase (without CAP_) or should we output `CAP_CHOWN` as they are named in the kernel?
     // or as they are output in `capsh --decode=0000001fffffffff``? (e.g. `cap_chown`)
+    // For example, in the socket family, we output `AF_INET` instead of `INET`
     "CHOWN",
     "DAC_OVERRIDE",
     "DAC_READ_SEARCH",

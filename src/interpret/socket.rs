@@ -2,10 +2,9 @@ use std::net::{Ipv4Addr, Ipv6Addr, SocketAddrV4, SocketAddrV6};
 
 use bytes::{Buf, Bytes};
 
-const AF_LOCAL: u16 = 1;
+const AF_UNIX: u16 = 1;
 const AF_INET: u16 = 2;
 const AF_INET6: u16 = 10;
-// TODO: print AF_NETLINK like `ss -f netlink` does
 const AF_NETLINK: u16 = 16;
 
 #[derive(Debug, PartialEq)]
@@ -19,7 +18,7 @@ pub enum SocketAddr {
 impl SocketAddr {
     pub fn family(&self) -> &'static str {
         match self {
-            Self::Local(_) => "AF_LOCAL",
+            Self::Local(_) => "AF_UNIX",
             Self::Inet(_) => "AF_INET",
             Self::Inet6(_) => "AF_INET6",
             Self::Netlink(_) => "AF_NETLINK",
@@ -56,9 +55,10 @@ pub fn parse_sockaddr(mut bytes: Bytes) -> Option<SocketAddr> {
     let family = bytes.get_u16_le();
 
     match family {
-        AF_LOCAL => Some(SocketAddr::Local(parse_af_local(bytes))),
+        AF_UNIX => Some(SocketAddr::Local(parse_af_unix(bytes))),
         AF_INET => parse_af_inet(bytes).map(SocketAddr::Inet),
         AF_INET6 => parse_af_inet6(bytes).map(SocketAddr::Inet6),
+        AF_NETLINK => parse_af_netlink(bytes).map(SocketAddr::Netlink),
         // TODO: output None or something like `saddr=unknown family(0)` as auparse does..
         _ => None,
     }
@@ -66,7 +66,7 @@ pub fn parse_sockaddr(mut bytes: Bytes) -> Option<SocketAddr> {
 
 // Parses a `sockaddr_un` struct memory layout.
 // Ref: https://github.com/torvalds/linux/blob/cd802e7e5f1e77ae68cd98653fb70a97189eb937/include/uapi/linux/un.h#L9
-fn parse_af_local(bytes: Bytes) -> SocketAddrLocal {
+fn parse_af_unix(bytes: Bytes) -> SocketAddrLocal {
     // The `sun_path` field is a char array. Strings in C are null-terminated,
     // so we will read bytes until we find a null byte.
     let path = bytes
@@ -131,6 +131,25 @@ fn parse_af_inet6(mut bytes: Bytes) -> Option<SocketAddrV6> {
     Some(SocketAddrV6::new(address, port, flowinfo, scope_id))
 }
 
+// Parses a `sockaddr_nl` struct memory layout.
+// Ref: https://github.com/torvalds/linux/blob/82f2b0b97b36ee3fcddf0f0780a9a0825d52fec3/include/uapi/linux/netlink.h#L37
+fn parse_af_netlink(mut bytes: Bytes) -> Option<SocketAddrNetlink> {
+    if bytes.remaining() < 10 {
+        return None;
+    }
+
+    // The `pad` field is an `unsigned short`, we assume 16-bit wide.
+    let _pad = bytes.get_u16_le();
+
+    // The `port_id` and `groups` fields are `__u32`, which is a 32-bit integer with no specified endianness.
+    let port_id = bytes.get_u32_le();
+    // Although the groups are a bitmap (mask) of groups to listen (multicast), I don't know
+    // how to interpret it like we do in the capabilities. We leave it as an integer for now.
+    let groups = bytes.get_u32_le();
+
+    Some(SocketAddrNetlink { port_id, groups })
+}
+
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
@@ -170,12 +189,13 @@ mod tests {
     }
 
     #[rstest]
-    #[case::af_local("01002F7661722F72756E2F6E7363642F736F636B6574", "/var/run/nscd/socket")]
+    #[case::af_unix("01002F7661722F72756E2F6E7363642F736F636B6574", "/var/run/nscd/socket")]
     #[case::af_inet("02000050A9FEA9FE", "169.254.169.254:80")]
     #[case::af_inet6(
         "0A0000160000000020010DC8E0040001000000000000F00A00000000",
         "[2001:dc8:e004:1::f00a]:22"
     )]
+    #[case::af_netlink("100000001000000001000000", SocketAddr::Netlink(SocketAddrNetlink { port_id: 16, groups: 1 }))]
     fn test_parse_sockaddr(#[case] input: &str, #[case] expected: SocketAddr) {
         let bytes = Bytes::from(hex::decode(input).unwrap());
         let result = parse_sockaddr(bytes).unwrap();
@@ -206,10 +226,10 @@ mod tests {
     )]
     #[case::empty_path("00", "")]
     #[case::empty_input("", "")]
-    fn test_parse_af_local(#[case] input: &str, #[case] expected: SocketAddrLocal) {
+    fn test_parse_af_unix(#[case] input: &str, #[case] expected: SocketAddrLocal) {
         let bytes = Bytes::from(hex::decode(input).unwrap());
 
-        let result = parse_af_local(bytes);
+        let result = parse_af_unix(bytes);
         assert_eq!(result, expected);
     }
 
@@ -267,6 +287,27 @@ mod tests {
     fn test_parse_af_inet6_fails_not_enough_bytes() {
         let bytes = Bytes::from(vec![0x12u8, 0x34u8]);
         let result = parse_af_inet6(bytes);
+        assert_eq!(result, None);
+    }
+
+    #[rstest]
+    #[case::all_zeros("00000000000000000000", SocketAddrNetlink { port_id: 0, groups: 0 })]
+    #[case::with_groups("00000000000078563412", SocketAddrNetlink { port_id: 0, groups: 0x12_345_678 })]
+    #[case::with_port_id("00007856341200000000", SocketAddrNetlink { port_id: 0x12_345_678, groups: 0 })]
+    #[case::with_port_id_and_groups(
+        "00007856341278563412",
+        SocketAddrNetlink { port_id: 0x12_345_678, groups: 0x12_345_678 }
+    )]
+    fn test_parse_af_netlink(#[case] input: &str, #[case] expected: SocketAddrNetlink) {
+        let bytes = Bytes::from(hex::decode(input).unwrap());
+        let result = parse_af_netlink(bytes).unwrap();
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_parse_af_netlink_fails_not_enough_bytes() {
+        let bytes = Bytes::from(vec![0x12u8, 0x34u8]);
+        let result = parse_af_netlink(bytes);
         assert_eq!(result, None);
     }
 }
