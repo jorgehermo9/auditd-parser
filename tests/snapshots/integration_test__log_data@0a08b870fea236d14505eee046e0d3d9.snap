@@ -8,6 +8,9 @@ info: "type=SOCKADDR msg=audit(1481078424.953:688): saddr=02000050A9FEA9FE000000
   "timestamp": 1481078424953,
   "id": 688,
   "fields": {
-    "saddr": "169.254.169.254:80"
+    "saddr": {
+      "address": "169.254.169.254:80",
+      "family": "AF_INET"
+    }
   }
 }

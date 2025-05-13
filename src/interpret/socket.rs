@@ -8,11 +8,41 @@ const AF_INET6: u16 = 10;
 // TODO: print AF_NETLINK like `ss -f netlink` does
 const AF_NETLINK: u16 = 16;
 
+#[derive(Debug, PartialEq)]
+pub enum SocketAddr {
+    Local(SocketAddrLocal),
+    Inet(SocketAddrV4),
+    Inet6(SocketAddrV6),
+    Netlink(SocketAddrNetlink),
+}
+
+impl SocketAddr {
+    pub fn family(&self) -> &'static str {
+        match self {
+            Self::Local(_) => "AF_LOCAL",
+            Self::Inet(_) => "AF_INET",
+            Self::Inet6(_) => "AF_INET6",
+            Self::Netlink(_) => "AF_NETLINK",
+        }
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub struct SocketAddrLocal {
+    pub path: String,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct SocketAddrNetlink {
+    pub port_id: u32,
+    pub groups: u32,
+}
+
 // We will parse the `sockaddr` struct memory layout.
 // This parsing will be very sensitive of the host machine's endianness.
 // Therefore, we will assume that the machine's endianness is little-endian (it is the most common one)
 // Ref: https://github.com/torvalds/linux/blob/cd802e7e5f1e77ae68cd98653fb70a97189eb937/include/linux/socket.h#L35
-pub fn parse_sockaddr(mut bytes: Bytes) -> Option<String> {
+pub fn parse_sockaddr(mut bytes: Bytes) -> Option<SocketAddr> {
     if bytes.remaining() < 2 {
         return None;
     }
@@ -26,9 +56,9 @@ pub fn parse_sockaddr(mut bytes: Bytes) -> Option<String> {
     let family = bytes.get_u16_le();
 
     match family {
-        AF_LOCAL => Some(parse_af_local(bytes)),
-        AF_INET => parse_af_inet(bytes),
-        AF_INET6 => parse_af_inet6(bytes),
+        AF_LOCAL => Some(SocketAddr::Local(parse_af_local(bytes))),
+        AF_INET => parse_af_inet(bytes).map(SocketAddr::Inet),
+        AF_INET6 => parse_af_inet6(bytes).map(SocketAddr::Inet6),
         // TODO: output None or something like `saddr=unknown family(0)` as auparse does..
         _ => None,
     }
@@ -36,19 +66,21 @@ pub fn parse_sockaddr(mut bytes: Bytes) -> Option<String> {
 
 // Parses a `sockaddr_un` struct memory layout.
 // Ref: https://github.com/torvalds/linux/blob/cd802e7e5f1e77ae68cd98653fb70a97189eb937/include/uapi/linux/un.h#L9
-fn parse_af_local(bytes: Bytes) -> String {
+fn parse_af_local(bytes: Bytes) -> SocketAddrLocal {
     // The `sun_path` field is a char array. Strings in C are null-terminated,
     // so we will read bytes until we find a null byte.
-    bytes
+    let path = bytes
         .into_iter()
         .take_while(|&b| b != 0)
         .map(|b| b as char)
-        .collect::<String>()
+        .collect::<String>();
+
+    SocketAddrLocal { path }
 }
 
 // Parses a `sockaddr_in` struct memory layout.
 // Ref: https://github.com/torvalds/linux/blob/cd802e7e5f1e77ae68cd98653fb70a97189eb937/include/uapi/linux/in.h#L260
-fn parse_af_inet(mut bytes: Bytes) -> Option<String> {
+fn parse_af_inet(mut bytes: Bytes) -> Option<SocketAddrV4> {
     if bytes.remaining() < 6 {
         return None;
     }
@@ -65,13 +97,12 @@ fn parse_af_inet(mut bytes: Bytes) -> Option<String> {
     // Ref: https://github.com/torvalds/linux/blob/cd802e7e5f1e77ae68cd98653fb70a97189eb937/include/uapi/linux/in.h#L97
     let address = Ipv4Addr::from_bits(bytes.get_u32());
 
-    let socket_address = SocketAddrV4::new(address, port);
-    Some(socket_address.to_string())
+    Some(SocketAddrV4::new(address, port))
 }
 
 // Parses a `sockaddr_in6` struct memory layout.
 // Ref: https://github.com/torvalds/linux/blob/cd802e7e5f1e77ae68cd98653fb70a97189eb937/include/uapi/linux/in6.h#L50
-fn parse_af_inet6(mut bytes: Bytes) -> Option<String> {
+fn parse_af_inet6(mut bytes: Bytes) -> Option<SocketAddrV6> {
     if bytes.remaining() < 26 {
         return None;
     }
@@ -97,15 +128,46 @@ fn parse_af_inet6(mut bytes: Bytes) -> Option<String> {
     // here will be incorrect (as we would have to skip 256 bits from the input to reach this field)
     let scope_id = bytes.get_u32_le();
 
-    let socket_address = SocketAddrV6::new(address, port, flowinfo, scope_id);
-    Some(socket_address.to_string())
+    Some(SocketAddrV6::new(address, port, flowinfo, scope_id))
 }
 
 #[cfg(test)]
 mod tests {
+    use std::str::FromStr;
+
     use rstest::rstest;
 
     use super::*;
+
+    impl FromStr for SocketAddrLocal {
+        type Err = ();
+
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
+            Ok(SocketAddrLocal {
+                path: s.to_string(),
+            })
+        }
+    }
+
+    impl FromStr for SocketAddr {
+        type Err = ();
+
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
+            if let Ok(address) = s.parse::<SocketAddrV4>() {
+                return Ok(SocketAddr::Inet(address));
+            }
+
+            if let Ok(address) = s.parse::<SocketAddrV6>() {
+                return Ok(SocketAddr::Inet6(address));
+            }
+
+            if let Ok(address) = s.parse::<SocketAddrLocal>() {
+                return Ok(SocketAddr::Local(address));
+            }
+
+            Err(())
+        }
+    }
 
     #[rstest]
     #[case::af_local("01002F7661722F72756E2F6E7363642F736F636B6574", "/var/run/nscd/socket")]
@@ -114,7 +176,7 @@ mod tests {
         "0A0000160000000020010DC8E0040001000000000000F00A00000000",
         "[2001:dc8:e004:1::f00a]:22"
     )]
-    fn test_parse_sockaddr(#[case] input: &str, #[case] expected: &str) {
+    fn test_parse_sockaddr(#[case] input: &str, #[case] expected: SocketAddr) {
         let bytes = Bytes::from(hex::decode(input).unwrap());
         let result = parse_sockaddr(bytes).unwrap();
         assert_eq!(result, expected);
@@ -144,8 +206,9 @@ mod tests {
     )]
     #[case::empty_path("00", "")]
     #[case::empty_input("", "")]
-    fn test_parse_af_local(#[case] input: &str, #[case] expected: &str) {
+    fn test_parse_af_local(#[case] input: &str, #[case] expected: SocketAddrLocal) {
         let bytes = Bytes::from(hex::decode(input).unwrap());
+
         let result = parse_af_local(bytes);
         assert_eq!(result, expected);
     }
@@ -156,8 +219,9 @@ mod tests {
     #[case::localhost("00507F000001", "127.0.0.1:80")]
     #[case::all_zeros("000000000000", "0.0.0.0:0")]
     #[case::all_ones("FFFFFFFFFFFF", "255.255.255.255:65535")]
-    fn test_parse_af_inet(#[case] input: &str, #[case] expected: &str) {
+    fn test_parse_af_inet(#[case] input: &str, #[case] expected: SocketAddrV4) {
         let bytes = Bytes::from(hex::decode(input).unwrap());
+
         let result = parse_af_inet(bytes).unwrap();
         assert_eq!(result, expected);
     }
@@ -189,10 +253,14 @@ mod tests {
         "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
         "[ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff%4294967295]:65535"
     )]
-    fn test_parse_af_inet6(#[case] input: &str, #[case] expected: &str) {
+    fn test_parse_af_inet6(#[case] input: &str, #[case] expected: SocketAddrV6) {
         let bytes = Bytes::from(hex::decode(input).unwrap());
         let result = parse_af_inet6(bytes).unwrap();
-        assert_eq!(result, expected);
+        // We assert the `to_string()` representation because the `flowinfo` field is not used
+        // in the `FromStr` implementation of `SocketAddrV6` and therefore the expected SocketAddrV6
+        // would have a `flowinfo` value of 0.
+        // `assert_eq!(result, expected);` would fail because of that.
+        assert_eq!(result.to_string(), expected.to_string());
     }
 
     #[test]

@@ -1,8 +1,9 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 
 use bytes::Bytes;
 use field_type::FieldType;
 use nom::{Parser, combinator::all_consuming};
+use socket::SocketAddr;
 
 use crate::{
     AuditdRecord, FieldValue,
@@ -70,8 +71,9 @@ fn interpret_msg_field(field_value: String) -> FieldValue {
         return FieldValue::String(field_value);
     };
     // TODO: create a new parse_key_value_list here that returns NestedFieldValue itself...
-    let nested_field_value_map: BTreeMap<String, String> = key_value_list
+    let nested_field_value_map = key_value_list
         .into_iter()
+        .map(|(key, value)| (key, FieldValue::String(value)))
         // TODO: should we call interpret_field_value for nested fields inside the msg field?
         .collect();
 
@@ -118,8 +120,45 @@ fn interpret_socket_addr_field(field_value: String) -> FieldValue {
     };
     let bytes = Bytes::from(byte_vec);
 
-    let result = socket::parse_sockaddr(bytes).unwrap_or(field_value);
-    FieldValue::String(result)
+    let Some(socket_address) = socket::parse_sockaddr(bytes) else {
+        return FieldValue::String(field_value);
+    };
+
+    let mut map = BTreeMap::new();
+
+    map.insert(
+        "family".into(),
+        FieldValue::String(socket_address.family().to_string()),
+    );
+    match socket_address {
+        SocketAddr::Local(local_address) => {
+            map.insert("path".into(), FieldValue::String(local_address.path));
+        }
+        SocketAddr::Inet(inet_address) => {
+            map.insert(
+                "address".into(),
+                FieldValue::String(inet_address.to_string()),
+            );
+        }
+        SocketAddr::Inet6(inet6_address) => {
+            map.insert(
+                "address".into(),
+                FieldValue::String(inet6_address.to_string()),
+            );
+        }
+        SocketAddr::Netlink(netlink_address) => {
+            map.insert(
+                "port_id".into(),
+                FieldValue::Number(Number::UnsignedInteger(netlink_address.port_id as u64)),
+            );
+            map.insert(
+                "groups".into(),
+                FieldValue::Number(Number::UnsignedInteger(netlink_address.groups as u64)),
+            );
+        }
+    }
+
+    FieldValue::Map(map)
 }
 
 #[cfg(test)]

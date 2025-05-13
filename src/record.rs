@@ -40,7 +40,7 @@ pub enum FieldValue {
     // where we need an array of anything other than strings?
     Array(Vec<String>),
     // TODO: use index-ordered map?
-    Map(BTreeMap<String, String>),
+    Map(BTreeMap<String, FieldValue>),
 }
 
 #[derive(Debug, PartialEq, Eq)]

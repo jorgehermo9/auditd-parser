@@ -8,6 +8,9 @@ info: "type=SOCKADDR msg=audit(1490816924.990:517647): saddr=01002F7661722F72756
   "timestamp": 1490816924990,
   "id": 517647,
   "fields": {
-    "saddr": "/var/run/nscd/socket"
+    "saddr": {
+      "family": "AF_LOCAL",
+      "path": "/var/run/nscd/socket"
+    }
   }
 }
