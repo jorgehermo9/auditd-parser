@@ -31,7 +31,7 @@ impl From<RawAuditdRecord> for AuditdRecord {
         let enrichment = value.enrichment.map(|enrichment| {
             enrichment
                 .into_iter()
-                .map(|(key, val)| (key, FieldValue::String(val)))
+                .map(|(key, val)| (key, val.into()))
                 .collect()
         });
 
@@ -48,7 +48,7 @@ impl From<RawAuditdRecord> for AuditdRecord {
 fn interpret_field_value(_record_type: &str, field_name: &str, field_value: String) -> FieldValue {
     let Some(field_type) = FieldType::resolve(field_name) else {
         // Defaults to leave the field uninterpreted
-        return FieldValue::String(field_value);
+        return field_value.into();
     };
 
     match field_type {
@@ -68,16 +68,16 @@ fn interpret_msg_field(field_value: String) -> FieldValue {
         all_consuming(parser::body::parse_key_value_list)
             .parse(field_value.as_str())
     else {
-        return FieldValue::String(field_value);
+        return field_value.into();
     };
     // TODO: create a new parse_key_value_list here that returns NestedFieldValue itself...
     let nested_field_value_map = key_value_list
         .into_iter()
-        .map(|(key, value)| (key, FieldValue::String(value)))
+        .map(|(key, value)| (key, value.into()))
         // TODO: should we call interpret_field_value for nested fields inside the msg field?
-        .collect();
+        .collect::<BTreeMap<String, FieldValue>>();
 
-    FieldValue::Map(nested_field_value_map)
+    nested_field_value_map.into()
 }
 
 // https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/lib/audit_logging.c#L103
@@ -86,85 +86,75 @@ fn interpret_escaped_field(field_value: String) -> FieldValue {
     // https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/auparse/interpret.c#L343
     let hex_decoded =
         hex::decode(&field_value).map(|bytes| String::from_utf8_lossy(&bytes).to_string());
-    FieldValue::String(hex_decoded.unwrap_or(field_value))
+    hex_decoded.unwrap_or(field_value).into()
 }
 
 fn interpret_unsigned_integer_field(field_value: String) -> FieldValue {
     field_value.parse().map_or_else(
-        |_| FieldValue::String(field_value),
-        |val| FieldValue::Number(Number::UnsignedInteger(val)),
+        |_| field_value.into(),
+        |val| Number::UnsignedInteger(val).into(),
     )
 }
 
 fn interpret_signed_integer_field(field_value: String) -> FieldValue {
     field_value.parse().map_or_else(
-        |_| FieldValue::String(field_value),
-        |val| FieldValue::Number(Number::SignedInteger(val)),
+        |_| field_value.into(),
+        |val| Number::SignedInteger(val).into(),
     )
 }
 
 fn interpret_cap_bitmap_field(field_value: String) -> FieldValue {
     // Capabilities are encoded as a 64-bit hexadecimal string
     let Ok(cap_bitmap) = u64::from_str_radix(&field_value, 16) else {
-        return FieldValue::String(field_value);
+        return field_value.into();
     };
 
     let capabilities = capability::resolve_capability_bitmap(cap_bitmap);
 
-    FieldValue::Array(capabilities)
+    capabilities.into()
 }
 
 fn interpret_socket_addr_field(field_value: String) -> FieldValue {
     let Ok(byte_vec) = hex::decode(&field_value) else {
-        return FieldValue::String(field_value);
+        return field_value.into();
     };
     let bytes = Bytes::from(byte_vec);
 
     let Some(socket_address) = socket::parse_sockaddr(bytes) else {
-        return FieldValue::String(field_value);
+        return field_value.into();
     };
 
     let mut map = BTreeMap::new();
 
-    map.insert(
-        "family".into(),
-        FieldValue::String(socket_address.family().to_string()),
-    );
+    map.insert("family".into(), socket_address.family().into());
     match socket_address {
-        SocketAddr::Local(local_address) => {
-            map.insert("path".into(), FieldValue::String(local_address.path));
+        SocketAddr::Unix(unix_address) => {
+            map.insert("path".into(), unix_address.path.into());
         }
         SocketAddr::Inet(inet_address) => {
-            map.insert(
-                "address".into(),
-                FieldValue::String(inet_address.to_string()),
-            );
+            map.insert("address".into(), inet_address.to_string().into());
         }
         SocketAddr::Inet6(inet6_address) => {
-            map.insert(
-                "address".into(),
-                FieldValue::String(inet6_address.to_string()),
-            );
+            map.insert("address".into(), inet6_address.to_string().into());
         }
         SocketAddr::Netlink(netlink_address) => {
             map.insert(
                 "port_id".into(),
-                FieldValue::Number(Number::UnsignedInteger(u64::from(netlink_address.port_id))),
+                Number::from(u64::from(netlink_address.port_id)).into(),
             );
             map.insert(
                 "multicast_groups_mask".into(),
-                FieldValue::Number(Number::UnsignedInteger(u64::from(
-                    netlink_address.multicast_groups_mask,
-                ))),
+                Number::from(u64::from(netlink_address.multicast_groups_mask)).into(),
             );
         }
     }
 
-    FieldValue::Map(map)
+    map.into()
 }
 
 #[cfg(test)]
 mod tests {
+    use maplit::btreemap;
     use rstest::rstest;
 
     use super::*;
@@ -172,33 +162,66 @@ mod tests {
     // TODO: add tests for interpret_msg_field
 
     #[rstest]
-    #[case::hex_encoded("666f6f", FieldValue::String("foo".to_string()))]
-    #[case::not_encoded_fallbacks_to_input("foo", FieldValue::String("foo".to_string()))]
-    #[case::hex_encoded_with_trailing_data_fallbacks_to_input("666f6fbar", FieldValue::String("666f6fbar".to_string()))]
-    fn test_interpret_escaped_field(#[case] input: &str, #[case] expected: FieldValue) {
-        let result = interpret_escaped_field(input.to_string());
+    #[case::hex_encoded("666f6f","foo".into())]
+    #[case::not_encoded_fallbacks_to_input("foo", "foo".into())]
+    #[case::hex_encoded_with_trailing_data_fallbacks_to_input("666f6fbar", "666f6fbar".into())]
+    fn test_interpret_escaped_field(#[case] input: String, #[case] expected: FieldValue) {
+        let result = interpret_escaped_field(input);
         assert_eq!(result, expected);
     }
 
     #[rstest]
-    #[case::positive_integer("123", FieldValue::Number(Number::UnsignedInteger(123)))]
-    #[case::negative_integer("-123", FieldValue::String("-123".to_string()))]
-    #[case::not_integer_fallbacks_to_input("foo", FieldValue::String("foo".to_string()))]
-    fn test_interpret_integer_field(#[case] input: &str, #[case] expected: FieldValue) {
-        let result = interpret_unsigned_integer_field(input.to_string());
+    #[case::positive_integer("123", Number::UnsignedInteger(123).into())]
+    #[case::negative_integer("-123", "-123".into())]
+    #[case::not_integer_fallbacks_to_input("foo", "foo".into())]
+    fn test_interpret_integer_field(#[case] input: String, #[case] expected: FieldValue) {
+        let result = interpret_unsigned_integer_field(input);
         assert_eq!(result, expected);
     }
 
     #[rstest]
-    #[case::integer("123", FieldValue::Number(Number::SignedInteger(123)))]
-    #[case::negative_integer("-123", FieldValue::Number(Number::SignedInteger(-123)))]
-    #[case::not_integer_fallbacks_to_input("foo", FieldValue::String("foo".to_string()))]
-    fn test_interpret_signed_integer_field(#[case] input: &str, #[case] expected: FieldValue) {
-        let result = interpret_signed_integer_field(input.to_string());
+    #[case::integer("123", Number::SignedInteger(123).into())]
+    #[case::negative_integer("-123", Number::SignedInteger(-123).into())]
+    #[case::not_integer_fallbacks_to_input("foo","foo".into())]
+    fn test_interpret_signed_integer_field(#[case] input: String, #[case] expected: FieldValue) {
+        let result = interpret_signed_integer_field(input);
         assert_eq!(result, expected);
     }
 
     // TODO: add tests for interpret_socket_addr_field.
     // Use https://docs.rs/maplit/latest/maplit/macro.btreemap.html as a test dependency
     // to create BTreeMaps in the test cases
+    #[rstest]
+    #[case::af_unix("01002F7661722F72756E2F6E7363642F736F636B6574",
+        btreemap!{
+            "family".into() => "AF_UNIX".into(),
+            "path".into() => "/var/run/nscd/socket".into(),
+        }.into()
+    )]
+    #[case::af_inet("02000050A9FEA9FE",
+        btreemap!{
+            "family".into() => "AF_INET".into(),
+            "address".into() => "169.254.169.254:80".into(),
+        }.into()
+    )]
+    #[case::af_inet6("0A0000160000000020010DC8E0040001000000000000F00A00000000",
+        btreemap!{
+            "family".into() => "AF_INET6".into(),
+            "address".into() => "[2001:dc8:e004:1::f00a]:22".into(),
+        }.into()
+    )]
+    #[case::af_netlink("100000001000000001000000",
+        btreemap!{
+            "family".into() => "AF_NETLINK".into(),
+            "port_id".into() => Number::UnsignedInteger(16).into(),
+            "multicast_groups_mask".into() => Number::UnsignedInteger(1).into(),
+        }.into()
+    )]
+    #[case::not_hexstring_fallbacks_to_input("foo", "foo".into())]
+    #[case::incomplete_hexstring_fallbacks_to_input("012", "012".into())]
+    #[case::parse_sockaddr_fail_fallbacks_to_input("FFFF0000", "FFFF0000".into())]
+    fn test_interpret_socket_addr_field(#[case] input: String, #[case] expected: FieldValue) {
+        let result = interpret_socket_addr_field(input);
+        assert_eq!(result, expected);
+    }
 }

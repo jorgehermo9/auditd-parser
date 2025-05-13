@@ -9,7 +9,7 @@ const AF_NETLINK: u16 = 16;
 
 #[derive(Debug, PartialEq)]
 pub enum SocketAddr {
-    Local(SocketAddrLocal),
+    Unix(SocketAddrLocal),
     Inet(SocketAddrV4),
     Inet6(SocketAddrV6),
     Netlink(SocketAddrNetlink),
@@ -18,7 +18,7 @@ pub enum SocketAddr {
 impl SocketAddr {
     pub fn family(&self) -> &'static str {
         match self {
-            Self::Local(_) => "AF_UNIX",
+            Self::Unix(_) => "AF_UNIX",
             Self::Inet(_) => "AF_INET",
             Self::Inet6(_) => "AF_INET6",
             Self::Netlink(_) => "AF_NETLINK",
@@ -55,7 +55,7 @@ pub fn parse_sockaddr(mut bytes: Bytes) -> Option<SocketAddr> {
     let family = bytes.get_u16_le();
 
     match family {
-        AF_UNIX => Some(SocketAddr::Local(parse_af_unix(bytes))),
+        AF_UNIX => Some(SocketAddr::Unix(parse_af_unix(bytes))),
         AF_INET => parse_af_inet(bytes).map(SocketAddr::Inet),
         AF_INET6 => parse_af_inet6(bytes).map(SocketAddr::Inet6),
         AF_NETLINK => parse_af_netlink(bytes).map(SocketAddr::Netlink),
@@ -184,7 +184,7 @@ mod tests {
             }
 
             if let Ok(address) = s.parse::<SocketAddrLocal>() {
-                return Ok(SocketAddr::Local(address));
+                return Ok(SocketAddr::Unix(address));
             }
 
             Err(())

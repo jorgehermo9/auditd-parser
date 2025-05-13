@@ -21,6 +21,7 @@ serde = ["dep:serde"]
 
 [dev-dependencies]
 insta = { version = "1.43.1", features = ["json"] }
+maplit = "1.0.2"
 md5 = "0.7.0"
 rstest = "0.25.0"
 

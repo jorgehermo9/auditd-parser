@@ -43,11 +43,53 @@ pub enum FieldValue {
     Map(BTreeMap<String, FieldValue>),
 }
 
+impl From<Number> for FieldValue {
+    fn from(value: Number) -> Self {
+        Self::Number(value)
+    }
+}
+
+impl From<String> for FieldValue {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl From<&str> for FieldValue {
+    fn from(value: &str) -> Self {
+        Self::String(value.to_string())
+    }
+}
+
+impl From<Vec<String>> for FieldValue {
+    fn from(value: Vec<String>) -> Self {
+        Self::Array(value)
+    }
+}
+
+impl From<BTreeMap<String, FieldValue>> for FieldValue {
+    fn from(value: BTreeMap<String, FieldValue>) -> Self {
+        Self::Map(value)
+    }
+}
+
 #[derive(Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(untagged))]
 pub enum Number {
     UnsignedInteger(u64),
     SignedInteger(i64),
+}
+
+impl From<u64> for Number {
+    fn from(value: u64) -> Self {
+        Self::UnsignedInteger(value)
+    }
+}
+
+impl From<i64> for Number {
+    fn from(value: i64) -> Self {
+        Self::SignedInteger(value)
+    }
 }
 
 impl FromStr for AuditdRecord {
