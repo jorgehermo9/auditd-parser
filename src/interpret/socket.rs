@@ -221,8 +221,8 @@ mod tests {
     }
 
     #[rstest]
-    #[case::non_null_terminated("2F7661722F72756E2F6E7363642F736F636B6574", "/var/run/nscd/socket")]
     #[case::null_terminated("2F7661722F72756E2F6E7363642F736F636B657400", "/var/run/nscd/socket")]
+    #[case::non_null_terminated("2F7661722F72756E2F6E7363642F736F636B6574", "/var/run/nscd/socket")]
     #[case::trailing_data(
         "2F7661722F72756E2F6E7363642F736F636B65740000603B7B47FC7F0000303C7B47FC7F0000020000000000000014000000160001030800000000000000C03B7B47FC7F0000103B7B47FC7F00002000000000000000303C7B47FC7F0000C0FB39861C7F0000787F2F861C7F",
         "/var/run/nscd/socket"
@@ -259,6 +259,10 @@ mod tests {
     #[rstest]
     #[case::simple(
         "00160000000020010DC8E0040001000000000000F00A00000000",
+        "[2001:dc8:e004:1::f00a]:22"
+    )]
+    #[case::trailing_data(
+        "00160000000020010DC8E0040001000000000000F00A00000000123456",
         "[2001:dc8:e004:1::f00a]:22"
     )]
     #[case::with_flow_info(
@@ -299,6 +303,9 @@ mod tests {
     #[case::with_port_id("00007856341200000000", SocketAddrNetlink { port_id: 0x12_345_678, multicast_groups_mask: 0 })]
     #[case::with_port_id_and_groups(
         "00007856341278563412",
+        SocketAddrNetlink { port_id: 0x12_345_678, multicast_groups_mask: 0x12_345_678 }
+    )]
+    #[case::trailing_data("000078563412785634120000000000",
         SocketAddrNetlink { port_id: 0x12_345_678, multicast_groups_mask: 0x12_345_678 }
     )]
     fn test_parse_af_netlink(#[case] input: &str, #[case] expected: SocketAddrNetlink) {
