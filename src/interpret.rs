@@ -13,6 +13,7 @@ use crate::{
 
 mod capability;
 mod field_type;
+mod perm;
 mod socket;
 
 impl From<RawAuditdRecord> for AuditdRecord {
@@ -58,6 +59,7 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
         FieldType::Exit => interpret_signed_integer_field(field_value),
         FieldType::CapabilityBitmap => interpret_cap_bitmap_field(field_value),
         FieldType::SocketAddr => interpret_socket_addr_field(field_value),
+        FieldType::Perm => interpret_perm_field(field_value),
     }
 }
 
@@ -152,6 +154,18 @@ fn interpret_socket_addr_field(field_value: String) -> FieldValue {
     map.into()
 }
 
+fn interpret_perm_field(field_value: String) -> FieldValue {
+    // Perm is parsed as a long (usually 32 bits)
+    // Ref: https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/auparse/interpret.c#L1023
+    let Ok(perm_mask) = field_value.parse::<u32>() else {
+        return field_value.into();
+    };
+
+    let perms = perm::resolve_perm_mask(perm_mask);
+
+    perms.into()
+}
+
 #[cfg(test)]
 mod tests {
     use maplit::btreemap;
@@ -222,6 +236,25 @@ mod tests {
     #[case::parse_sockaddr_fail_fallbacks_to_input("FFFF0000", "FFFF0000".into())]
     fn test_interpret_socket_addr_field(#[case] input: String, #[case] expected: FieldValue) {
         let result = interpret_socket_addr_field(input);
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::all_zero("0", vec!["exec".into(), "write".into(), "read".into(), "attr".into()].into())]
+    #[case::all_ones("15", vec!["exec".into(), "write".into(), "read".into(), "attr".into()].into())]
+    #[case::exec("1", vec!["exec".into()].into())]
+    #[case::write("2", vec!["write".into()].into())]
+    #[case::read("4", vec!["read".into()].into())]
+    #[case::attr("8", vec!["attr".into()].into())]
+    #[case::exec_write("3", vec!["exec".into(), "write".into()].into())]
+    #[case::read_attr("12", vec!["read".into(), "attr".into()].into())]
+    #[case::exec_attr("9", vec!["exec".into(), "attr".into()].into())]
+    #[case::write_read("6", vec!["write".into(), "read".into()].into())]
+    #[case::max_u32("4294967295", vec!["exec".into(), "write".into(), "read".into(), "attr".into()].into())]
+    #[case::none_perms("16", vec![].into())]
+    #[case::resolve_perm_mask_fail_fallbacks_to_input("foo", "foo".into())]
+    fn test_interpret_perm_field(#[case] input: String, #[case] expected: FieldValue) {
+        let result = interpret_perm_field(input);
         assert_eq!(result, expected);
     }
 }
