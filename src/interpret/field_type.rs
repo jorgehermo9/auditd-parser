@@ -73,6 +73,8 @@ const CAP_BITMAP_FIELD_NAMES: [&str; 19] = [
     "old_pe", "old_pa", "new_pp", "new_pi", "new_pe", "pp", "pi", "pe", "pa",
 ];
 
+const PERM_FIELD_NAMES: [&str; 2] = ["perm", "perm_mask"];
+
 pub enum FieldType {
     // Change to `MaybeMap`?
     Msg,
@@ -82,6 +84,7 @@ pub enum FieldType {
     Gid,
     CapabilityBitmap,
     SocketAddr,
+    Perm,
 }
 
 impl FieldType {
@@ -113,6 +116,10 @@ impl FieldType {
 
         if CAP_BITMAP_FIELD_NAMES.contains(&field_name) {
             return Some(Self::CapabilityBitmap);
+        }
+
+        if PERM_FIELD_NAMES.contains(&field_name) {
+            return Some(Self::Perm);
         }
 
         None
