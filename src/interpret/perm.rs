@@ -1,3 +1,4 @@
+// Constants extracted from https://github.com/torvalds/linux/blob/c94d59a126cb9a8d1f71e3e044363d654dcd7af8/include/uapi/linux/audit.h#L451C9-L451C24
 const AUDIT_PERM_EXEC: u32 = 0b0001;
 const AUDIT_PERM_WRITE: u32 = 0b0010;
 const AUDIT_PERM_READ: u32 = 0b0100;
