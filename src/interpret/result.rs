@@ -7,9 +7,8 @@ pub enum Result {
 }
 
 pub fn resolve_result(result: &str) -> Result {
-    // First, try to parse it as a number
+    // First, try to parse it as a 32-bit unsigned integer
     // Ref: https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/auparse/interpret.c#L1459
-
     if let Ok(result) = result.parse::<u32>() {
         // Ref: https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/auparse/interpret.c#L540
         return match result {
