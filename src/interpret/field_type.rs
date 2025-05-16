@@ -75,8 +75,10 @@ const CAP_BITMAP_FIELD_NAMES: [&str; 19] = [
 
 const PERM_FIELD_NAMES: [&str; 2] = ["perm", "perm_mask"];
 
+// Those are the equivalent of `AUPARSE_TYPE_SUCCESS` fields
+const RESULT_FIELD_NAMES: [&str; 2] = ["res", "result"];
+
 pub enum FieldType {
-    // Change to `MaybeMap`?
     Msg,
     Exit,
     Escaped,
@@ -85,6 +87,7 @@ pub enum FieldType {
     CapabilityBitmap,
     SocketAddr,
     Perm,
+    Result,
 }
 
 impl FieldType {
@@ -120,6 +123,10 @@ impl FieldType {
 
         if PERM_FIELD_NAMES.contains(&field_name) {
             return Some(Self::Perm);
+        }
+
+        if RESULT_FIELD_NAMES.contains(&field_name) {
+            return Some(Self::Result);
         }
 
         None

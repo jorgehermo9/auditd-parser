@@ -14,6 +14,7 @@ use crate::{
 mod capability;
 mod field_type;
 mod perm;
+mod result;
 mod socket;
 
 impl From<RawAuditdRecord> for AuditdRecord {
@@ -60,6 +61,7 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
         FieldType::CapabilityBitmap => interpret_cap_bitmap_field(field_value),
         FieldType::SocketAddr => interpret_socket_addr_field(field_value),
         FieldType::Perm => interpret_perm_field(field_value),
+        FieldType::Result => interpret_result_field(&field_value),
     }
 }
 
@@ -164,6 +166,12 @@ fn interpret_perm_field(field_value: String) -> FieldValue {
     let perms = perm::resolve_perm_mask(perm_mask);
 
     perms.into()
+}
+
+fn interpret_result_field(field_value: &str) -> FieldValue {
+    let result = result::resolve_result(field_value);
+
+    result.to_string().into()
 }
 
 #[cfg(test)]
