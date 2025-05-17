@@ -288,4 +288,16 @@ mod tests {
         let result = interpret_result_field(input);
         assert_eq!(result, expected);
     }
+
+    #[rstest]
+    #[case::non_hexstring("foo", "foo".into())]
+    #[case::hexstring("666f6f", "foo".into())]
+    #[case::hexstring_with_args("666f6f00626172", "foo bar".into())]
+    #[case::hexstring_with_multiple_args("666f6f006261720062617a", "foo bar baz".into())]
+    #[case::non_utf8_hexstring("666f6f0062ff6172", "foo b�ar".into())]
+    #[case::empty("", "".into())]
+    fn test_interpret_proctitle_field(#[case] input: String, #[case] expected: FieldValue) {
+        let result = interpret_proctitle_field(input);
+        assert_eq!(result, expected);
+    }
 }
