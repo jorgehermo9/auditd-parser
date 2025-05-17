@@ -1,5 +1,6 @@
 use std::fmt::{self, Display, Formatter};
 
+#[derive(Debug, PartialEq, Eq)]
 pub enum Result {
     Failed,
     Success,
@@ -35,5 +36,24 @@ impl Display for Result {
             Result::Success => write!(f, "success"),
             Result::Unset => write!(f, "unset"),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use rstest::rstest;
+
+    use super::*;
+
+    #[rstest]
+    #[case::failed("0", Result::Failed)]
+    #[case::success("1", Result::Success)]
+    #[case::unset("2", Result::Unset)]
+    #[case::failed_string("failed", Result::Failed)]
+    #[case::success_string("success", Result::Success)]
+    #[case::foo("foo", Result::Unset)]
+    fn test_resolve_result(#[case] input: &str, #[case] expected: Result) {
+        let result = resolve_result(input);
+        assert_eq!(result, expected);
     }
 }

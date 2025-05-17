@@ -169,9 +169,7 @@ fn interpret_perm_field(field_value: String) -> FieldValue {
 }
 
 fn interpret_result_field(field_value: &str) -> FieldValue {
-    let result = result::resolve_result(field_value);
-
-    result.to_string().into()
+    result::resolve_result(field_value).to_string().into()
 }
 
 #[cfg(test)]
@@ -263,6 +261,18 @@ mod tests {
     #[case::resolve_perm_mask_fail_fallbacks_to_input("foo", "foo".into())]
     fn test_interpret_perm_field(#[case] input: String, #[case] expected: FieldValue) {
         let result = interpret_perm_field(input);
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::failed("0", "failed".into())]
+    #[case::success("1", "success".into())]
+    #[case::unset("2", "unset".into())]
+    #[case::failed_string("failed", "failed".into())]
+    #[case::success_string("success", "success".into())]
+    #[case::foo("foo", "unset".into())]
+    fn test_interpret_result_field(#[case] input: &str, #[case] expected: FieldValue) {
+        let result = interpret_result_field(input);
         assert_eq!(result, expected);
     }
 }
