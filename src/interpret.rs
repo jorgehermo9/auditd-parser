@@ -14,6 +14,7 @@ use crate::{
 mod capability;
 mod field_type;
 mod perm;
+mod proctitle;
 mod result;
 mod socket;
 
@@ -47,6 +48,7 @@ impl From<RawAuditdRecord> for AuditdRecord {
     }
 }
 
+// Based on https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/auparse/interpret.c#L3325
 fn interpret_field_value(_record_type: &str, field_name: &str, field_value: String) -> FieldValue {
     let Some(field_type) = FieldType::resolve(field_name) else {
         // Defaults to leave the field uninterpreted
@@ -62,9 +64,11 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
         FieldType::SocketAddr => interpret_socket_addr_field(field_value),
         FieldType::Perm => interpret_perm_field(field_value),
         FieldType::Result => interpret_result_field(&field_value),
+        FieldType::Proctitle => interpret_proctitle_field(field_value),
     }
 }
 
+// TODO: move this to a msg.rs inside interpret module
 fn interpret_msg_field(field_value: String) -> FieldValue {
     // TODO: fields inside msg should be interpreted aswell?
     let Ok((_, key_value_list)) =
@@ -84,7 +88,6 @@ fn interpret_msg_field(field_value: String) -> FieldValue {
     nested_field_value_map.into()
 }
 
-// https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/lib/audit_logging.c#L103
 fn interpret_escaped_field(field_value: String) -> FieldValue {
     // TODO handle `au_unescape` correctly (for example, see the parenthesis and (null))
     // https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/auparse/interpret.c#L343
@@ -170,6 +173,16 @@ fn interpret_perm_field(field_value: String) -> FieldValue {
 
 fn interpret_result_field(field_value: &str) -> FieldValue {
     result::resolve_result(field_value).to_string().into()
+}
+
+fn interpret_proctitle_field(field_value: String) -> FieldValue {
+    let Ok(bytes) = hex::decode(&field_value) else {
+        // If the field is not encoded as a hexstring, we assume that
+        // it does not contain arguments separated by `\x00` and we return the field as is
+        return field_value.into();
+    };
+
+    proctitle::parse_proctitle(&bytes).into()
 }
 
 #[cfg(test)]

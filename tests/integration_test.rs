@@ -9,6 +9,7 @@ const LOG_TEST_DATA: &[&str] = &[
     "test2.log",
     "test3.log",
     "synthetic_perm.log", // TODO: https://github.com/jorgehermo9/auditd-parser/issues/41
+    "test4.log",
 ];
 const BASE_DIR: &str = "tests/testdata";
 

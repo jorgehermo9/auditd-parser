@@ -88,6 +88,7 @@ pub enum FieldType {
     SocketAddr,
     Perm,
     Result,
+    Proctitle,
 }
 
 impl FieldType {
@@ -103,6 +104,10 @@ impl FieldType {
 
         if field_name == "saddr" {
             return Some(Self::SocketAddr);
+        }
+
+        if field_name == "proctitle" {
+            return Some(Self::Proctitle);
         }
 
         if ESCAPED_FIELD_NAMES.contains(&field_name) {

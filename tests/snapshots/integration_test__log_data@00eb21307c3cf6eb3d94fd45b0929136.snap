@@ -8,6 +8,6 @@ info: "type=PROCTITLE msg=audit(1451781471.394:194435): proctitle=737368643A2062
   "timestamp": 1451781471394,
   "id": 194435,
   "fields": {
-    "proctitle": "737368643A206275726E205B707269765D"
+    "proctitle": "sshd: burn [priv]"
   }
 }
