@@ -14,6 +14,7 @@ use crate::{
 mod capability;
 mod field_type;
 mod perm;
+mod result;
 mod socket;
 
 impl From<RawAuditdRecord> for AuditdRecord {
@@ -60,6 +61,7 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
         FieldType::CapabilityBitmap => interpret_cap_bitmap_field(field_value),
         FieldType::SocketAddr => interpret_socket_addr_field(field_value),
         FieldType::Perm => interpret_perm_field(field_value),
+        FieldType::Result => interpret_result_field(&field_value),
     }
 }
 
@@ -166,6 +168,10 @@ fn interpret_perm_field(field_value: String) -> FieldValue {
     perms.into()
 }
 
+fn interpret_result_field(field_value: &str) -> FieldValue {
+    result::resolve_result(field_value).to_string().into()
+}
+
 #[cfg(test)]
 mod tests {
     use maplit::btreemap;
@@ -255,6 +261,18 @@ mod tests {
     #[case::resolve_perm_mask_fail_fallbacks_to_input("foo", "foo".into())]
     fn test_interpret_perm_field(#[case] input: String, #[case] expected: FieldValue) {
         let result = interpret_perm_field(input);
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::failed("0", "failed".into())]
+    #[case::success("1", "success".into())]
+    #[case::unset("2", "unset".into())]
+    #[case::failed_string("failed", "failed".into())]
+    #[case::success_string("success", "success".into())]
+    #[case::foo("foo", "unset".into())]
+    fn test_interpret_result_field(#[case] input: &str, #[case] expected: FieldValue) {
+        let result = interpret_result_field(input);
         assert_eq!(result, expected);
     }
 }
