@@ -13,6 +13,7 @@ use crate::{
 
 mod capability;
 mod field_type;
+mod mode;
 mod perm;
 mod proctitle;
 mod result;
@@ -65,6 +66,7 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
         FieldType::Perm => interpret_perm_field(field_value),
         FieldType::Result => interpret_result_field(&field_value),
         FieldType::Proctitle => interpret_proctitle_field(field_value),
+        FieldType::Mode => interpret_mode_field(field_value),
     }
 }
 
@@ -183,6 +185,33 @@ fn interpret_proctitle_field(field_value: String) -> FieldValue {
     };
 
     proctitle::parse_proctitle(&bytes).into()
+}
+
+fn interpret_mode_field(field_value: String) -> FieldValue {
+    let Some(mode) = mode::resolve_mode(&field_value) else {
+        return field_value.into();
+    };
+
+    let mut map = BTreeMap::new();
+
+    map.insert("file_type".into(), mode.file_type.to_string().into());
+    map.insert(
+        "attributes".into(),
+        into_string_to_field_value(&mode.attributes),
+    );
+    map.insert("user".into(), into_string_to_field_value(&mode.user));
+    map.insert("group".into(), into_string_to_field_value(&mode.group));
+    map.insert("other".into(), into_string_to_field_value(&mode.other));
+
+    map.into()
+}
+
+fn into_string_to_field_value<T: ToString>(permissions: &[T]) -> FieldValue {
+    permissions
+        .iter()
+        .map(ToString::to_string)
+        .collect::<Vec<String>>()
+        .into()
 }
 
 #[cfg(test)]
