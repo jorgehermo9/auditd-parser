@@ -329,4 +329,6 @@ mod tests {
         let result = interpret_proctitle_field(input);
         assert_eq!(result, expected);
     }
+
+    // TODO: add tests for interpret_mode_field
 }
