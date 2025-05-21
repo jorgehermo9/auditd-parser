@@ -2,6 +2,8 @@ use std::fmt::{self, Display, Formatter};
 
 // Constants are extracted from https://github.com/torvalds/linux/blob/4a95bc121ccdaee04c4d72f84dbfa6b880a514b6/include/uapi/asm-generic/signal.h#L11
 // More information about signals can be found in https://man7.org/linux/man-pages/man7/signal.7.html
+#[derive(Debug, PartialEq)]
+#[allow(clippy::upper_case_acronyms)]
 pub enum Signal {
     SIGHUP,
     SIGINT,
@@ -9,6 +11,7 @@ pub enum Signal {
     SIGILL,
     SIGTRAP,
     SIGABRT,
+    #[allow(dead_code)]
     SIGIOT, // Synomym for SIGABRT, we will prefer SIGABRT over this one
     SIGBUS,
     SIGFPE,
@@ -33,6 +36,7 @@ pub enum Signal {
     SIGPROF,
     SIGWINCH,
     SIGPOLL,
+    #[allow(dead_code)]
     SIGIO, // Synomym for SIGPOLL, we will prefer SIGPOLL over this one
     SIGPWR,
     SIGSYS,
@@ -122,4 +126,49 @@ pub fn resolve_signal(signal: u32) -> Option<Signal> {
     };
 
     Some(signal)
+}
+
+#[cfg(test)]
+mod tests {
+    use rstest::rstest;
+
+    use super::*;
+
+    #[rstest]
+    #[case::sighup(1, Signal::SIGHUP)]
+    #[case::sigint(2, Signal::SIGINT)]
+    #[case::sigquit(3, Signal::SIGQUIT)]
+    #[case::sigkill(4, Signal::SIGILL)]
+    #[case::sigtrap(5, Signal::SIGTRAP)]
+    #[case::sigabrt(6, Signal::SIGABRT)]
+    #[case::sigbus(7, Signal::SIGBUS)]
+    #[case::sigfpe(8, Signal::SIGFPE)]
+    #[case::sigkill(9, Signal::SIGKILL)]
+    #[case::sigusr1(10, Signal::SIGUSR1)]
+    #[case::sigsegv(11, Signal::SIGSEGV)]
+    #[case::sigusr2(12, Signal::SIGUSR2)]
+    #[case::sigpipe(13, Signal::SIGPIPE)]
+    #[case::sigalrm(14, Signal::SIGALRM)]
+    #[case::sigterm(15, Signal::SIGTERM)]
+    #[case::sigstkflt(16, Signal::SIGSTKFLT)]
+    #[case::sigchld(17, Signal::SIGCHLD)]
+    #[case::sigcont(18, Signal::SIGCONT)]
+    #[case::sigstop(19, Signal::SIGSTOP)]
+    #[case::sigtstp(20, Signal::SIGTSTP)]
+    #[case::sigttin(21, Signal::SIGTTIN)]
+    #[case::sigttou(22, Signal::SIGTTOU)]
+    #[case::sigurg(23, Signal::SIGURG)]
+    #[case::sigxcpu(24, Signal::SIGXCPU)]
+    #[case::sigxfsz(25, Signal::SIGXFSZ)]
+    #[case::sigvtalrm(26, Signal::SIGVTALRM)]
+    #[case::sigprof(27, Signal::SIGPROF)]
+    #[case::sigwinch(28, Signal::SIGWINCH)]
+    #[case::sigpoll(29, Signal::SIGPOLL)]
+    #[case::sigpwr(30, Signal::SIGPWR)]
+    #[case::sigsys(31, Signal::SIGSYS)]
+    #[case::sigunused(32, Signal::SIGUNUSED)]
+    fn test_resolve_signal(#[case] input: u32, #[case] expected: Signal) {
+        let result = resolve_signal(input).unwrap();
+        assert_eq!(result, expected);
+    }
 }
