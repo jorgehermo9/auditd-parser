@@ -189,6 +189,7 @@ fn interpret_proctitle_field(field_value: String) -> FieldValue {
 
 fn interpret_mode_field(field_value: String) -> FieldValue {
     let Some(mode) = mode::resolve_mode(&field_value) else {
+        // TODO: this default is kind of weird
         return field_value.into();
     };
 
@@ -331,4 +332,39 @@ mod tests {
     }
 
     // TODO: add tests for interpret_mode_field
+    //
+    #[rstest]
+    #[case("100644",
+        btreemap!{
+            "file_type".into() => "regular-file".into(),
+            "attributes".into() => vec![].into(),
+            "user".into() => vec!["read".into(), "write".into()].into(),
+            "group".into() => vec!["read".into()].into(),
+            "other".into() => vec!["read".into()].into(),
+        }.into()
+    )]
+    #[case("7777",
+        btreemap!{
+            "file_type".into() => "unknown".into(),
+            "attributes".into() => vec!["sticky".into(), "setgid".into(), "setuid".into()].into(),
+            "user".into() => vec!["read".into(), "write".into(), "exec".into()].into(),
+            "group".into() => vec!["read".into(), "write".into(), "exec".into()].into(),
+            "other".into() => vec!["read".into(), "write".into(), "exec".into()].into(),
+        }.into()
+    )]
+    #[case("100000",
+        btreemap!{
+            "file_type".into() => "regular-file".into(),
+            "attributes".into() => vec![].into(),
+            "user".into() => vec![].into(),
+            "group".into() => vec![].into(),
+            "other".into() => vec![].into(),
+        }.into()
+    )]
+    #[case::empty("", "".into())]
+    #[case::foo("foo", "foo".into())]
+    fn test_interpret_mode_field(#[case] input: String, #[case] expected: FieldValue) {
+        let result = interpret_mode_field(input);
+        assert_eq!(result, expected);
+    }
 }
