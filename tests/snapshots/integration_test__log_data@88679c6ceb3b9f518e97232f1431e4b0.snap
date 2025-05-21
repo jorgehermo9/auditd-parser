@@ -17,18 +17,18 @@ info: "type=PATH msg=audit(1521758453.536:1428931): item=0 name=2F73686172652F67
       ],
       "file_type": "directory",
       "group": [
-        "r",
-        "w",
-        "x"
+        "read",
+        "write",
+        "exec"
       ],
       "other": [
-        "r",
-        "x"
+        "read",
+        "exec"
       ],
       "user": [
-        "r",
-        "w",
-        "x"
+        "read",
+        "write",
+        "exec"
       ]
     },
     "name": "/share/general/path_redacted",

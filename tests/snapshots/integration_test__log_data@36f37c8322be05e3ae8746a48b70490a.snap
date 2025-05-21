@@ -15,14 +15,14 @@ info: "type=PATH msg=audit(1170021493.977:293): item=0 name=\"maildrop\" inode=1
       "attributes": [],
       "file_type": "directory",
       "group": [
-        "w",
-        "x"
+        "write",
+        "exec"
       ],
       "other": [],
       "user": [
-        "r",
-        "w",
-        "x"
+        "read",
+        "write",
+        "exec"
       ]
     },
     "name": "maildrop",

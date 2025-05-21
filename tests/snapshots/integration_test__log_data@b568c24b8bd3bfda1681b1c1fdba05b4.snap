@@ -13,16 +13,16 @@ info: "type=PATH msg=audit(1481077231.371:479): item=0 name=\"/sbin/auditctl\" i
     "item": "0",
     "mode": {
       "attributes": [],
-      "file_type": "regular file",
+      "file_type": "regular-file",
       "group": [
-        "r",
-        "x"
+        "read",
+        "exec"
       ],
       "other": [],
       "user": [
-        "r",
-        "w",
-        "x"
+        "read",
+        "write",
+        "exec"
       ]
     },
     "name": "/sbin/auditctl",

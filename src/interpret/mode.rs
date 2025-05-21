@@ -50,10 +50,10 @@ impl Display for FileType {
         match self {
             FileType::Socket => write!(f, "socket"),
             FileType::Symlink => write!(f, "symlink"),
-            FileType::RegularFile => write!(f, "regular file"),
-            FileType::BlockDevice => write!(f, "block device"),
+            FileType::RegularFile => write!(f, "regular-file"),
+            FileType::BlockDevice => write!(f, "block-device"),
             FileType::Directory => write!(f, "directory"),
-            FileType::CharDevice => write!(f, "char device"),
+            FileType::CharDevice => write!(f, "char-device"),
             FileType::Fifo => write!(f, "fifo"),
             FileType::Unknown => write!(f, "unknown"),
         }
@@ -71,9 +71,9 @@ impl Display for Permission {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         // TODO: rwx or read, write, exec?
         match self {
-            Permission::Read => write!(f, "r"),
-            Permission::Write => write!(f, "w"),
-            Permission::Exec => write!(f, "x"),
+            Permission::Read => write!(f, "read"),
+            Permission::Write => write!(f, "write"),
+            Permission::Exec => write!(f, "exec"),
         }
     }
 }

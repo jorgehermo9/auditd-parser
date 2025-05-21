@@ -18,19 +18,19 @@ info: "type=PATH msg=audit(1655465404.819:27091): item=1 name=\"/lib64/ld-linux-
     "item": "1",
     "mode": {
       "attributes": [],
-      "file_type": "regular file",
+      "file_type": "regular-file",
       "group": [
-        "r",
-        "x"
+        "read",
+        "exec"
       ],
       "other": [
-        "r",
-        "x"
+        "read",
+        "exec"
       ],
       "user": [
-        "r",
-        "w",
-        "x"
+        "read",
+        "write",
+        "exec"
       ]
     },
     "name": "/lib64/ld-linux-aarch64.so.1",
