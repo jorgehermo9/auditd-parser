@@ -11,7 +11,20 @@ info: "type=PATH msg=audit(1481077231.371:479): item=0 name=\"/sbin/auditctl\" i
     "dev": "08:01",
     "inode": "17367907",
     "item": "0",
-    "mode": "0100750",
+    "mode": {
+      "attributes": [],
+      "file_type": "regular-file",
+      "group": [
+        "read",
+        "exec"
+      ],
+      "other": [],
+      "user": [
+        "read",
+        "write",
+        "exec"
+      ]
+    },
     "name": "/sbin/auditctl",
     "obj": "system_u:object_r:auditctl_exec_t:s0",
     "objtype": "NORMAL",

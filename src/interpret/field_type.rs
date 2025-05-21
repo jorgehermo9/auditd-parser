@@ -89,6 +89,7 @@ pub enum FieldType {
     Perm,
     Result,
     Proctitle,
+    Mode,
 }
 
 impl FieldType {
@@ -108,6 +109,10 @@ impl FieldType {
 
         if field_name == "proctitle" {
             return Some(Self::Proctitle);
+        }
+
+        if field_name == "mode" {
+            return Some(Self::Mode);
         }
 
         if ESCAPED_FIELD_NAMES.contains(&field_name) {

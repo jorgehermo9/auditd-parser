@@ -11,7 +11,26 @@ info: "type=PATH msg=audit(1521758453.536:1428931): item=0 name=2F73686172652F67
     "dev": "fc:01",
     "inode": "1442434",
     "item": "0",
-    "mode": "042775",
+    "mode": {
+      "attributes": [
+        "setgid"
+      ],
+      "file_type": "directory",
+      "group": [
+        "read",
+        "write",
+        "exec"
+      ],
+      "other": [
+        "read",
+        "exec"
+      ],
+      "user": [
+        "read",
+        "write",
+        "exec"
+      ]
+    },
     "name": "/share/general/path_redacted",
     "nametype": "NORMAL",
     "ogid": 7003,

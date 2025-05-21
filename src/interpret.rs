@@ -13,6 +13,7 @@ use crate::{
 
 mod capability;
 mod field_type;
+mod mode;
 mod perm;
 mod proctitle;
 mod result;
@@ -65,6 +66,7 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
         FieldType::Perm => interpret_perm_field(field_value),
         FieldType::Result => interpret_result_field(&field_value),
         FieldType::Proctitle => interpret_proctitle_field(field_value),
+        FieldType::Mode => interpret_mode_field(field_value),
     }
 }
 
@@ -185,6 +187,34 @@ fn interpret_proctitle_field(field_value: String) -> FieldValue {
     proctitle::parse_proctitle(&bytes).into()
 }
 
+fn interpret_mode_field(field_value: String) -> FieldValue {
+    let Some(mode) = mode::resolve_mode(&field_value) else {
+        // TODO: this default is kind of weird
+        return field_value.into();
+    };
+
+    let mut map = BTreeMap::new();
+
+    map.insert("file_type".into(), mode.file_type.to_string().into());
+    map.insert(
+        "attributes".into(),
+        into_string_to_field_value(&mode.attributes),
+    );
+    map.insert("user".into(), into_string_to_field_value(&mode.user));
+    map.insert("group".into(), into_string_to_field_value(&mode.group));
+    map.insert("other".into(), into_string_to_field_value(&mode.other));
+
+    map.into()
+}
+
+fn into_string_to_field_value<T: ToString>(permissions: &[T]) -> FieldValue {
+    permissions
+        .iter()
+        .map(ToString::to_string)
+        .collect::<Vec<String>>()
+        .into()
+}
+
 #[cfg(test)]
 mod tests {
     use maplit::btreemap;
@@ -298,6 +328,43 @@ mod tests {
     #[case::empty("", "".into())]
     fn test_interpret_proctitle_field(#[case] input: String, #[case] expected: FieldValue) {
         let result = interpret_proctitle_field(input);
+        assert_eq!(result, expected);
+    }
+
+    // TODO: add tests for interpret_mode_field
+    //
+    #[rstest]
+    #[case("100644",
+        btreemap!{
+            "file_type".into() => "regular-file".into(),
+            "attributes".into() => vec![].into(),
+            "user".into() => vec!["read".into(), "write".into()].into(),
+            "group".into() => vec!["read".into()].into(),
+            "other".into() => vec!["read".into()].into(),
+        }.into()
+    )]
+    #[case("7777",
+        btreemap!{
+            "file_type".into() => "unknown".into(),
+            "attributes".into() => vec!["sticky".into(), "setgid".into(), "setuid".into()].into(),
+            "user".into() => vec!["read".into(), "write".into(), "exec".into()].into(),
+            "group".into() => vec!["read".into(), "write".into(), "exec".into()].into(),
+            "other".into() => vec!["read".into(), "write".into(), "exec".into()].into(),
+        }.into()
+    )]
+    #[case("100000",
+        btreemap!{
+            "file_type".into() => "regular-file".into(),
+            "attributes".into() => vec![].into(),
+            "user".into() => vec![].into(),
+            "group".into() => vec![].into(),
+            "other".into() => vec![].into(),
+        }.into()
+    )]
+    #[case::empty("", "".into())]
+    #[case::foo("foo", "foo".into())]
+    fn test_interpret_mode_field(#[case] input: String, #[case] expected: FieldValue) {
+        let result = interpret_mode_field(input);
         assert_eq!(result, expected);
     }
 }

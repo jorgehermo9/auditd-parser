@@ -16,7 +16,23 @@ info: "type=PATH msg=audit(1655465398.534:25618): item=0 name=\"/usr/bin/ld\" in
     "dev": "00:30",
     "inode": "40854",
     "item": "0",
-    "mode": "0100755",
+    "mode": {
+      "attributes": [],
+      "file_type": "regular-file",
+      "group": [
+        "read",
+        "exec"
+      ],
+      "other": [
+        "read",
+        "exec"
+      ],
+      "user": [
+        "read",
+        "write",
+        "exec"
+      ]
+    },
     "name": "/usr/bin/ld",
     "nametype": "NORMAL",
     "ogid": 582,
