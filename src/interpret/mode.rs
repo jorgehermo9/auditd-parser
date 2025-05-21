@@ -271,6 +271,7 @@ mod tests {
 
     #[rstest]
     #[case::unknown(0, FileType::Unknown)]
+    #[case::unknown(0o15, FileType::Unknown)]
     #[case::socket(0o14, FileType::Socket)]
     #[case::symlink(0o12, FileType::Symlink)]
     #[case::regular_file(0o10, FileType::RegularFile)]
