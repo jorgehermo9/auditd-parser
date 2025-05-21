@@ -18,7 +18,7 @@ info: "type=SECCOMP msg=audit(1433785727.186:10262): auid=20003 uid=22 gid=22 se
     "ip": "0xb7670aac",
     "pid": "11217",
     "ses": "21",
-    "sig": "31",
+    "sig": "SIGSYS",
     "syscall": "132",
     "uid": 22
   }

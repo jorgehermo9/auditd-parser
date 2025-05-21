@@ -17,6 +17,7 @@ mod mode;
 mod perm;
 mod proctitle;
 mod result;
+mod signal;
 mod socket;
 
 impl From<RawAuditdRecord> for AuditdRecord {
@@ -67,6 +68,7 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
         FieldType::Result => interpret_result_field(&field_value),
         FieldType::Proctitle => interpret_proctitle_field(field_value),
         FieldType::Mode => interpret_mode_field(field_value),
+        FieldType::Signal => interpret_signal_field(field_value),
     }
 }
 
@@ -205,6 +207,18 @@ fn interpret_mode_field(field_value: String) -> FieldValue {
     map.insert("other".into(), into_string_to_field_value(&mode.other));
 
     map.into()
+}
+
+fn interpret_signal_field(field_value: String) -> FieldValue {
+    let Ok(signal_number) = field_value.parse::<u32>() else {
+        return field_value.into();
+    };
+
+    let Some(signal) = signal::resolve_signal(signal_number) else {
+        return Number::UnsignedInteger(u64::from(signal_number)).into();
+    };
+
+    signal.to_string().into()
 }
 
 fn into_string_to_field_value<T: ToString>(permissions: &[T]) -> FieldValue {

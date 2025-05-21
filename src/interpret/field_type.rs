@@ -78,6 +78,8 @@ const PERM_FIELD_NAMES: [&str; 2] = ["perm", "perm_mask"];
 // Those are the equivalent of `AUPARSE_TYPE_SUCCESS` fields
 const RESULT_FIELD_NAMES: [&str; 2] = ["res", "result"];
 
+const SIGNAL_FIELD_NAMES: [&str; 2] = ["sig", "sigev_signo"];
+
 pub enum FieldType {
     Msg,
     Exit,
@@ -90,6 +92,7 @@ pub enum FieldType {
     Result,
     Proctitle,
     Mode,
+    Signal,
 }
 
 impl FieldType {
@@ -137,6 +140,10 @@ impl FieldType {
 
         if RESULT_FIELD_NAMES.contains(&field_name) {
             return Some(Self::Result);
+        }
+
+        if SIGNAL_FIELD_NAMES.contains(&field_name) {
+            return Some(Self::Signal);
         }
 
         None
