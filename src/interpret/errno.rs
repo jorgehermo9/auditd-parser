@@ -2,8 +2,6 @@ use std::fmt::{self, Display, Formatter};
 
 #[derive(Debug, PartialEq)]
 #[allow(clippy::upper_case_acronyms)]
-// Constants extracted from linux/include/uapi/asm-generic/errno-base.h
-// and linux/include/uapi/asm-generic/errno.h
 pub enum Errno {
     EPERM,
     ENOENT,
@@ -153,7 +151,9 @@ impl TryFrom<u64> for Errno {
 
     #[allow(clippy::too_many_lines)]
     fn try_from(value: u64) -> Result<Self, Self::Error> {
-        // This emulates strerror libc function
+        // This emulates `strerror` libc function
+        // Constants extracted from linux/include/uapi/asm-generic/errno-base.h
+        // and linux/include/uapi/asm-generic/errno.h
         let errno = match value {
             1 => Errno::EPERM,
             2 => Errno::ENOENT,
