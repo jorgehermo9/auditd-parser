@@ -93,6 +93,7 @@ pub enum FieldType {
     Proctitle,
     Mode,
     Signal,
+    List,
 }
 
 impl FieldType {
@@ -116,6 +117,10 @@ impl FieldType {
 
         if field_name == "mode" {
             return Some(Self::Mode);
+        }
+
+        if field_name == "list" {
+            return Some(Self::List);
         }
 
         if ESCAPED_FIELD_NAMES.contains(&field_name) {

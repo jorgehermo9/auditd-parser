@@ -10,7 +10,7 @@ info: "type=CONFIG_CHANGE msg=audit(1492749467.018:1209): auid=4294967295 ses=42
   "fields": {
     "auid": 4294967295,
     "key": "pam",
-    "list": "4",
+    "list": "exit",
     "op": "add_rule",
     "res": "success",
     "ses": "4294967295",
