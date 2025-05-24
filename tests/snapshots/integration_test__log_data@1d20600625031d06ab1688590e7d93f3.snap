@@ -13,7 +13,7 @@ info: "type=USER_LOGIN msg=audit(1481077043.193:421): pid=1298 uid=0 auid=1000 s
       "addr": "96.241.146.97",
       "exe": "/usr/sbin/sshd",
       "hostname": "pool-96-241-146-97.washdc.fios.verizon.net",
-      "id": "1000",
+      "id": 1000,
       "op": "login",
       "res": "success",
       "terminal": "/dev/pts/0"

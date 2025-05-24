@@ -13,7 +13,7 @@ info: "type=USER_END msg=audit(1481077049.033:423): pid=1298 uid=0 auid=1000 ses
       "addr": "?",
       "exe": "/usr/sbin/sshd",
       "hostname": "?",
-      "id": "1000",
+      "id": 1000,
       "op": "login",
       "res": "success",
       "terminal": "/dev/pts/0"

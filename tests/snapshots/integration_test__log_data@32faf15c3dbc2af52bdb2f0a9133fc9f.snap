@@ -10,7 +10,7 @@ info: "type=USER_CMD msg=audit(1481077231.363:475): pid=1382 uid=1000 auid=1000 
   "fields": {
     "auid": 1000,
     "msg": {
-      "cmd": "2E2F6D657472696362656174202D63206D622E6465762E796D6C",
+      "cmd": "./metricbeat -c mb.dev.yml",
       "cwd": "/home/andrew_kroh",
       "res": "success",
       "terminal": "pts/0"

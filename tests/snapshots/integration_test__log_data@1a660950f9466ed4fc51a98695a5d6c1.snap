@@ -13,7 +13,7 @@ info: "type=ADD_USER msg=audit(1481076992.488:389): pid=1264 uid=0 auid=42949672
       "addr": "?",
       "exe": "/usr/sbin/useradd",
       "hostname": "?",
-      "id": "1000",
+      "id": 1000,
       "op": "add-user",
       "res": "success",
       "terminal": "?"

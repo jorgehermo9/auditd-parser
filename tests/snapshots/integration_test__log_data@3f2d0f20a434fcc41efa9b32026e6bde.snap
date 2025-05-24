@@ -13,7 +13,7 @@ info: "type=ADD_GROUP msg=audit(1481076992.414:385): pid=1235 uid=0 auid=4294967
       "addr": "?",
       "exe": "/usr/sbin/groupadd",
       "hostname": "?",
-      "id": "1000",
+      "id": 1000,
       "op": "add-group",
       "res": "success",
       "terminal": "?"
