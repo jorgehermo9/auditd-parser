@@ -1,8 +1,10 @@
 use std::collections::BTreeMap;
 
 use bytes::Bytes;
+use errno::Errno;
 use field_type::FieldType;
 use nom::{Parser, combinator::all_consuming};
+use signal::Signal;
 use socket::SocketAddr;
 
 use crate::{
@@ -13,6 +15,7 @@ use crate::{
 
 mod audit_flag;
 mod capability;
+mod errno;
 mod field_type;
 mod mode;
 mod perm;
@@ -74,6 +77,7 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
         FieldType::Signal => interpret_signal_field(field_value),
         FieldType::List => interpret_list_field(field_value),
         FieldType::Success => interpret_success_field(field_value),
+        FieldType::Errno => interpret_errno_field(field_value),
     }
 }
 
@@ -225,7 +229,7 @@ fn interpret_signal_field(field_value: String) -> FieldValue {
         return field_value.into();
     };
 
-    let Some(signal) = signal::resolve_signal(signal_number) else {
+    let Ok(signal) = Signal::try_from(signal_number) else {
         return Number::UnsignedInteger(signal_number).into();
     };
 
@@ -250,6 +254,18 @@ fn interpret_success_field(field_value: String) -> FieldValue {
     };
 
     success.into()
+}
+
+fn interpret_errno_field(field_value: String) -> FieldValue {
+    let Ok(errno_number) = field_value.parse::<u64>() else {
+        return field_value.into();
+    };
+
+    let Ok(errno) = Errno::try_from(errno_number) else {
+        return Number::UnsignedInteger(errno_number).into();
+    };
+
+    errno.to_string().into()
 }
 
 #[cfg(test)]
@@ -440,6 +456,17 @@ mod tests {
     #[case::unknown("foo", "foo".into())]
     fn test_interpret_success_field(#[case] input: String, #[case] expected: FieldValue) {
         let result = interpret_success_field(input);
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::foo("foo", "foo".into())]
+    #[case::zero("0", Number::UnsignedInteger(0).into())]
+    #[case::eperm("1", "EPERM".into())]
+    #[case::enoent("2", "ENOENT".into())]
+    #[case::enomem("12", "ENOMEM".into())]
+    fn test_interpret_errno_field(#[case] input: String, #[case] expected: FieldValue) {
+        let result = interpret_errno_field(input);
         assert_eq!(result, expected);
     }
 }

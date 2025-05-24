@@ -1,0 +1,2 @@
+# TODO: this is a synthetic log file until https://github.com/jorgehermo9/auditd-parser/issues/53 is addressed
+type=AUDIT_INTEGRITY_PCR msg=audit(1524662933.080:61207): errno=1
