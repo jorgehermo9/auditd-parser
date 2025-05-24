@@ -61,8 +61,8 @@ mod tests {
     #[case::io_uring(7, Some(AuditFlag::IoUringExit))]
     #[case::invalid(8, None)]
     #[case::max_u64(u64::MAX, None)]
-    fn test_resolve_audit_flag(#[case] audit_flag: u64, #[case] expected: Option<AuditFlag>) {
-        let result = resolve_audit_flag(audit_flag);
+    fn test_resolve_audit_flag(#[case] input: u64, #[case] expected: Option<AuditFlag>) {
+        let result = resolve_audit_flag(input);
         assert_eq!(result, expected);
     }
 }

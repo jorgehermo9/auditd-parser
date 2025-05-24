@@ -28,7 +28,7 @@ info: "type=SYSCALL msg=audit(1655465404.819:27091): arch=c000003e syscall=59 su
     "ppid": "105932",
     "ses": "2632",
     "sgid": 583,
-    "success": "yes",
+    "success": true,
     "suid": 583,
     "syscall": "59",
     "tty": "pts2",

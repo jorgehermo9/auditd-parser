@@ -36,6 +36,7 @@ pub struct AuditdRecord {
 pub enum FieldValue {
     Number(Number),
     String(String),
+    Bool(bool),
     // TODO: Vec<String> or Vec<FieldValue>? is there any case
     // where we need an array of anything other than strings?
     Array(Vec<String>),
@@ -52,6 +53,12 @@ impl From<Number> for FieldValue {
 impl From<String> for FieldValue {
     fn from(value: String) -> Self {
         Self::String(value)
+    }
+}
+
+impl From<bool> for FieldValue {
+    fn from(value: bool) -> Self {
+        Self::Bool(value)
     }
 }
 

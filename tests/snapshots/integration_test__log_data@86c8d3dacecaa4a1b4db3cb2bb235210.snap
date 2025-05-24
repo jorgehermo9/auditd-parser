@@ -28,7 +28,7 @@ info: "type=SYSCALL msg=audit(1490995752.404:20614537): arch=c000003e syscall=44
     "ppid": "1240",
     "ses": "4294967295",
     "sgid": 0,
-    "success": "yes",
+    "success": true,
     "suid": 0,
     "syscall": "44",
     "tty": "(none)",

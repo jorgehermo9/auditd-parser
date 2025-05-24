@@ -20,6 +20,7 @@ mod proctitle;
 mod result;
 mod signal;
 mod socket;
+mod success;
 mod utils;
 
 impl From<RawAuditdRecord> for AuditdRecord {
@@ -72,6 +73,7 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
         FieldType::Mode => interpret_mode_field(field_value),
         FieldType::Signal => interpret_signal_field(field_value),
         FieldType::List => interpret_list_field(field_value),
+        FieldType::Success => interpret_success_field(field_value),
     }
 }
 
@@ -240,6 +242,14 @@ fn interpret_list_field(field_value: String) -> FieldValue {
     };
 
     audit_flag.to_string().into()
+}
+
+fn interpret_success_field(field_value: String) -> FieldValue {
+    let Some(success) = success::resolve_success(&field_value) else {
+        return field_value.into();
+    };
+
+    success.into()
 }
 
 #[cfg(test)]
@@ -421,6 +431,15 @@ mod tests {
     #[case::unknown("8", Number::UnsignedInteger(8).into())]
     fn test_interpret_list_field(#[case] input: String, #[case] expected: FieldValue) {
         let result = interpret_list_field(input);
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::yes("yes", true.into())]
+    #[case::no("no", false.into())]
+    #[case::unknown("foo", "foo".into())]
+    fn test_interpret_success_field(#[case] input: String, #[case] expected: FieldValue) {
+        let result = interpret_success_field(input);
         assert_eq!(result, expected);
     }
 }
