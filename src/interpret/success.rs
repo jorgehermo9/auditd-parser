@@ -1,4 +1,8 @@
 pub fn resolve_success(success: &str) -> Option<bool> {
+    // Extracted from:
+    // https://github.com/torvalds/linux/blob/4856ebd997159f198e3177e515bda01143727463/kernel/auditsc.c#L1651
+    // and
+    // https://github.com/torvalds/linux/blob/master/include/linux/string_choices.h#L68
     match success {
         "yes" => Some(true),
         "no" => Some(false),
