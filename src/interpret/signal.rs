@@ -45,7 +45,7 @@ pub enum Signal {
 
 impl Display for Signal {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 

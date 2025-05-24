@@ -144,13 +144,14 @@ pub enum Errno {
 
 impl Display for Errno {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 
 impl TryFrom<u64> for Errno {
     type Error = ();
 
+    #[allow(clippy::too_many_lines)]
     fn try_from(value: u64) -> Result<Self, Self::Error> {
         // This emulates strerror libc function
         let errno = match value {
