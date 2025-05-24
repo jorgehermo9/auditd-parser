@@ -381,4 +381,15 @@ mod tests {
         let result = interpret_mode_field(input);
         assert_eq!(result, expected);
     }
+
+    #[rstest]
+    #[case::foo("foo", "foo".into())]
+    #[case::zero("0", Number::UnsignedInteger(0).into())]
+    #[case::sighup("1", "SIGHUP".into())]
+    #[case::sigunused("32", "SIGUNUSED".into())]
+    #[case::out_of_range("33", Number::UnsignedInteger(33).into())]
+    fn test_interpret_signal_field(#[case] input: String, #[case] expected: FieldValue) {
+        let result = interpret_signal_field(input);
+        assert_eq!(result, expected);
+    }
 }
