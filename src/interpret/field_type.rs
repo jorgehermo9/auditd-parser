@@ -97,6 +97,7 @@ pub enum FieldType {
     // auparse does not interpet this field type,
     // their `AUPARSE_TYPE_SUCCESS` is used for `res` and `result` fields
     Success,
+    Errno,
 }
 
 impl FieldType {
@@ -128,6 +129,10 @@ impl FieldType {
 
         if field_name == "success" {
             return Some(Self::Success);
+        }
+
+        if field_name == "errno" {
+            return Some(Self::Errno);
         }
 
         if ESCAPED_FIELD_NAMES.contains(&field_name) {
