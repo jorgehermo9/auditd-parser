@@ -93,6 +93,10 @@ pub enum FieldType {
     Proctitle,
     Mode,
     Signal,
+    List,
+    // auparse does not interpet this field type,
+    // their `AUPARSE_TYPE_SUCCESS` is used for `res` and `result` fields
+    Success,
 }
 
 impl FieldType {
@@ -116,6 +120,14 @@ impl FieldType {
 
         if field_name == "mode" {
             return Some(Self::Mode);
+        }
+
+        if field_name == "list" {
+            return Some(Self::List);
+        }
+
+        if field_name == "success" {
+            return Some(Self::Success);
         }
 
         if ESCAPED_FIELD_NAMES.contains(&field_name) {

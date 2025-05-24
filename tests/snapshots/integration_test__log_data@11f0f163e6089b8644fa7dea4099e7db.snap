@@ -10,7 +10,7 @@ info: "type=CONFIG_CHANGE msg=audit(1481077231.371:478): auid=1000 ses=3 subj=un
   "fields": {
     "auid": 1000,
     "key": "(null)",
-    "list": "4",
+    "list": "exit",
     "op": "add_rule",
     "res": "success",
     "ses": "3",

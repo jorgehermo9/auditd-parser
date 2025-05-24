@@ -84,7 +84,7 @@ impl Display for Signal {
     }
 }
 
-pub fn resolve_signal(signal: u32) -> Option<Signal> {
+pub fn resolve_signal(signal: u64) -> Option<Signal> {
     // Constants from linux/include/uapi/asm-generic/signal.h
     // Some architectures may have different signal numbers
     // (as described by https://man7.org/linux/man-pages/man7/signal.7.html)
@@ -167,7 +167,7 @@ mod tests {
     #[case::sigpwr(30, Signal::SIGPWR)]
     #[case::sigsys(31, Signal::SIGSYS)]
     #[case::sigunused(32, Signal::SIGUNUSED)]
-    fn test_resolve_signal(#[case] input: u32, #[case] expected: Signal) {
+    fn test_resolve_signal(#[case] input: u64, #[case] expected: Signal) {
         let result = resolve_signal(input).unwrap();
         assert_eq!(result, expected);
     }

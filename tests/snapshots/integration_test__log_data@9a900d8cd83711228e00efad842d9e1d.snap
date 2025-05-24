@@ -29,7 +29,7 @@ info: "type=SYSCALL msg=audit(1481076984.827:17): arch=c000003e syscall=313 succ
     "ses": "4294967295",
     "sgid": 0,
     "subj": "system_u:system_r:insmod_t:s0",
-    "success": "yes",
+    "success": true,
     "suid": 0,
     "syscall": "313",
     "tty": "(none)",

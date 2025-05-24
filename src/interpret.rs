@@ -11,6 +11,7 @@ use crate::{
     record::Number,
 };
 
+mod audit_flag;
 mod capability;
 mod field_type;
 mod mode;
@@ -19,6 +20,8 @@ mod proctitle;
 mod result;
 mod signal;
 mod socket;
+mod success;
+mod utils;
 
 impl From<RawAuditdRecord> for AuditdRecord {
     fn from(value: RawAuditdRecord) -> Self {
@@ -69,6 +72,8 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
         FieldType::Proctitle => interpret_proctitle_field(field_value),
         FieldType::Mode => interpret_mode_field(field_value),
         FieldType::Signal => interpret_signal_field(field_value),
+        FieldType::List => interpret_list_field(field_value),
+        FieldType::Success => interpret_success_field(field_value),
     }
 }
 
@@ -200,33 +205,51 @@ fn interpret_mode_field(field_value: String) -> FieldValue {
     map.insert("file_type".into(), mode.file_type.to_string().into());
     map.insert(
         "attributes".into(),
-        into_string_to_field_value(&mode.attributes),
+        utils::into_string_to_field_value(&mode.attributes),
     );
-    map.insert("user".into(), into_string_to_field_value(&mode.user));
-    map.insert("group".into(), into_string_to_field_value(&mode.group));
-    map.insert("other".into(), into_string_to_field_value(&mode.other));
+    map.insert("user".into(), utils::into_string_to_field_value(&mode.user));
+    map.insert(
+        "group".into(),
+        utils::into_string_to_field_value(&mode.group),
+    );
+    map.insert(
+        "other".into(),
+        utils::into_string_to_field_value(&mode.other),
+    );
 
     map.into()
 }
 
 fn interpret_signal_field(field_value: String) -> FieldValue {
-    let Ok(signal_number) = field_value.parse::<u32>() else {
+    let Ok(signal_number) = field_value.parse::<u64>() else {
         return field_value.into();
     };
 
     let Some(signal) = signal::resolve_signal(signal_number) else {
-        return Number::UnsignedInteger(u64::from(signal_number)).into();
+        return Number::UnsignedInteger(signal_number).into();
     };
 
     signal.to_string().into()
 }
 
-fn into_string_to_field_value<T: ToString>(permissions: &[T]) -> FieldValue {
-    permissions
-        .iter()
-        .map(ToString::to_string)
-        .collect::<Vec<String>>()
-        .into()
+fn interpret_list_field(field_value: String) -> FieldValue {
+    let Ok(audit_flag_number) = field_value.parse::<u64>() else {
+        return field_value.into();
+    };
+
+    let Some(audit_flag) = audit_flag::resolve_audit_flag(audit_flag_number) else {
+        return Number::UnsignedInteger(audit_flag_number).into();
+    };
+
+    audit_flag.to_string().into()
+}
+
+fn interpret_success_field(field_value: String) -> FieldValue {
+    let Some(success) = success::resolve_success(&field_value) else {
+        return field_value.into();
+    };
+
+    success.into()
 }
 
 #[cfg(test)]
@@ -384,12 +407,39 @@ mod tests {
 
     #[rstest]
     #[case::foo("foo", "foo".into())]
+    #[case::negative("-1", "-1".into())]
     #[case::zero("0", Number::UnsignedInteger(0).into())]
     #[case::sighup("1", "SIGHUP".into())]
     #[case::sigunused("32", "SIGUNUSED".into())]
-    #[case::out_of_range("33", Number::UnsignedInteger(33).into())]
+    #[case::unknown("33", Number::UnsignedInteger(33).into())]
     fn test_interpret_signal_field(#[case] input: String, #[case] expected: FieldValue) {
         let result = interpret_signal_field(input);
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::foo("foo", "foo".into())]
+    #[case::negative("-1", "-1".into())]
+    #[case::user("0", "user".into())]
+    #[case::task("1", "task".into())]
+    #[case::entry("2", "entry".into())]
+    #[case::watch("3", "watch".into())]
+    #[case::exit("4", "exit".into())]
+    #[case::exclude("5", "exclude".into())]
+    #[case::filesystem("6", "filesystem".into())]
+    #[case::io_uring_exit("7", "io-uring-exit".into())]
+    #[case::unknown("8", Number::UnsignedInteger(8).into())]
+    fn test_interpret_list_field(#[case] input: String, #[case] expected: FieldValue) {
+        let result = interpret_list_field(input);
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::yes("yes", true.into())]
+    #[case::no("no", false.into())]
+    #[case::unknown("foo", "foo".into())]
+    fn test_interpret_success_field(#[case] input: String, #[case] expected: FieldValue) {
+        let result = interpret_success_field(input);
         assert_eq!(result, expected);
     }
 }

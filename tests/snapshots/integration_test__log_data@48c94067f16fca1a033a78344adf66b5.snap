@@ -29,7 +29,7 @@ info: "type=SYSCALL msg=audit(1451781471.394:194437): arch=c000003e syscall=14 s
     "ses": "1",
     "sgid": 1000,
     "subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
-    "success": "yes",
+    "success": true,
     "suid": 1000,
     "syscall": "14",
     "tty": "(none)",

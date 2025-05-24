@@ -28,7 +28,7 @@ info: "type=SYSCALL msg=audit(1170021493.977:293): arch=c000003e syscall=2 succe
     "ppid": "2013",
     "sgid": 890,
     "subj": "system_u:system_r:postfix_pickup_t:s0",
-    "success": "no",
+    "success": false,
     "suid": 890,
     "syscall": "2",
     "tty": "(none)",
