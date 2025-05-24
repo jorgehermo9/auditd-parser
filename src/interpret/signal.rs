@@ -107,7 +107,7 @@ mod tests {
     #[case::sighup(1, Some(Signal::SIGHUP))]
     #[case::sigint(2, Some(Signal::SIGINT))]
     #[case::sigquit(3, Some(Signal::SIGQUIT))]
-    #[case::sigkill(4, Some(Signal::SIGILL))]
+    #[case::sigill(4, Some(Signal::SIGILL))]
     #[case::sigtrap(5, Some(Signal::SIGTRAP))]
     #[case::sigabrt(6, Some(Signal::SIGABRT))]
     #[case::sigbus(7, Some(Signal::SIGBUS))]
