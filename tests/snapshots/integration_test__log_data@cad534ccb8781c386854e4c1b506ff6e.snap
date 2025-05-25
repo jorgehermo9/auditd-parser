@@ -21,7 +21,15 @@ info: "type=SYSTEM_RUNLEVEL msg=audit(1481076992.492:390): pid=1279 uid=0 auid=4
     },
     "pid": "1279",
     "ses": "4294967295",
-    "subj": "system_u:system_r:init_t:s0",
+    "subj": {
+      "level": {
+        "sensitivity": "s0"
+      },
+      "module": "SELinux",
+      "role": "system_r",
+      "type": "init_t",
+      "user": "system_u"
+    },
     "uid": "root"
   }
 }

@@ -3,6 +3,7 @@ use std::collections::BTreeMap;
 use bytes::Bytes;
 use errno::Errno;
 use field_type::FieldType;
+use mac_label::MacLabel;
 use nom::{Parser, combinator::all_consuming};
 use signal::Signal;
 use socket::SocketAddr;
@@ -18,6 +19,7 @@ mod audit_flag;
 mod capability;
 mod errno;
 mod field_type;
+mod mac_label;
 mod mode;
 mod perm;
 mod proctitle;
@@ -80,6 +82,7 @@ fn interpret_field_value(record_type: &str, field_name: &str, field_value: Strin
         FieldType::List => interpret_list_field(field_value),
         FieldType::Success => interpret_success_field(field_value),
         FieldType::Errno => interpret_errno_field(field_value),
+        FieldType::MacLabel => interpret_mac_label_field(field_value),
     }
 }
 
@@ -276,6 +279,34 @@ fn interpret_errno_field(field_value: String) -> FieldValue {
     };
 
     errno.to_string().into()
+}
+
+fn interpret_mac_label_field(field_value: String) -> FieldValue {
+    let Some(mac_label) = mac_label::resolve_mac_label(&field_value) else {
+        return field_value.into();
+    };
+
+    let mut map = BTreeMap::new();
+
+    map.insert("module".into(), mac_label.module().into());
+    match mac_label {
+        MacLabel::SELinux(context) => {
+            map.insert("user".into(), context.user.into());
+            map.insert("role".into(), context.role.into());
+            map.insert("type".into(), context.r#type.into());
+
+            if let Some(level) = context.level {
+                let mut level_map = BTreeMap::new();
+                level_map.insert("sensitivity".into(), level.sensitivity.into());
+                if let Some(category) = level.category {
+                    level_map.insert("category".into(), category.into());
+                }
+                map.insert("level".into(), level_map.into());
+            }
+
+            map.into()
+        }
+    }
 }
 
 #[cfg(test)]

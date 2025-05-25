@@ -26,7 +26,15 @@ info: "type=PATH msg=audit(1170021493.977:293): item=0 name=\"maildrop\" inode=1
       ]
     },
     "name": "maildrop",
-    "obj": "system_u:object_r:postfix_spool_maildrop_t:s0",
+    "obj": {
+      "level": {
+        "sensitivity": "s0"
+      },
+      "module": "SELinux",
+      "role": "object_r",
+      "type": "postfix_spool_maildrop_t",
+      "user": "system_u"
+    },
     "ogid": 891,
     "ouid": 890,
     "rdev": "00:00"

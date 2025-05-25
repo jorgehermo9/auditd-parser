@@ -14,6 +14,15 @@ info: "type=CONFIG_CHANGE msg=audit(1481077231.371:478): auid=1000 ses=3 subj=un
     "op": "add_rule",
     "res": "success",
     "ses": "3",
-    "subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023"
+    "subj": {
+      "level": {
+        "category": "c0.c1023",
+        "sensitivity": "s0-s0"
+      },
+      "module": "SELinux",
+      "role": "unconfined_r",
+      "type": "unconfined_t",
+      "user": "unconfined_u"
+    }
   }
 }

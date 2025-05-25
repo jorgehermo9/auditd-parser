@@ -14,7 +14,16 @@ info: "type=LOGIN msg=audit(1481077043.057:414): pid=1298 uid=0 subj=system_u:sy
     "pid": "1298",
     "res": "success",
     "ses": "1",
-    "subj": "system_u:system_r:sshd_t:s0-s0:c0.c1023",
+    "subj": {
+      "level": {
+        "category": "c0.c1023",
+        "sensitivity": "s0-s0"
+      },
+      "module": "SELinux",
+      "role": "system_r",
+      "type": "sshd_t",
+      "user": "system_u"
+    },
     "uid": "root"
   }
 }

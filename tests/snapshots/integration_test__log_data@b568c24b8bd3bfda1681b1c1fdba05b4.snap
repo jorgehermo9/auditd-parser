@@ -26,7 +26,15 @@ info: "type=PATH msg=audit(1481077231.371:479): item=0 name=\"/sbin/auditctl\" i
       ]
     },
     "name": "/sbin/auditctl",
-    "obj": "system_u:object_r:auditctl_exec_t:s0",
+    "obj": {
+      "level": {
+        "sensitivity": "s0"
+      },
+      "module": "SELinux",
+      "role": "object_r",
+      "type": "auditctl_exec_t",
+      "user": "system_u"
+    },
     "objtype": "NORMAL",
     "ogid": "root",
     "ouid": "root",

@@ -28,7 +28,15 @@ info: "type=SYSCALL msg=audit(1481076984.827:17): arch=c000003e syscall=313 succ
     "ppid": "390",
     "ses": "4294967295",
     "sgid": "root",
-    "subj": "system_u:system_r:insmod_t:s0",
+    "subj": {
+      "level": {
+        "sensitivity": "s0"
+      },
+      "module": "SELinux",
+      "role": "system_r",
+      "type": "insmod_t",
+      "user": "system_u"
+    },
     "success": true,
     "suid": "root",
     "syscall": "313",

@@ -21,7 +21,16 @@ info: "type=CRED_ACQ msg=audit(1481077043.057:413): pid=1298 uid=0 auid=42949672
     },
     "pid": "1298",
     "ses": "4294967295",
-    "subj": "system_u:system_r:sshd_t:s0-s0:c0.c1023",
+    "subj": {
+      "level": {
+        "category": "c0.c1023",
+        "sensitivity": "s0-s0"
+      },
+      "module": "SELinux",
+      "role": "system_r",
+      "type": "sshd_t",
+      "user": "system_u"
+    },
     "uid": "root"
   }
 }
