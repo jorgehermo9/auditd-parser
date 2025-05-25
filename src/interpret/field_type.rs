@@ -1,18 +1,18 @@
 // The constants of this file are extracted from
 // https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/auparse/typetab.h#L75
 
-const ESCAPED_FIELD_NAMES: [&str; 36] = [
+const ESCAPED_FIELD_NAMES: [&str; 37] = [
     "path",
     "comm",
     "exe",
     "file",
-    "name", // TODO: This is actually `AUPARSE_TYPE_ESCAPED_FILE`, check if its the same
+    "name", // This is actually `AUPARSE_TYPE_ESCAPED_FILE`, but seems to work ok like this
     "watch",
     "cwd",
     "cmd",
     "acct",
     "dir",
-    "key", // TODO: this is actually `AUPARSE_TYPE_ESCAPED_KEY`, check if its the same
+    "key", // this is actually `AUPARSE_TYPE_ESCAPED_KEY`, but seems to work ok like this
     "vm",
     "old-chardev",
     "new-chardev",
@@ -38,6 +38,7 @@ const ESCAPED_FIELD_NAMES: [&str; 36] = [
     "invalid_context",
     "sw",
     "root_dir",
+    "data", // `AUPARSE_TTY_DATA`, but it seems that it is enough to treat it as a escaped feild
 ];
 
 const UID_FIELD_NAMES: [&str; 13] = [
