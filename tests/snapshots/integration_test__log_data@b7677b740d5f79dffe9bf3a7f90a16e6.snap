@@ -10,7 +10,7 @@ info: "type=USER_LOGIN msg=audit(1492896301.818:19955): pid=12635 uid=0 auid=429
   "fields": {
     "auid": null,
     "msg": {
-      "acct": "28696E76616C6964207573657229",
+      "acct": "(invalid user)",
       "addr": "179.38.151.221",
       "exe": "/usr/sbin/sshd",
       "hostname": "?",

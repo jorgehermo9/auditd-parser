@@ -19,7 +19,7 @@ info: "type=CRYPTO_KEY_USER msg=audit(1481077041.497:404): pid=1299 uid=0 auid=4
       "op": "destroy",
       "res": "success",
       "spid": "1299",
-      "suid": "0",
+      "suid": 0,
       "terminal": "?"
     },
     "pid": "1299",

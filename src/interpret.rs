@@ -59,7 +59,7 @@ impl From<RawAuditdRecord> for AuditdRecord {
 }
 
 // Based on https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/auparse/interpret.c#L3325
-fn interpret_field_value(_record_type: &str, field_name: &str, field_value: String) -> FieldValue {
+fn interpret_field_value(record_type: &str, field_name: &str, field_value: String) -> FieldValue {
     let Some(field_type) = FieldType::resolve(field_name) else {
         // Defaults to leave the field uninterpreted
         return field_value.into();
@@ -67,7 +67,7 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
 
     match field_type {
         FieldType::Escaped => interpret_escaped_field(field_value),
-        FieldType::Msg => interpret_msg_field(field_value),
+        FieldType::Msg => interpret_msg_field(record_type, field_value),
         FieldType::Uid | FieldType::Gid => interpret_uid_field(field_value),
         FieldType::Exit => interpret_exit_field(field_value),
         FieldType::CapabilityBitmap => interpret_cap_bitmap_field(field_value),
@@ -84,8 +84,7 @@ fn interpret_field_value(_record_type: &str, field_name: &str, field_value: Stri
 }
 
 // TODO: move this to a msg.rs inside interpret module
-fn interpret_msg_field(field_value: String) -> FieldValue {
-    // TODO: fields inside msg should be interpreted aswell?
+fn interpret_msg_field(record_type: &str, field_value: String) -> FieldValue {
     let Ok((_, key_value_list)) =
         // TODO: maybe we should refactor this so this doesn't use parser module functions...
         all_consuming(parser::body::parse_key_value_list)
@@ -93,11 +92,13 @@ fn interpret_msg_field(field_value: String) -> FieldValue {
     else {
         return field_value.into();
     };
-    // TODO: create a new parse_key_value_list here that returns NestedFieldValue itself...
     let nested_field_value_map = key_value_list
         .into_iter()
-        .map(|(key, value)| (key, value.into()))
-        // TODO: should we call interpret_field_value for nested fields inside the msg field?
+        .map(|(key, value)| {
+            // TODO: fields inside msg should be interpreted aswell?
+            let interpreted_value = interpret_field_value(record_type, &key, value);
+            (key, interpreted_value)
+        })
         .collect::<BTreeMap<String, FieldValue>>();
 
     nested_field_value_map.into()
