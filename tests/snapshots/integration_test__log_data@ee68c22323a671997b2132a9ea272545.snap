@@ -8,7 +8,7 @@ info: "type=CRYPTO_KEY_USER msg=audit(1481077041.497:404): pid=1299 uid=0 auid=4
   "timestamp": 1481077041497,
   "id": 404,
   "fields": {
-    "auid": 4294967295,
+    "auid": null,
     "msg": {
       "addr": "96.241.146.97",
       "direction": "?",
@@ -25,6 +25,6 @@ info: "type=CRYPTO_KEY_USER msg=audit(1481077041.497:404): pid=1299 uid=0 auid=4
     "pid": "1299",
     "ses": "4294967295",
     "subj": "system_u:system_r:sshd_t:s0-s0:c0.c1023",
-    "uid": 0
+    "uid": "root"
   }
 }

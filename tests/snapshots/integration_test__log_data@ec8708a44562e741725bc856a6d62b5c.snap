@@ -8,7 +8,7 @@ info: "type=SERVICE_STOP msg=audit(1481076984.534:16): pid=1 uid=0 auid=42949672
   "timestamp": 1481076984534,
   "id": 16,
   "fields": {
-    "auid": 4294967295,
+    "auid": null,
     "msg": {
       "addr": "?",
       "comm": "systemd",
@@ -21,6 +21,6 @@ info: "type=SERVICE_STOP msg=audit(1481076984.534:16): pid=1 uid=0 auid=42949672
     "pid": "1",
     "ses": "4294967295",
     "subj": "system_u:system_r:init_t:s0",
-    "uid": 0
+    "uid": "root"
   }
 }

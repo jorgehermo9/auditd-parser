@@ -21,6 +21,6 @@ info: "type=USER_LOGOUT msg=audit(1481077049.033:424): pid=1298 uid=0 auid=1000 
     "pid": "1298",
     "ses": "1",
     "subj": "system_u:system_r:sshd_t:s0-s0:c0.c1023",
-    "uid": 0
+    "uid": "root"
   }
 }

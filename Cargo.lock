@@ -15,6 +15,7 @@ dependencies = [
 name = "auditd-parser"
 version = "0.1.0"
 dependencies = [
+ "auditd-parser",
  "bytes",
  "hex",
  "insta",

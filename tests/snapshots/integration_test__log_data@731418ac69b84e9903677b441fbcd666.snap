@@ -21,6 +21,6 @@ info: "type=ADD_GROUP msg=audit(1451781471.602:194894): pid=1321 uid=0 auid=1000
     "pid": "1321",
     "ses": "1",
     "subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
-    "uid": 0
+    "uid": "root"
   }
 }

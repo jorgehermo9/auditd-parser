@@ -22,6 +22,6 @@ info: "type=CRED_DISP msg=audit(1481077049.058:427): pid=1298 uid=0 auid=1000 se
     "pid": "1298",
     "ses": "1",
     "subj": "system_u:system_r:sshd_t:s0-s0:c0.c1023",
-    "uid": 0
+    "uid": "root"
   }
 }

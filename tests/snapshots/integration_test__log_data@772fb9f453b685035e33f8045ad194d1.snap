@@ -13,6 +13,6 @@ info: "type=USER_TTY msg=audit(1491922681.082:1065050): pid=28058 uid=0 auid=100
     "pid": "28058",
     "ses": "762",
     "subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
-    "uid": 0
+    "uid": "root"
   }
 }
