@@ -20,6 +20,6 @@ info: "type=USER_LOGIN msg=audit(1492810797.778:12651): pid=11396 uid=0 auid=100
     },
     "pid": "11396",
     "ses": "36",
-    "uid": 0
+    "uid": "root"
   }
 }

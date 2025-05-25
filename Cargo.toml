@@ -7,23 +7,24 @@ license = "MIT OR Apache-2.0"
 # so more people can use this
 rust-version = "1.85"
 
+[features]
+serde = ["dep:serde"]
+
 [dependencies]
 bytes = "1.10.1"
 hex = "0.4.3"
 nom = "8.0.0"
-serde = { version = "1.0.219", features = ["derive"], optional = true }
+serde = { version = "1.0.219", optional = true, features = ["derive"] }
 static_assertions = "1.1.0"
 thiserror = "2.0.12"
-
-[features]
-default = ["serde"]
-serde = ["dep:serde"]
 
 [dev-dependencies]
 insta = { version = "1.43.1", features = ["json"] }
 maplit = "1.0.2"
 md5 = "0.7.0"
 rstest = "0.25.0"
+# Enable serde feature for tests
+auditd-parser = { path = ".", features = ["serde"] }
 
 [profile.dev.package]
 insta.opt-level = 3

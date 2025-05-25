@@ -8,7 +8,7 @@ info: "type=SYSTEM_RUNLEVEL msg=audit(1481076992.492:390): pid=1279 uid=0 auid=4
   "timestamp": 1481076992492,
   "id": 390,
   "fields": {
-    "auid": 4294967295,
+    "auid": null,
     "msg": {
       "addr": "?",
       "comm": "systemd-update-utmp",
@@ -22,6 +22,6 @@ info: "type=SYSTEM_RUNLEVEL msg=audit(1481076992.492:390): pid=1279 uid=0 auid=4
     "pid": "1279",
     "ses": "4294967295",
     "subj": "system_u:system_r:init_t:s0",
-    "uid": 0
+    "uid": "root"
   }
 }

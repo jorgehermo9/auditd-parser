@@ -6,6 +6,7 @@ use field_type::FieldType;
 use nom::{Parser, combinator::all_consuming};
 use signal::Signal;
 use socket::SocketAddr;
+use uid::Uid;
 
 use crate::{
     AuditdRecord, FieldValue,
@@ -24,6 +25,7 @@ mod result;
 mod signal;
 mod socket;
 mod success;
+mod uid;
 mod utils;
 
 impl From<RawAuditdRecord> for AuditdRecord {
@@ -66,8 +68,8 @@ fn interpret_field_value(record_type: &str, field_name: &str, field_value: Strin
     match field_type {
         FieldType::Escaped => interpret_escaped_field(field_value),
         FieldType::Msg => interpret_msg_field(record_type, field_value),
-        FieldType::Uid | FieldType::Gid => interpret_unsigned_integer_field(field_value),
-        FieldType::Exit => interpret_signed_integer_field(field_value),
+        FieldType::Uid | FieldType::Gid => interpret_uid_field(field_value),
+        FieldType::Exit => interpret_exit_field(field_value),
         FieldType::CapabilityBitmap => interpret_cap_bitmap_field(field_value),
         FieldType::SocketAddr => interpret_socket_addr_field(field_value),
         FieldType::Perm => interpret_perm_field(field_value),
@@ -110,18 +112,25 @@ fn interpret_escaped_field(field_value: String) -> FieldValue {
     hex_decoded.unwrap_or(field_value).into()
 }
 
-fn interpret_unsigned_integer_field(field_value: String) -> FieldValue {
-    field_value.parse().map_or_else(
-        |_| field_value.into(),
-        |val| Number::UnsignedInteger(val).into(),
-    )
+fn interpret_uid_field(field_value: String) -> FieldValue {
+    let Ok(uid) = field_value.parse::<i64>() else {
+        return field_value.into();
+    };
+
+    let uid = uid::resolve_uid(uid);
+
+    match uid {
+        Uid::Root => "root".to_string().into(),
+        Uid::User(uid) => Number::SignedInteger(uid).into(),
+        Uid::Unset => FieldValue::Null,
+    }
 }
 
-fn interpret_signed_integer_field(field_value: String) -> FieldValue {
-    field_value.parse().map_or_else(
-        |_| field_value.into(),
-        |val| Number::SignedInteger(val).into(),
-    )
+fn interpret_exit_field(field_value: String) -> FieldValue {
+    let Ok(exit_code) = field_value.parse::<i64>() else {
+        return field_value.into();
+    };
+    Number::SignedInteger(exit_code).into()
 }
 
 fn interpret_cap_bitmap_field(field_value: String) -> FieldValue {
@@ -288,20 +297,24 @@ mod tests {
     }
 
     #[rstest]
-    #[case::positive_integer("123", Number::UnsignedInteger(123).into())]
-    #[case::negative_integer("-123", "-123".into())]
+    #[case::root("0", "root".into())]
+    #[case::unset("4294967295", FieldValue::Null)]
+    #[case::unset_negative("-1", FieldValue::Null)]
+    #[case::positive_integer("123", Number::SignedInteger(123).into())]
+    #[case::negative_integer("-123", Number::SignedInteger(-123).into())]
     #[case::not_integer_fallbacks_to_input("foo", "foo".into())]
-    fn test_interpret_integer_field(#[case] input: String, #[case] expected: FieldValue) {
-        let result = interpret_unsigned_integer_field(input);
+    fn test_interpret_uid_field(#[case] input: String, #[case] expected: FieldValue) {
+        let result = interpret_uid_field(input);
         assert_eq!(result, expected);
     }
 
     #[rstest]
-    #[case::integer("123", Number::SignedInteger(123).into())]
+    #[case::zero("0", Number::SignedInteger(0).into())]
+    #[case::positive_integer("123", Number::SignedInteger(123).into())]
     #[case::negative_integer("-123", Number::SignedInteger(-123).into())]
     #[case::not_integer_fallbacks_to_input("foo","foo".into())]
-    fn test_interpret_signed_integer_field(#[case] input: String, #[case] expected: FieldValue) {
-        let result = interpret_signed_integer_field(input);
+    fn test_interpret_exit_field(#[case] input: String, #[case] expected: FieldValue) {
+        let result = interpret_exit_field(input);
         assert_eq!(result, expected);
     }
 

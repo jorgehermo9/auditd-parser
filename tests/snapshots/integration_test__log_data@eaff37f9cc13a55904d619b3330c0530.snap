@@ -13,7 +13,7 @@ info: "type=SYSCALL msg=audit(1170021493.977:293): arch=c000003e syscall=2 succe
     "a2": "5555665d91b8",
     "a3": "0",
     "arch": "c000003e",
-    "auid": 4294967295,
+    "auid": null,
     "comm": "pickup",
     "egid": 890,
     "euid": 890,
