@@ -12,7 +12,16 @@ info: "type=USER_TTY msg=audit(1491922671.974:1065045): pid=28202 uid=0 auid=100
     "data": "exit",
     "pid": "28202",
     "ses": "762",
-    "subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
+    "subj": {
+      "level": {
+        "category": "c0.c1023",
+        "sensitivity": "s0-s0"
+      },
+      "module": "SELinux",
+      "role": "unconfined_r",
+      "type": "unconfined_t",
+      "user": "unconfined_u"
+    },
     "uid": "root"
   }
 }

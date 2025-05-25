@@ -28,7 +28,16 @@ info: "type=SYSCALL msg=audit(1451781471.394:194438): arch=c000003e syscall=13 s
     "ppid": "1306",
     "ses": "1",
     "sgid": "root",
-    "subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
+    "subj": {
+      "level": {
+        "category": "c0.c1023",
+        "sensitivity": "s0-s0"
+      },
+      "module": "SELinux",
+      "role": "unconfined_r",
+      "type": "unconfined_t",
+      "user": "unconfined_u"
+    },
     "success": true,
     "suid": "root",
     "syscall": "13",

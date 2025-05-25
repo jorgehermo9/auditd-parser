@@ -27,7 +27,15 @@ info: "type=SYSCALL msg=audit(1170021493.977:293): arch=c000003e syscall=2 succe
     "pid": "13010",
     "ppid": "2013",
     "sgid": 890,
-    "subj": "system_u:system_r:postfix_pickup_t:s0",
+    "subj": {
+      "level": {
+        "sensitivity": "s0"
+      },
+      "module": "SELinux",
+      "role": "system_r",
+      "type": "postfix_pickup_t",
+      "user": "system_u"
+    },
     "success": false,
     "suid": 890,
     "syscall": "2",

@@ -19,7 +19,15 @@ info: "type=SYSTEM_BOOT msg=audit(1481076983.876:7): pid=273 uid=0 auid=42949672
     },
     "pid": "273",
     "ses": "4294967295",
-    "subj": "system_u:system_r:init_t:s0",
+    "subj": {
+      "level": {
+        "sensitivity": "s0"
+      },
+      "module": "SELinux",
+      "role": "system_r",
+      "type": "init_t",
+      "user": "system_u"
+    },
     "uid": "root"
   }
 }

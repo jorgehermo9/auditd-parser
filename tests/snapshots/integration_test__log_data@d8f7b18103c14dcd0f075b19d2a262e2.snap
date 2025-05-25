@@ -21,7 +21,16 @@ info: "type=CRED_REFR msg=audit(1489640461.198:480): pid=1402 uid=0 auid=0 ses=2
     },
     "pid": "1402",
     "ses": "2",
-    "subj": "system_u:system_r:crond_t:s0-s0:c0.c1023",
+    "subj": {
+      "level": {
+        "category": "c0.c1023",
+        "sensitivity": "s0-s0"
+      },
+      "module": "SELinux",
+      "role": "system_r",
+      "type": "crond_t",
+      "user": "system_u"
+    },
     "uid": "root"
   }
 }

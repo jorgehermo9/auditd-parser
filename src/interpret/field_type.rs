@@ -80,6 +80,9 @@ const RESULT_FIELD_NAMES: [&str; 2] = ["res", "result"];
 
 const SIGNAL_FIELD_NAMES: [&str; 2] = ["sig", "sigev_signo"];
 
+const MAC_LABEL_FIELD_NAMES: [&str; 6] =
+    ["subj", "obj", "scontext", "tcontext", "vm-ctx", "img-ctx"];
+
 pub enum FieldType {
     Msg,
     Exit,
@@ -98,6 +101,7 @@ pub enum FieldType {
     // their `AUPARSE_TYPE_SUCCESS` is used for `res` and `result` fields
     Success,
     Errno,
+    MacLabel, // Mandatory Access Control
 }
 
 impl FieldType {
@@ -161,6 +165,10 @@ impl FieldType {
 
         if SIGNAL_FIELD_NAMES.contains(&field_name) {
             return Some(Self::Signal);
+        }
+
+        if MAC_LABEL_FIELD_NAMES.contains(&field_name) {
+            return Some(Self::MacLabel);
         }
 
         None

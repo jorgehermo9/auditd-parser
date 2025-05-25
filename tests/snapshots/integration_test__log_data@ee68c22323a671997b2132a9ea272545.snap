@@ -24,7 +24,16 @@ info: "type=CRYPTO_KEY_USER msg=audit(1481077041.497:404): pid=1299 uid=0 auid=4
     },
     "pid": "1299",
     "ses": "4294967295",
-    "subj": "system_u:system_r:sshd_t:s0-s0:c0.c1023",
+    "subj": {
+      "level": {
+        "category": "c0.c1023",
+        "sensitivity": "s0-s0"
+      },
+      "module": "SELinux",
+      "role": "system_r",
+      "type": "sshd_t",
+      "user": "system_u"
+    },
     "uid": "root"
   }
 }

@@ -20,7 +20,15 @@ info: "type=SERVICE_STOP msg=audit(1481076984.534:16): pid=1 uid=0 auid=42949672
     },
     "pid": "1",
     "ses": "4294967295",
-    "subj": "system_u:system_r:init_t:s0",
+    "subj": {
+      "level": {
+        "sensitivity": "s0"
+      },
+      "module": "SELinux",
+      "role": "system_r",
+      "type": "init_t",
+      "user": "system_u"
+    },
     "uid": "root"
   }
 }
