@@ -64,6 +64,7 @@ impl From<RawAuditdRecord> for AuditdRecord {
 fn interpret_field_value(record_type: &str, field_name: &str, field_value: String) -> FieldValue {
     let Some(field_type) = FieldType::resolve(field_name) else {
         // Defaults to leave the field uninterpreted
+        // TODO: should we default to `FieldValue::Escaped`?
         return field_value.into();
     };
 
