@@ -514,4 +514,39 @@ mod tests {
         let result = interpret_errno_field(input);
         assert_eq!(result, expected);
     }
+
+    #[rstest]
+    #[case::selinux_minimal("user_u:role_r:type_t", btreemap!{
+            "module".into() => "SELinux".into(),
+            "user".into() => "user_u".into(),
+            "role".into() => "role_r".into(),
+            "type".into() => "type_t".into(),
+        }.into()
+    )]
+    #[case::selinux_sensitivity("user_u:role_r:type_t:s0", btreemap!{
+            "module".into() => "SELinux".into(),
+            "user".into() => "user_u".into(),
+            "role".into() => "role_r".into(),
+            "type".into() => "type_t".into(),
+            "level".into() => btreemap!{
+                    "sensitivity".into() => "s0".into(),
+                }.into(),
+        }.into()
+    )]
+    #[case::selinux_sensitivity_and_category("user_u:role_r:type_t:s0:c1", btreemap!{
+            "module".into() => "SELinux".into(),
+            "user".into() => "user_u".into(),
+            "role".into() => "role_r".into(),
+            "type".into() => "type_t".into(),
+            "level".into() => btreemap!{
+                    "sensitivity".into() => "s0".into(),
+                    "category".into() => "c1".into(),
+                }.into(),
+        }.into()
+    )]
+    #[case::not_a_mac_label("foo", "foo".into())]
+    fn test_interpret_mac_label_field(#[case] input: String, #[case] expected: FieldValue) {
+        let result = interpret_mac_label_field(input);
+        assert_eq!(result, expected);
+    }
 }

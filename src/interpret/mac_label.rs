@@ -1,7 +1,9 @@
+#[derive(Debug, PartialEq)]
 pub enum MacLabel {
     SELinux(SELinuxContext),
 }
 
+#[derive(Debug, PartialEq)]
 pub struct SELinuxContext {
     pub user: String,
     pub role: String,
@@ -9,6 +11,7 @@ pub struct SELinuxContext {
     pub level: Option<SELinuxLevel>,
 }
 
+#[derive(Debug, PartialEq)]
 pub struct SELinuxLevel {
     pub sensitivity: String,
     pub category: Option<String>,
@@ -22,6 +25,7 @@ impl MacLabel {
     }
 }
 
+// TODO: https://github.com/jorgehermo9/auditd-parser/issues/60
 // We will assume that the MAC is always SELinux.
 // Some distributions use other MAC such as AppArmor, but for now we will only interpret
 // SELinux ones.
@@ -42,7 +46,7 @@ pub fn parse_selinux_context(context: &str) -> Option<SELinuxContext> {
     let r#type = parts[2].to_string();
 
     // Level is optional, sensitiviy may not be present.
-    // Level is composed of sensitivity and category, being the category optional.
+    // it is composed of sensitivity and category, being the category optional.
     let sensitivity = parts.get(3).map(ToString::to_string);
     let category = parts.get(4).map(ToString::to_string);
     let level = sensitivity.map(|sensitivity| SELinuxLevel {
@@ -56,4 +60,57 @@ pub fn parse_selinux_context(context: &str) -> Option<SELinuxContext> {
         r#type,
         level,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case::level_and_category("user_u:role_r:type_t:s0:c1", Some(MacLabel::SELinux(SELinuxContext{
+        user: "user_u".to_string(),
+        role: "role_r".to_string(),
+        r#type: "type_t".to_string(),
+        level: Some(SELinuxLevel {
+            sensitivity: "s0".to_string(),
+            category: Some("c1".to_string()),
+        }),
+    })))]
+    #[case::not_mac_label("foo", None)]
+    fn test_resolve_mac_label(#[case] input: &str, #[case] expected: Option<MacLabel>) {
+        let result = resolve_mac_label(input);
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::minimal("user_u:role_r:type_t", Some(SELinuxContext {
+        user: "user_u".to_string(),
+        role: "role_r".to_string(),
+        r#type: "type_t".to_string(),
+        level: None,
+    }))]
+    #[case::level("user_u:role_r:type_t:s0", Some(SELinuxContext {
+        user: "user_u".to_string(),
+        role: "role_r".to_string(),
+        r#type: "type_t".to_string(),
+        level: Some(SELinuxLevel {
+            sensitivity: "s0".to_string(),
+            category: None,
+        }),
+    }))]
+    #[case::level_and_category("user_u:role_r:type_t:s0:c1", Some(SELinuxContext{
+        user: "user_u".to_string(),
+        role: "role_r".to_string(),
+        r#type: "type_t".to_string(),
+        level: Some(SELinuxLevel {
+            sensitivity: "s0".to_string(),
+            category: Some("c1".to_string()),
+        }),
+    }))]
+    #[case::not_selinux_context("foo", None)]
+    fn test_parse_selinux_context(#[case] input: &str, #[case] expected: Option<SELinuxContext>) {
+        let result = parse_selinux_context(input);
+        assert_eq!(result, expected);
+    }
 }
