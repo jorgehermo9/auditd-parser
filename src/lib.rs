@@ -23,4 +23,11 @@ mod tests {
         let line = "type=SYSTEM_SHUTDOWN msg=audit(1725041662.447:172): pid=834299 uid=0 auid=4294967295 ses=4294967295 msg=' comm=\"systemd-update-utmp\" exe=\"/usr/lib/systemd/systemd-update-utmp\" hostname=? addr=? terminal=? res=success'";
         assert!(parser::parse_record(line).is_ok());
     }
+
+    #[test]
+    fn test_node_field_parsing() {
+        let line = "node=server.example.com type=SYSCALL msg=audit(1725039526.208:52): pid=580903 uid=1000 auid=1000";
+        let parsed = line.parse::<AuditdRecord>().unwrap();
+        assert_eq!(parsed.node, Some("server.example.com".to_string()));
+    }
 }

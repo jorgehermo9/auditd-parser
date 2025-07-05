@@ -54,6 +54,7 @@ impl From<RawAuditdRecord> for AuditdRecord {
             record_type: value.record_type,
             timestamp: value.timestamp,
             id: value.id,
+            node: value.node,
             fields,
             enrichment,
         }

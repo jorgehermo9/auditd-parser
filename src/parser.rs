@@ -21,6 +21,9 @@ pub struct RawAuditdRecord {
     /// Record identifier
     pub id: u64,
 
+    /// Node field
+    pub node: Option<String>,
+
     // TODO: use index-ordered map?
     pub fields: BTreeMap<String, String>,
 
@@ -41,6 +44,7 @@ pub fn parse_record(input: &str) -> Result<RawAuditdRecord, ParserError> {
             record_type: header.record_type,
             timestamp: header.audit_msg.timestamp,
             id: header.audit_msg.id,
+            node: header.node,
             fields: body.fields,
             enrichment: body.enrichment,
         })
@@ -63,6 +67,7 @@ mod tests {
             record_type: "foo".into(),
             timestamp: 1_234_567,
             id: 89,
+            node: None,
             fields: btreemap!{"key1".into() => "value1".into(), "key2".into() => "value2".into()},
             enrichment: None,
         }
@@ -72,8 +77,19 @@ mod tests {
             record_type: "foo".into(),
             timestamp: 1_234_567,
             id: 89,
+            node: None,
             fields: btreemap!{"key1".into() => "value1".into(), "key2".into() => "value2".into()},
             enrichment: Some(btreemap!{"enriched_key".into() => "enriched_value".into()}),
+        }
+    )]
+    #[case::with_node("node=server.example.com type=foo msg=audit(1234.567:89): key1=value1 key2=value2",
+        RawAuditdRecord {
+            record_type: "foo".into(),
+            timestamp: 1_234_567,
+            id: 89,
+            node: Some("server.example.com".into()),
+            fields: btreemap!{"key1".into() => "value1".into(), "key2".into() => "value2".into()},
+            enrichment: None,
         }
     )]
     fn test_parse_record(#[case] input: &str, #[case] expected: RawAuditdRecord) {
