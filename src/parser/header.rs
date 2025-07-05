@@ -73,13 +73,17 @@ fn parse_audit_msg(input: &str) -> IResult<&str, InnerAuditMsg> {
 /// Example with node: `node=node.org type=USER_ACCT msg=audit(1725039526.208:52): `
 pub fn parse_header(input: &str) -> IResult<&str, InnerHeader> {
     let (input, node) = opt(terminated(parse_node, char(' '))).parse(input)?;
-    let (input, (record_type, audit_msg)) = separated_pair(parse_record_type, char(' '), parse_audit_msg).parse(input)?;
-    
-    Ok((input, InnerHeader {
-        node,
-        record_type,
-        audit_msg,
-    }))
+    let (input, (record_type, audit_msg)) =
+        separated_pair(parse_record_type, char(' '), parse_audit_msg).parse(input)?;
+
+    Ok((
+        input,
+        InnerHeader {
+            node,
+            record_type,
+            audit_msg,
+        },
+    ))
 }
 
 #[cfg(test)]
