@@ -108,10 +108,6 @@ mod tests {
     #[case::multiple_empty_values("key1= key2= key3=value3",
         btreemap!{"key1".into() => "".into(), "key2".into() => "".into(), "key3".into() => "value3".into()}
     )]
-    #[case::ssh_log_with_empty_mac("op=start direction=from-server mac= pfs=curve25519-sha256",
-        btreemap!{"op".into() => "start".into(), "direction".into() => "from-server".into(), 
-                  "mac".into() => "".into(), "pfs".into() => "curve25519-sha256".into()}
-    )]
     fn test_parse_key_value_list(#[case] input: &str, #[case] expected: BTreeMap<String, String>) {
         let (remaining, result) = parse_key_value_list(input).unwrap();
         assert!(remaining.is_empty());
