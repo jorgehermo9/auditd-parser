@@ -54,8 +54,8 @@ pub fn parse_record(input: &str) -> Result<RawAuditdRecord, ParserError> {
 mod tests {
     use super::*;
     use body::ENRICHMENT_SEPARATOR;
+    use maplit::btreemap;
     use rstest::rstest;
-    use std::collections::BTreeMap;
 
     #[rstest]
     #[case::not_enriched("type=foo msg=audit(1234.567:89): key1=value1 key2=value2",
@@ -63,7 +63,7 @@ mod tests {
             record_type: "foo".into(),
             timestamp: 1_234_567,
             id: 89,
-            fields: BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
+            fields: btreemap!{"key1".into() => "value1".into(), "key2".into() => "value2".into()},
             enrichment: None,
         }
     )]
@@ -72,8 +72,8 @@ mod tests {
             record_type: "foo".into(),
             timestamp: 1_234_567,
             id: 89,
-            fields: BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
-            enrichment: Some(BTreeMap::from([("enriched_key".into(), "enriched_value".into())])),
+            fields: btreemap!{"key1".into() => "value1".into(), "key2".into() => "value2".into()},
+            enrichment: Some(btreemap!{"enriched_key".into() => "enriched_value".into()}),
         }
     )]
     fn test_parse_record(#[case] input: &str, #[case] expected: RawAuditdRecord) {
