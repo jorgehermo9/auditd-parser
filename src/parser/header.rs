@@ -1,4 +1,4 @@
-use nom::bytes::complete::{tag, take, take_while1};
+use nom::bytes::complete::{tag, take, take_while, take_while1};
 use nom::character::complete::{char, u64 as parse_u64};
 use nom::combinator::opt;
 use nom::sequence::{delimited, preceded, separated_pair, terminated};
@@ -29,7 +29,7 @@ fn parse_record_type(input: &str) -> IResult<&str, String> {
 
 /// Parses the optional `node=value ` part of the message.
 fn parse_node(input: &str) -> IResult<&str, String> {
-    preceded(tag("node="), take_while1(|c: char| !c.is_space()))
+    preceded(tag("node="), take_while(|c: char| !c.is_space()))
         .map(ToString::to_string)
         .parse(input)
 }
@@ -92,6 +92,7 @@ mod tests {
     #[case::single_word("node=localhost", "localhost")]
     #[case::numeric("node=123", "123")]
     #[case::with_special_chars("node=node-01.example.org", "node-01.example.org")]
+    #[case::empty_value("node=", "")]
     fn test_parse_node(#[case] input: &str, #[case] expected: &str) {
         let (remaining, result) = parse_node(input).unwrap();
         assert!(remaining.is_empty());
@@ -100,7 +101,6 @@ mod tests {
 
     #[rstest]
     #[case::without_key("server.domain.com")]
-    #[case::without_value("node=")]
     #[case::wrong_key("type=server")]
     #[case::empty("")]
     fn test_parse_node_fails(#[case] input: &str) {
@@ -231,6 +231,7 @@ mod tests {
     #[rstest]
     #[case::regular("type=USER_ACCT msg=audit(123.456:789): ", InnerHeader { node: None, record_type: "USER_ACCT".to_string(), audit_msg: InnerAuditMsg { timestamp: 123_456, id: 789 } })]
     #[case::with_node("node=node.org type=USER_ACCT msg=audit(123.456:789): ", InnerHeader { node: Some("node.org".to_string()), record_type: "USER_ACCT".to_string(), audit_msg: InnerAuditMsg { timestamp: 123_456, id: 789 } })]
+    #[case::with_empty_node("node= type=USER_ACCT msg=audit(123.456:789): ", InnerHeader { node: Some("".to_string()), record_type: "USER_ACCT".to_string(), audit_msg: InnerAuditMsg { timestamp: 123_456, id: 789 } })]
     fn test_parse_header(#[case] input: &str, #[case] expected: InnerHeader) {
         let (remaining, result) = parse_header(input).unwrap();
         assert!(remaining.is_empty());

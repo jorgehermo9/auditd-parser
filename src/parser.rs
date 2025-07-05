@@ -21,7 +21,7 @@ pub struct RawAuditdRecord {
     /// Record identifier
     pub id: u64,
 
-    /// Optional node field
+    /// Node field
     pub node: Option<String>,
 
     // TODO: use index-ordered map?
