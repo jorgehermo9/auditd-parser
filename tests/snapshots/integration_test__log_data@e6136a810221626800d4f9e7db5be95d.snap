@@ -9,7 +9,24 @@ info: "type=CRYPTO_SESSION msg=audit(1481077041.515:406): pid=1298 uid=0 auid=42
   "id": 406,
   "fields": {
     "auid": null,
-    "msg": "op=start direction=from-server cipher=chacha20-poly1305@openssh.com ksize=512 mac= pfs=curve25519-sha256@libssh.org spid=1299 suid=74 rport=63927 laddr=10.142.0.2 lport=22  exe=\"/usr/sbin/sshd\" hostname=? addr=96.241.146.97 terminal=? res=success",
+    "msg": {
+      "addr": "96.241.146.97",
+      "cipher": "chacha20-poly1305@openssh.com",
+      "direction": "from-server",
+      "exe": "/usr/sbin/sshd",
+      "hostname": "?",
+      "ksize": "512",
+      "laddr": "10.142.0.2",
+      "lport": "22",
+      "mac": "",
+      "op": "start",
+      "pfs": "curve25519-sha256@libssh.org",
+      "res": "success",
+      "rport": "63927",
+      "spid": "1299",
+      "suid": 74,
+      "terminal": "?"
+    },
     "pid": "1298",
     "ses": "4294967295",
     "subj": {

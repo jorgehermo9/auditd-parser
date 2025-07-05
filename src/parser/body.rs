@@ -67,6 +67,8 @@ mod tests {
 
     #[rstest]
     #[case::regular("key=value", ("key", "value"))]
+    #[case::empty_value("key=", ("key", ""))]
+    #[case::mac_empty_value_from_issue("mac=", ("mac", ""))]
     fn test_parse_key_value(#[case] input: &str, #[case] expected: (&str, &str)) {
         let (expected_key, expected_value) = expected;
         let (remaining, (key, value)) = parse_key_value(input).unwrap();
@@ -78,7 +80,6 @@ mod tests {
     #[rstest]
     #[case::missing_separator("keyvalue")]
     #[case::missing_key("=value")]
-    #[case::missing_value("key=")]
     #[case::missing_key_and_value("=")]
     #[case::empty("")]
     fn test_parse_key_value_fails(#[case] input: &str) {
@@ -101,6 +102,16 @@ mod tests {
         btreemap!{"key1".into() => "value1".into(),
             "key2".into() => "value2".into(),"key3".into() => "value3".into()}
     )]
+    #[case::empty_value("key1= key2=value2", 
+        btreemap!{"key1".into() => "".into(), "key2".into() => "value2".into()}
+    )]
+    #[case::multiple_empty_values("key1= key2= key3=value3",
+        btreemap!{"key1".into() => "".into(), "key2".into() => "".into(), "key3".into() => "value3".into()}
+    )]
+    #[case::ssh_log_with_empty_mac("op=start direction=from-server mac= pfs=curve25519-sha256",
+        btreemap!{"op".into() => "start".into(), "direction".into() => "from-server".into(), 
+                  "mac".into() => "".into(), "pfs".into() => "curve25519-sha256".into()}
+    )]
     fn test_parse_key_value_list(#[case] input: &str, #[case] expected: BTreeMap<String, String>) {
         let (remaining, result) = parse_key_value_list(input).unwrap();
         assert!(remaining.is_empty());
@@ -109,7 +120,6 @@ mod tests {
 
     #[rstest]
     #[case::missing_key("=value1 key2=value2")]
-    #[case::missing_value("key1= key2=value2")]
     #[case::missing_key_and_value("=")]
     #[case::missing_equal("foo")]
     #[case::empty("")]

@@ -1,6 +1,6 @@
 use nom::AsChar;
 use nom::branch::alt;
-use nom::bytes::complete::{take_while, take_while1};
+use nom::bytes::complete::take_while;
 use nom::character::complete::char;
 use nom::sequence::delimited;
 use nom::{IResult, Parser};
@@ -38,12 +38,23 @@ fn parse_unquoted_value(input: &str) -> IResult<&str, &str> {
     // If the value is not surrounded by quotes, take all the characters until a space or the enrichment separator is found.
     // For example, in the `op` field of auditd records: `op=PAM:accounting`, the value should be a string, but
     // it is not surrounded by quotes.
-    // TODO: use take_while0?
-    take_while1(|c: char| !c.is_space() && c != ENRICHMENT_SEPARATOR).parse(input)
+    // Use take_while to allow empty values (e.g., `mac=` with no value)
+    
+    // Handle special case of input that is only whitespace or enrichment separator
+    if input == " " || input == ENRICHMENT_SEPARATOR.to_string() {
+        return Err(nom::Err::Error(nom::error::Error::new(input, nom::error::ErrorKind::TakeWhile1)));
+    }
+    
+    take_while(|c: char| !c.is_space() && c != ENRICHMENT_SEPARATOR).parse(input)
 }
 
 /// Parses the value part of a field, the right side of the `key=value` pair.
 pub fn parse_value(input: &str) -> IResult<&str, String> {
+    // Handle special case of input that is only whitespace or enrichment separator
+    if input == " " || input == ENRICHMENT_SEPARATOR.to_string() {
+        return Err(nom::Err::Error(nom::error::Error::new(input, nom::error::ErrorKind::Alt)));
+    }
+    
     alt((parse_quoted_value, parse_unquoted_value))
         .map(ToString::to_string)
         .parse(input)
@@ -94,6 +105,7 @@ mod tests {
     #[rstest]
     #[case::unquoted_string("foo", "foo")]
     #[case::number("123", "123")]
+    #[case::empty("", "")]
     fn test_parse_unquoted_value(#[case] input: &str, #[case] expected: &str) {
         let (remaining, result) = parse_unquoted_value(input).unwrap();
         assert!(remaining.is_empty());
@@ -118,7 +130,6 @@ mod tests {
     }
 
     #[rstest]
-    #[case::empty("")]
     #[case::only_space(" ")]
     #[case::only_enrichment_separator(&ENRICHMENT_SEPARATOR.to_string())]
     fn test_parse_unquoted_value_fails(#[case] input: &str) {
@@ -131,6 +142,7 @@ mod tests {
     #[case::unquoted_string("foo", "foo")]
     #[case::map("'key=value'", "key=value")]
     #[case::number("123", "123")]
+    #[case::empty("", "")]
     fn test_parse_value(#[case] input: &str, #[case] expected: &str) {
         let (remaining, result) = parse_value(input).unwrap();
         assert!(remaining.is_empty());
@@ -138,7 +150,6 @@ mod tests {
     }
 
     #[rstest]
-    #[case::empty("")]
     #[case::only_space(" ")]
     #[case::only_enrichment_separator(&ENRICHMENT_SEPARATOR.to_string())]
     fn test_parse_value_fails(#[case] input: &str) {
