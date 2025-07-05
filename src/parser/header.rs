@@ -250,6 +250,7 @@ mod tests {
     #[case::without_space_separator("type=USER_ACCTmsg=audit(123.456:789): ")]
     #[case::with_two_spaces_separator("type=USER_ACCT  msg=audit(123.456:789): ")]
     #[case::with_non_space_separator("type=USER_ACCT\tmsg=audit(123.456:789): ")]
+    #[case::with_empty_node("node= type=USER_ACCT msg=audit(123.456:789): ")]
     #[case::empty("")]
     fn test_parse_header_fails(#[case] input: &str) {
         assert!(parse_header(input).is_err());
