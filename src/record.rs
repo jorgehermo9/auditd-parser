@@ -16,6 +16,13 @@ pub struct AuditdRecord {
     /// Record identifier
     pub id: u64,
 
+    /// Optional node field
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, skip_serializing_if = "Option::is_none")
+    )]
+    pub node: Option<String>,
+
     // TODO: use index-ordered map?
     pub fields: BTreeMap<String, FieldValue>,
 

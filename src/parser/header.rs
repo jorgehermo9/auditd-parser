@@ -1,11 +1,13 @@
 use nom::bytes::complete::{tag, take, take_while1};
 use nom::character::complete::{char, u64 as parse_u64};
-use nom::sequence::{delimited, preceded, separated_pair};
+use nom::combinator::opt;
+use nom::sequence::{delimited, preceded, separated_pair, terminated};
 use nom::{AsChar, IResult, Parser};
 
 #[derive(Debug)]
 #[cfg_attr(test, derive(PartialEq))]
 pub struct InnerHeader {
+    pub node: Option<String>,
     pub record_type: String,
     pub audit_msg: InnerAuditMsg,
 }
@@ -21,6 +23,13 @@ pub struct InnerAuditMsg {
 
 fn parse_record_type(input: &str) -> IResult<&str, String> {
     preceded(tag("type="), take_while1(|c: char| !c.is_space()))
+        .map(ToString::to_string)
+        .parse(input)
+}
+
+/// Parses the optional `node=value ` part of the message.
+fn parse_node(input: &str) -> IResult<&str, String> {
+    preceded(tag("node="), take_while1(|c: char| !c.is_space()))
         .map(ToString::to_string)
         .parse(input)
 }
@@ -58,22 +67,45 @@ fn parse_audit_msg(input: &str) -> IResult<&str, InnerAuditMsg> {
 }
 
 // TODO: parse `node` field of auditd records
-/// Parses the header of the record, which contains the record type and the audit message part.
+/// Parses the header of the record, which contains the optional node, record type and the audit message part.
 ///
 /// Example: `type=USER_ACCT msg=audit(1725039526.208:52): `
+/// Example with node: `node=node.org type=USER_ACCT msg=audit(1725039526.208:52): `
 pub fn parse_header(input: &str) -> IResult<&str, InnerHeader> {
-    separated_pair(parse_record_type, char(' '), parse_audit_msg)
-        .map(|(record_type, audit_msg)| InnerHeader {
-            record_type,
-            audit_msg,
-        })
-        .parse(input)
+    let (input, node) = opt(terminated(parse_node, char(' '))).parse(input)?;
+    let (input, (record_type, audit_msg)) = separated_pair(parse_record_type, char(' '), parse_audit_msg).parse(input)?;
+    
+    Ok((input, InnerHeader {
+        node,
+        record_type,
+        audit_msg,
+    }))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use rstest::rstest;
+
+    #[rstest]
+    #[case::regular("node=server.domain.com", "server.domain.com")]
+    #[case::single_word("node=localhost", "localhost")]
+    #[case::numeric("node=123", "123")]
+    #[case::with_special_chars("node=node-01.example.org", "node-01.example.org")]
+    fn test_parse_node(#[case] input: &str, #[case] expected: &str) {
+        let (remaining, result) = parse_node(input).unwrap();
+        assert!(remaining.is_empty());
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::without_key("server.domain.com")]
+    #[case::without_value("node=")]
+    #[case::wrong_key("type=server")]
+    #[case::empty("")]
+    fn test_parse_node_fails(#[case] input: &str) {
+        assert!(parse_node(input).is_err());
+    }
 
     #[rstest]
     #[case::regular("type=USER_ACCT", "USER_ACCT")]
@@ -197,7 +229,8 @@ mod tests {
     }
 
     #[rstest]
-    #[case::regular("type=USER_ACCT msg=audit(123.456:789): ", InnerHeader { record_type: "USER_ACCT".to_string(), audit_msg: InnerAuditMsg { timestamp: 123_456, id: 789 } })]
+    #[case::regular("type=USER_ACCT msg=audit(123.456:789): ", InnerHeader { node: None, record_type: "USER_ACCT".to_string(), audit_msg: InnerAuditMsg { timestamp: 123_456, id: 789 } })]
+    #[case::with_node("node=node.org type=USER_ACCT msg=audit(123.456:789): ", InnerHeader { node: Some("node.org".to_string()), record_type: "USER_ACCT".to_string(), audit_msg: InnerAuditMsg { timestamp: 123_456, id: 789 } })]
     fn test_parse_header(#[case] input: &str, #[case] expected: InnerHeader) {
         let (remaining, result) = parse_header(input).unwrap();
         assert!(remaining.is_empty());
