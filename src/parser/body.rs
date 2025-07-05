@@ -62,6 +62,7 @@ pub fn parse_body(input: &str) -> IResult<&str, InnerBody> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use maplit::btreemap;
     use rstest::rstest;
 
     #[rstest]
@@ -85,20 +86,20 @@ mod tests {
     }
 
     #[rstest]
-    #[case::single("key1=value1", BTreeMap::from([("key1".into(), "value1".into())]))]
+    #[case::single("key1=value1", btreemap!{"key1".into() => "value1".into()})]
     #[case::multiple("key1=value1 key2=value2 key3=value3",
-        BTreeMap::from([("key1".into(), "value1".into()),
-            ("key2".into(), "value2".into()),("key3".into(), "value3".into())])
+        btreemap!{"key1".into() => "value1".into(),
+            "key2".into() => "value2".into(),"key3".into() => "value3".into()}
     )]
     #[case::preceding_space(" key1=value1",
-        BTreeMap::from([("key1".into(), "value1".into())])
+        btreemap!{"key1".into() => "value1".into()}
     )]
     #[case::multiple_preceding_space("  key1=value1",
-        BTreeMap::from([("key1".into(), "value1".into())])
+        btreemap!{"key1".into() => "value1".into()}
     )]
     #[case::multiple_space_separator("key1=value1   key2=value2   key3=value3",
-        BTreeMap::from([("key1".into(), "value1".into()),
-            ("key2".into(), "value2".into()),("key3".into(), "value3".into())])
+        btreemap!{"key1".into() => "value1".into(),
+            "key2".into() => "value2".into(),"key3".into() => "value3".into()}
     )]
     fn test_parse_key_value_list(#[case] input: &str, #[case] expected: BTreeMap<String, String>) {
         let (remaining, result) = parse_key_value_list(input).unwrap();
@@ -120,8 +121,8 @@ mod tests {
     #[rstest]
     #[case::regular(&format!("key1=value1 key2=value2{ENRICHMENT_SEPARATOR}enriched_key=enriched_value"),
         InnerBody{
-            fields: BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
-            enrichment: Some(BTreeMap::from([("enriched_key".into(), "enriched_value".into())]))
+            fields: btreemap!{"key1".into() => "value1".into(), "key2".into() => "value2".into()},
+            enrichment: Some(btreemap!{"enriched_key".into() => "enriched_value".into()})
         }
     )]
     fn test_parse_enriched_body(#[case] input: &str, #[case] expected: InnerBody) {
@@ -143,7 +144,7 @@ mod tests {
     #[rstest]
     #[case::regular("key1=value1 key2=value2",
         InnerBody{
-            fields: BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
+            fields: btreemap!{"key1".into() => "value1".into(), "key2".into() => "value2".into()},
             enrichment: None
         }
     )]
@@ -163,13 +164,13 @@ mod tests {
     #[rstest]
     #[case::enriched(&format!("key1=value1 key2=value2{ENRICHMENT_SEPARATOR}enriched_key=enriched_value"),
         InnerBody{
-            fields: BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
-            enrichment: Some(BTreeMap::from([("enriched_key".into(), "enriched_value".into())]))
+            fields: btreemap!{"key1".into() => "value1".into(), "key2".into() => "value2".into()},
+            enrichment: Some(btreemap!{"enriched_key".into() => "enriched_value".into()})
         }
     )]
     #[case::not_enriched("key1=value1 key2=value2",
         InnerBody{
-            fields: BTreeMap::from([("key1".into(), "value1".into()), ("key2".into(), "value2".into())]),
+            fields: btreemap!{"key1".into() => "value1".into(), "key2".into() => "value2".into()},
             enrichment: None
         }
     )]
