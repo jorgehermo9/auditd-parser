@@ -11,13 +11,13 @@ info: "type=DEL_USER msg=audit(1724970804.251:2682): pid=13860 uid=0 auid=429496
   "fields": {
     "auid": null,
     "msg": {
-      "addr": "?",
+      "addr": null,
       "exe": "/usr/sbin/userdel",
-      "hostname": "?",
+      "hostname": null,
       "id": 65534,
       "op": "delete-user",
       "res": "success",
-      "terminal": "?"
+      "terminal": null
     },
     "pid": "13860",
     "ses": "4294967295",

@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-rhel7.log:2"
+expression: result
 info: "type=ADD_USER msg=audit(1481076992.488:389): pid=1264 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:unconfined_service_t:s0 msg='op=add-user id=1000 exe=\"/usr/sbin/useradd\" hostname=? addr=? terminal=? res=success'"
 ---
 {
@@ -10,13 +11,13 @@ info: "type=ADD_USER msg=audit(1481076992.488:389): pid=1264 uid=0 auid=42949672
   "fields": {
     "auid": null,
     "msg": {
-      "addr": "?",
+      "addr": null,
       "exe": "/usr/sbin/useradd",
-      "hostname": "?",
+      "hostname": null,
       "id": 1000,
       "op": "add-user",
       "res": "success",
-      "terminal": "?"
+      "terminal": null
     },
     "pid": "1264",
     "ses": "4294967295",

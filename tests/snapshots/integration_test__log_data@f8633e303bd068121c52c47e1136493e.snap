@@ -11,17 +11,17 @@ info: "type=CRYPTO_KEY_USER msg=audit(1724970643.372:107): pid=2751 uid=0 auid=4
   "fields": {
     "auid": null,
     "msg": {
-      "addr": "?",
-      "direction": "?",
+      "addr": null,
+      "direction": null,
       "exe": "/usr/sbin/sshd",
       "fp": "SHA256:02:11:7b:31:4b:de:6c:32:85:19:91:e2:22:6d:8e:c6:73:8c:8f:72:2f:c3:36:bd:55:65:23:de:85:a6:ce:13",
-      "hostname": "?",
+      "hostname": null,
       "kind": "server",
       "op": "destroy",
       "res": "success",
       "spid": "2751",
       "suid": "root",
-      "terminal": "?"
+      "terminal": null
     },
     "pid": "2751",
     "ses": "4294967295",

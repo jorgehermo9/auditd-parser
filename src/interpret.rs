@@ -21,6 +21,11 @@ mod errno;
 mod field_type;
 mod mac_label;
 mod mode;
+<<<<<<< Updated upstream
+=======
+mod null;
+mod pam;
+>>>>>>> Stashed changes
 mod perm;
 mod proctitle;
 mod result;
@@ -63,6 +68,10 @@ impl From<RawAuditdRecord> for AuditdRecord {
 
 // Based on https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/auparse/interpret.c#L3325
 fn interpret_field_value(record_type: &str, field_name: &str, field_value: String) -> FieldValue {
+    if null::is_null_value(&field_value) {
+        return FieldValue::Null;
+    }
+
     let Some(field_type) = FieldType::resolve(field_name) else {
         // Defaults to leave the field uninterpreted
         // TODO: should we default to `FieldValue::Escaped`?
@@ -319,6 +328,14 @@ mod tests {
     use super::*;
 
     // TODO: add tests for interpret_msg_field
+    //
+
+    #[rstest]
+    #[case::null_question_mark("?", FieldValue::Null)]
+    fn test_interpret_field_value(#[case] field_value: String, #[case] expected: FieldValue) {
+        let result = interpret_field_value("test_type", "test_field_name", field_value);
+        assert_eq!(result, expected);
+    }
 
     #[rstest]
     #[case::hex_encoded("666f6f","foo".into())]

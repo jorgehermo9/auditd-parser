@@ -11,13 +11,13 @@ info: "type=ACCT_LOCK msg=audit(1725000411.409:1065): pid=2352 uid=0 auid=429496
   "fields": {
     "auid": null,
     "msg": {
-      "addr": "?",
+      "addr": null,
       "exe": "/usr/bin/passwd",
-      "hostname": "?",
+      "hostname": null,
       "id": 1000,
       "op": "locked-password",
       "res": "success",
-      "terminal": "?"
+      "terminal": null
     },
     "pid": "2352",
     "ses": "4294967295",

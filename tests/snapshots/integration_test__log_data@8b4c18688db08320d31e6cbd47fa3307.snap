@@ -15,7 +15,7 @@ info: "type=CRYPTO_SESSION msg=audit(1724778544.061:594047): pid=21702 uid=0 aui
       "cipher": "chacha20-poly1305@openssh.com",
       "direction": "from-client",
       "exe": "/usr/sbin/sshd",
-      "hostname": "?",
+      "hostname": null,
       "ksize": "512",
       "laddr": "10.10.10.10",
       "lport": "22",
@@ -26,7 +26,7 @@ info: "type=CRYPTO_SESSION msg=audit(1724778544.061:594047): pid=21702 uid=0 aui
       "rport": "46984",
       "spid": "21704",
       "suid": 74,
-      "terminal": "?"
+      "terminal": null
     },
     "pid": "21702",
     "ses": "4294967295",

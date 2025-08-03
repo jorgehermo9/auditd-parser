@@ -11,10 +11,14 @@ info: "type=USER_ERR msg=audit(1724985521.124:28189957): pid=164518 uid=0 auid=4
   "fields": {
     "auid": null,
     "msg": {
-      "acct": "?",
+      "acct": null,
       "addr": "10.105.231.56",
       "exe": "/usr/sbin/sshd",
+<<<<<<< Updated upstream
       "grantors": "?",
+=======
+      "grantors": null,
+>>>>>>> Stashed changes
       "hostname": "10.105.231.56",
       "op": "PAM:bad_ident",
       "res": "failed",

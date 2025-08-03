@@ -11,7 +11,7 @@ info: "type=SOFTWARE_UPDATE msg=audit(1724947731.641:5836352): pid=3312968 uid=0
   "fields": {
     "auid": null,
     "msg": {
-      "addr": "?",
+      "addr": null,
       "comm": "yum",
       "exe": "/usr/libexec/platform-python3.6",
       "gpg_res": "1",

@@ -25,7 +25,7 @@ info: "node=auditdtest.a1959.org type=SYSCALL msg=audit(1451781471.394:194436): 
     "fsuid": "root",
     "gid": "root",
     "items": "0",
-    "key": "(null)",
+    "key": null,
     "pid": "1321",
     "ppid": "1306",
     "ses": "1",

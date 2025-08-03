@@ -12,10 +12,18 @@ info: "type=CRED_ACQ msg=audit(1725004861.996:747421): pid=26752 uid=0 auid=4294
     "auid": null,
     "msg": {
       "acct": "root",
-      "addr": "?",
+      "addr": null,
       "exe": "/usr/sbin/crond",
+<<<<<<< Updated upstream
       "grantors": "pam_env,pam_unix",
       "hostname": "?",
+=======
+      "grantors": [
+        "pam_env",
+        "pam_unix"
+      ],
+      "hostname": null,
+>>>>>>> Stashed changes
       "op": "PAM:setcred",
       "res": "success",
       "terminal": "cron"

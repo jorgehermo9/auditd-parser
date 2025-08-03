@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-rhel7.log:21"
+expression: result
 info: "type=SERVICE_STOP msg=audit(1481076984.534:16): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=irqbalance comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'"
 ---
 {
@@ -10,12 +11,12 @@ info: "type=SERVICE_STOP msg=audit(1481076984.534:16): pid=1 uid=0 auid=42949672
   "fields": {
     "auid": null,
     "msg": {
-      "addr": "?",
+      "addr": null,
       "comm": "systemd",
       "exe": "/usr/lib/systemd/systemd",
-      "hostname": "?",
+      "hostname": null,
       "res": "success",
-      "terminal": "?",
+      "terminal": null,
       "unit": "irqbalance"
     },
     "pid": "1",

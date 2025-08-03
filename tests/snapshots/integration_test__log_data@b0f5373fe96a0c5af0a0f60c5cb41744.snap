@@ -12,10 +12,17 @@ info: "type=USER_ACCT msg=audit(1615113648.981:15220): pid=9460 uid=1000 auid=10
     "auid": 1000,
     "msg": {
       "acct": "user",
-      "addr": "?",
+      "addr": null,
       "exe": "/usr/bin/sudo",
+<<<<<<< Updated upstream
       "grantors": "pam_permit",
       "hostname": "?",
+=======
+      "grantors": [
+        "pam_permit"
+      ],
+      "hostname": null,
+>>>>>>> Stashed changes
       "op": "PAM:accounting",
       "res": "success",
       "terminal": "/dev/pts/1"

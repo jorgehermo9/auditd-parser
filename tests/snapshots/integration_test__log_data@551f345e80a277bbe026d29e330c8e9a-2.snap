@@ -13,9 +13,9 @@ info: "node=auditdtest.a1959.org type=ADD_GROUP msg=audit(1451781471.602:194894)
     "auid": 1000,
     "msg": {
       "acct": "frodo",
-      "addr": "?",
+      "addr": null,
       "exe": "/usr/sbin/useradd",
-      "hostname": "?",
+      "hostname": null,
       "op": "add-group",
       "res": "success",
       "terminal": "pts/0"

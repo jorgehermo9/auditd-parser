@@ -12,10 +12,21 @@ info: "type=USER_START msg=audit(1725004605.811:105663): pid=14548 uid=0 auid=42
     "auid": null,
     "msg": {
       "acct": "root",
-      "addr": "?",
+      "addr": null,
       "exe": "/usr/bin/sudo",
+<<<<<<< Updated upstream
       "grantors": "pam_keyinit,pam_keyinit,pam_limits,pam_systemd,pam_unix",
       "hostname": "?",
+=======
+      "grantors": [
+        "pam_keyinit",
+        "pam_keyinit",
+        "pam_limits",
+        "pam_systemd",
+        "pam_unix"
+      ],
+      "hostname": null,
+>>>>>>> Stashed changes
       "op": "PAM:session_open",
       "res": "success",
       "terminal": "/dev/pts/0"

@@ -24,7 +24,7 @@ info: "type=SYSCALL msg=audit(1655465404.819:27091): arch=c000003e syscall=59 su
     "fsuid": 583,
     "gid": 583,
     "items": "2",
-    "key": "(null)",
+    "key": null,
     "pid": "105933",
     "ppid": "105932",
     "ses": "2632",
