@@ -11,13 +11,13 @@ info: "type=ADD_USER msg=audit(1724970920.775:6705): pid=15618 uid=0 auid=429496
   "fields": {
     "auid": null,
     "msg": {
-      "addr": "?",
+      "addr": null,
       "exe": "/usr/sbin/useradd",
-      "hostname": "?",
+      "hostname": null,
       "id": 1501,
       "op": "add-user",
       "res": "success",
-      "terminal": "?"
+      "terminal": null
     },
     "pid": "15618",
     "ses": "4294967295",

@@ -25,7 +25,7 @@ info: "node=auditdtest.a1959.org type=SYSCALL msg=audit(1451781471.394:194439): 
     "fsuid": 1000,
     "gid": 1000,
     "items": "0",
-    "key": "(null)",
+    "key": null,
     "pid": "1281",
     "ppid": "1271",
     "ses": "1",
@@ -43,7 +43,7 @@ info: "node=auditdtest.a1959.org type=SYSCALL msg=audit(1451781471.394:194439): 
     "success": true,
     "suid": 1000,
     "syscall": "14",
-    "tty": "(none)",
+    "tty": null,
     "uid": 1000
   }
 }

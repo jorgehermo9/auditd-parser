@@ -24,7 +24,7 @@ info: "type=SYSCALL msg=audit(1634628127.584:166): arch=c000003e syscall=59 succ
     "fsuid": "root",
     "gid": "root",
     "items": "2",
-    "key": "(null)",
+    "key": null,
     "pid": "661",
     "ppid": "659",
     "ses": "4294967295",
@@ -33,7 +33,7 @@ info: "type=SYSCALL msg=audit(1634628127.584:166): arch=c000003e syscall=59 succ
     "success": true,
     "suid": "root",
     "syscall": "59",
-    "tty": "(none)",
+    "tty": null,
     "uid": "root"
   }
 }

@@ -16,7 +16,7 @@ info: "type=URINGOP msg=audit(1737533617.373:12266329): uring_op=18 success=yes 
     "fsuid": "root",
     "gid": "root",
     "items": "0",
-    "key": "(null)",
+    "key": null,
     "pid": "3178806",
     "ppid": "140504",
     "sgid": "root",

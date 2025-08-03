@@ -12,13 +12,13 @@ info: "type=DEL_GROUP msg=audit(1724970804.251:2683): pid=13860 uid=0 auid=42949
     "auid": null,
     "msg": {
       "acct": "nfsnobody",
-      "addr": "?",
+      "addr": null,
       "exe": "/usr/sbin/userdel",
       "grp": "nfsnobody",
-      "hostname": "?",
+      "hostname": null,
       "op": "delete-group",
       "res": "success",
-      "terminal": "?"
+      "terminal": null
     },
     "pid": "13860",
     "ses": "4294967295",

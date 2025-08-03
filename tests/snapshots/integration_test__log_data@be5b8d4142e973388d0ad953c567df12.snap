@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-rhel7.log:49"
+expression: result
 info: "type=SYSCALL msg=audit(1492000940.864:1095517): arch=c000003e syscall=62 success=yes exit=0 a0=1fde a1=1 a2=0 a3=8 items=0 ppid=1 pid=8158 auid=1000 uid=1000 gid=1001 euid=1000 suid=1000 fsuid=1000 egid=1001 sgid=1001 fsgid=1001 tty=(none) ses=790 comm=\"bash\" exe=\"/usr/bin/bash\" subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 key=\"kill_signals\""
 ---
 {
@@ -41,7 +42,7 @@ info: "type=SYSCALL msg=audit(1492000940.864:1095517): arch=c000003e syscall=62 
     "success": true,
     "suid": 1000,
     "syscall": "62",
-    "tty": "(none)",
+    "tty": null,
     "uid": 1000
   }
 }

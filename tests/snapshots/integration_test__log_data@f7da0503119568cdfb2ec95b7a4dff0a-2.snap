@@ -24,7 +24,7 @@ info: "type=SYSCALL msg=audit(1170021493.977:283): arch=c000003e syscall=2 succe
     "fsuid": 890,
     "gid": 890,
     "items": "1",
-    "key": "(null)",
+    "key": null,
     "pid": "13010",
     "ppid": "2013",
     "sgid": 890,
@@ -40,7 +40,7 @@ info: "type=SYSCALL msg=audit(1170021493.977:283): arch=c000003e syscall=2 succe
     "success": false,
     "suid": 890,
     "syscall": "2",
-    "tty": "(none)",
+    "tty": null,
     "uid": 890
   }
 }

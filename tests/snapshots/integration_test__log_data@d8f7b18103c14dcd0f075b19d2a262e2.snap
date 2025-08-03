@@ -12,13 +12,13 @@ info: "type=CRED_REFR msg=audit(1489640461.198:480): pid=1402 uid=0 auid=0 ses=2
     "auid": "root",
     "msg": {
       "acct": "root",
-      "addr": "?",
+      "addr": null,
       "exe": "/usr/sbin/crond",
       "grantors": [
         "pam_env",
         "pam_unix"
       ],
-      "hostname": "?",
+      "hostname": null,
       "op": "PAM:setcred",
       "res": "success",
       "terminal": "cron"

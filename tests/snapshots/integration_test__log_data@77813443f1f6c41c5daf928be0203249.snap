@@ -11,15 +11,15 @@ info: "type=CRYPTO_PARAM_CHANGE_USER msg=audit(1720042308.296:1823003): pid=2640
   "fields": {
     "auid": null,
     "msg": {
-      "addr": "?",
+      "addr": null,
       "bytes": "6",
       "exe": "/usr/sbin/sshd",
-      "hostname": "?",
+      "hostname": null,
       "kind": "server",
       "op": "prng_seed",
       "res": "success",
       "source": "/dev/urandom",
-      "terminal": "?"
+      "terminal": null
     },
     "pid": "2640",
     "ses": "4294967295",

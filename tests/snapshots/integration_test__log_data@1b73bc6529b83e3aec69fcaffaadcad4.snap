@@ -1,6 +1,6 @@
 ---
 source: tests/integration_test.rs
-description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-add-group.log:0"
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-add-group.log:1"
 expression: result
 info: "type=ADD_GROUP msg=audit(1724970920.775:6704): pid=15618 uid=0 auid=4294967295 ses=4294967295 msg='op=add-group acct=\"gitlab-runner\" exe=\"/usr/sbin/useradd\" hostname=? addr=? terminal=? res=success'\u001dUID=\"root\" AUID=\"unset\""
 ---
@@ -12,12 +12,12 @@ info: "type=ADD_GROUP msg=audit(1724970920.775:6704): pid=15618 uid=0 auid=42949
     "auid": null,
     "msg": {
       "acct": "gitlab-runner",
-      "addr": "?",
+      "addr": null,
       "exe": "/usr/sbin/useradd",
-      "hostname": "?",
+      "hostname": null,
       "op": "add-group",
       "res": "success",
-      "terminal": "?"
+      "terminal": null
     },
     "pid": "15618",
     "ses": "4294967295",

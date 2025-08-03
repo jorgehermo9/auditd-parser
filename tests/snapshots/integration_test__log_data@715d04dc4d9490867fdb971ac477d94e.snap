@@ -24,7 +24,7 @@ info: "type=LOGIN msg=audit(1170021601.343:296): pid=2288 uid=0 subj=system_u:sy
       "type": "init_t",
       "user": "system_u"
     },
-    "tty": "(none)",
+    "tty": null,
     "uid": "root"
   }
 }

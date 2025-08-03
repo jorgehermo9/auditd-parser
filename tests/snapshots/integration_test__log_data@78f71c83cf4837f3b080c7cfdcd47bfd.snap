@@ -11,12 +11,12 @@ info: "type=USYS_CONFIG msg=audit(1724337072.493:467): pid=1876 uid=0 auid=42949
   "fields": {
     "auid": null,
     "msg": {
-      "addr": "?",
+      "addr": null,
       "exe": "/usr/sbin/hwclock",
-      "hostname": "?",
+      "hostname": null,
       "op": "change-system-time",
       "res": "failed",
-      "terminal": "?"
+      "terminal": null
     },
     "pid": "1876",
     "ses": "4294967295",

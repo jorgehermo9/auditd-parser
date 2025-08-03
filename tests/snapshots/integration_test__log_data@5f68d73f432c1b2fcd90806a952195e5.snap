@@ -12,13 +12,13 @@ info: "type=CRED_DISP msg=audit(1725004605.819:105665): pid=14548 uid=0 auid=429
     "auid": null,
     "msg": {
       "acct": "root",
-      "addr": "?",
+      "addr": null,
       "exe": "/usr/bin/sudo",
       "grantors": [
         "pam_env",
         "pam_unix"
       ],
-      "hostname": "?",
+      "hostname": null,
       "op": "PAM:setcred",
       "res": "success",
       "terminal": "/dev/pts/0"

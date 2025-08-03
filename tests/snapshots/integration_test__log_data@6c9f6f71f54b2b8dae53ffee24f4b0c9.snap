@@ -11,14 +11,14 @@ info: "type=USER_ROLE_CHANGE msg=audit(1725003303.447:87595829): pid=3224193 uid
   "fields": {
     "auid": null,
     "msg": {
-      "addr": "?",
+      "addr": null,
       "default-context": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
       "exe": "/usr/lib/systemd/systemd",
-      "hostname": "?",
+      "hostname": null,
       "op": "pam_selinux",
       "res": "success",
       "selected-context": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
-      "terminal": "?"
+      "terminal": null
     },
     "pid": "3224193",
     "ses": "4294967295",
