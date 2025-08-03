@@ -1,0 +1,31 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-acct-lock.log:1"
+expression: result
+info: "type=ACCT_LOCK msg=audit(1725000411.409:1065): pid=2352 uid=0 auid=4294967295 ses=4294967295 msg='op=locked-password id=1000 exe=\"/usr/bin/passwd\" hostname=? addr=? terminal=? res=success'\u001dUID=\"root\" AUID=\"unset\" ID=\"ec2-user\""
+---
+{
+  "record_type": "ACCT_LOCK",
+  "timestamp": 1725000411409,
+  "id": 1065,
+  "fields": {
+    "auid": null,
+    "msg": {
+      "addr": "?",
+      "exe": "/usr/bin/passwd",
+      "hostname": "?",
+      "id": 1000,
+      "op": "locked-password",
+      "res": "success",
+      "terminal": "?"
+    },
+    "pid": "2352",
+    "ses": "4294967295",
+    "uid": "root"
+  },
+  "enrichment": {
+    "AUID": "unset",
+    "ID": "ec2-user",
+    "UID": "root"
+  }
+}

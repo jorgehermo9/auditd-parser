@@ -1,0 +1,31 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-user-acct.log:1"
+expression: result
+info: "type=USER_ACCT msg=audit(1615113648.981:15220): pid=9460 uid=1000 auid=1000 ses=1 msg='op=PAM:accounting grantors=pam_permit acct=\"user\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=/dev/pts/1 res=success'\u001dUID=\"user\" AUID=\"user\""
+---
+{
+  "record_type": "USER_ACCT",
+  "timestamp": 1615113648981,
+  "id": 15220,
+  "fields": {
+    "auid": 1000,
+    "msg": {
+      "acct": "user",
+      "addr": "?",
+      "exe": "/usr/bin/sudo",
+      "grantors": "pam_permit",
+      "hostname": "?",
+      "op": "PAM:accounting",
+      "res": "success",
+      "terminal": "/dev/pts/1"
+    },
+    "pid": "9460",
+    "ses": "1",
+    "uid": 1000
+  },
+  "enrichment": {
+    "AUID": "user",
+    "UID": "user"
+  }
+}

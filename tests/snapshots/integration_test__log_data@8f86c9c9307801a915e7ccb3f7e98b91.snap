@@ -1,0 +1,31 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-add-user.log:1"
+expression: result
+info: "type=ADD_USER msg=audit(1724970920.775:6705): pid=15618 uid=0 auid=4294967295 ses=4294967295 msg='op=add-user id=1501 exe=\"/usr/sbin/useradd\" hostname=? addr=? terminal=? res=success'\u001dUID=\"root\" AUID=\"unset\" ID=\"unknown(1501)\""
+---
+{
+  "record_type": "ADD_USER",
+  "timestamp": 1724970920775,
+  "id": 6705,
+  "fields": {
+    "auid": null,
+    "msg": {
+      "addr": "?",
+      "exe": "/usr/sbin/useradd",
+      "hostname": "?",
+      "id": 1501,
+      "op": "add-user",
+      "res": "success",
+      "terminal": "?"
+    },
+    "pid": "15618",
+    "ses": "4294967295",
+    "uid": "root"
+  },
+  "enrichment": {
+    "AUID": "unset",
+    "ID": "unknown(1501)",
+    "UID": "root"
+  }
+}

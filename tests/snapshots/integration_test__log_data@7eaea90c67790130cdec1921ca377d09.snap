@@ -1,0 +1,17 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-sockaddr-unknown-3.log:1"
+expression: result
+info: "type=SOCKADDR msg=audit(1709205499.986:983151): saddr=00000000000000000000000000000000\u001dSADDR=unknown-family(0)"
+---
+{
+  "record_type": "SOCKADDR",
+  "timestamp": 1709205499986,
+  "id": 983151,
+  "fields": {
+    "saddr": "00000000000000000000000000000000"
+  },
+  "enrichment": {
+    "SADDR": "unknown-family(0)"
+  }
+}

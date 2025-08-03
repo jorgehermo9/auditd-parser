@@ -1,0 +1,11 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-sockaddr-unknown-1.log:1"
+expression: result
+info: "type=SOCKADDR msg=audit(1670427457.195:550): saddr=00000000000000000000000000000000\u001dSADDR=unknown family"
+---
+{
+  "Err": {
+    "Parse": "error Eof at:  family"
+  }
+}
