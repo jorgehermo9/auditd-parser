@@ -86,7 +86,7 @@ fn interpret_field_value(record_type: &str, field_name: &str, field_value: Strin
         FieldType::Success => interpret_success_field(field_value),
         FieldType::Errno => interpret_errno_field(field_value),
         FieldType::MacLabel => interpret_mac_label_field(field_value),
-        FieldType::PAMGrantors => interpret_pam_grantors_field(field_value),
+        FieldType::PAMGrantors => interpret_pam_grantors_field(&field_value),
     }
 }
 
@@ -316,8 +316,8 @@ fn interpret_mac_label_field(field_value: String) -> FieldValue {
     }
 }
 
-fn interpret_pam_grantors_field(field_value: String) -> FieldValue {
-    let grantors = pam::parse_grantors(&field_value);
+fn interpret_pam_grantors_field(field_value: &str) -> FieldValue {
+    let grantors = pam::parse_grantors(field_value);
 
     utils::into_string_array_to_field_value(&grantors)
 }
@@ -570,7 +570,7 @@ mod tests {
     #[case::multiple_grantors_with_spaces("user1, user2, user3", vec!["user1".into(), " user2".into(), " user3".into()].into())]
     #[case::empty_grantors("", vec![].into())]
     #[case::whitespace_grantors(" ", vec![" ".into()].into())]
-    fn test_interpret_pam_grantors_field(#[case] input: String, #[case] expected: FieldValue) {
+    fn test_interpret_pam_grantors_field(#[case] input: &str, #[case] expected: FieldValue) {
         let result = interpret_pam_grantors_field(input);
         assert_eq!(result, expected);
     }

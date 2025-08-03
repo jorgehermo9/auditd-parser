@@ -104,7 +104,7 @@ pub enum FieldType {
     Errno,
     /// Mandatory Access Control
     MacLabel,
-    /// Userspace field logged by https://github.com/linux-pam/linux-pam
+    /// Userspace field logged by [Linux PAM](https://github.com/linux-pam/linux-pam)
     PAMGrantors,
 }
 

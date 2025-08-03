@@ -1,10 +1,9 @@
-// Linux Pluggable Authentication Modules (PAM) https://en.wikipedia.org/wiki/Linux_PAM
+// [Linux Pluggable Authentication Modules (PAM)](https://en.wikipedia.org/wiki/Linux_PAM)
 // Interpreting inspired in the Linux PAM implementation
 // https://github.com/linux-pam/linux-pam
 //
 // Audit logging can be found [here](https://github.com/linux-pam/linux-pam/blob/07f1d987466b33780c7147d9d55e1a52425b5005/libpam/pam_audit.c)
 // and [here](https://github.com/linux-pam/linux-pam/blob/07f1d987466b33780c7147d9d55e1a52425b5005/libpam/pam_audit.c#L28)
-//
 //
 
 pub fn parse_grantors(grantors: &str) -> Vec<&str> {
@@ -15,7 +14,7 @@ pub fn parse_grantors(grantors: &str) -> Vec<&str> {
         return vec![];
     }
 
-    grantors.split(",").collect()
+    grantors.split(',').collect()
 }
 
 #[cfg(test)]
