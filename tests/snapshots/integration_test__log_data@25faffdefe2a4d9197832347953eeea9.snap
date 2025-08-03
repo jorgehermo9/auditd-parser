@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-rhel7.log:32"
+expression: result
 info: "type=USER_ACCT msg=audit(1481077043.052:410): pid=1298 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=PAM:accounting grantors=pam_unix,pam_localuser acct=\"andrew_kroh\" exe=\"/usr/sbin/sshd\" hostname=pool-96-241-146-97.washdc.fios.verizon.net addr=96.241.146.97 terminal=ssh res=success'"
 ---
 {
@@ -13,7 +14,10 @@ info: "type=USER_ACCT msg=audit(1481077043.052:410): pid=1298 uid=0 auid=4294967
       "acct": "andrew_kroh",
       "addr": "96.241.146.97",
       "exe": "/usr/sbin/sshd",
-      "grantors": "pam_unix,pam_localuser",
+      "grantors": [
+        "pam_unix",
+        "pam_localuser"
+      ],
       "hostname": "pool-96-241-146-97.washdc.fios.verizon.net",
       "op": "PAM:accounting",
       "res": "success",

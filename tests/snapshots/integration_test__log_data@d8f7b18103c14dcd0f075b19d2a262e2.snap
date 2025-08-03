@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-rhel7.log:7"
+expression: result
 info: "type=CRED_REFR msg=audit(1489640461.198:480): pid=1402 uid=0 auid=0 ses=2 subj=system_u:system_r:crond_t:s0-s0:c0.c1023 msg='op=PAM:setcred grantors=pam_env,pam_unix acct=\"root\" exe=\"/usr/sbin/crond\" hostname=? addr=? terminal=cron res=success'"
 ---
 {
@@ -13,7 +14,10 @@ info: "type=CRED_REFR msg=audit(1489640461.198:480): pid=1402 uid=0 auid=0 ses=2
       "acct": "root",
       "addr": "?",
       "exe": "/usr/sbin/crond",
-      "grantors": "pam_env,pam_unix",
+      "grantors": [
+        "pam_env",
+        "pam_unix"
+      ],
       "hostname": "?",
       "op": "PAM:setcred",
       "res": "success",

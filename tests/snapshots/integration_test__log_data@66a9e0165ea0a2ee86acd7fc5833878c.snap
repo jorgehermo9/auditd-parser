@@ -14,7 +14,10 @@ info: "type=CRED_ACQ msg=audit(1725004861.996:747421): pid=26752 uid=0 auid=4294
       "acct": "root",
       "addr": "?",
       "exe": "/usr/sbin/crond",
-      "grantors": "pam_env,pam_unix",
+      "grantors": [
+        "pam_env",
+        "pam_unix"
+      ],
       "hostname": "?",
       "op": "PAM:setcred",
       "res": "success",

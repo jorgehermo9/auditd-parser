@@ -14,7 +14,10 @@ info: "type=CRED_DISP msg=audit(1725004605.819:105665): pid=14548 uid=0 auid=429
       "acct": "root",
       "addr": "?",
       "exe": "/usr/bin/sudo",
-      "grantors": "pam_env,pam_unix",
+      "grantors": [
+        "pam_env",
+        "pam_unix"
+      ],
       "hostname": "?",
       "op": "PAM:setcred",
       "res": "success",
