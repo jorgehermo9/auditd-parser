@@ -25,6 +25,7 @@ md5 = "0.8.0"
 rstest = "0.26.1"
 # Enable serde feature for tests
 auditd-parser = { path = ".", features = ["serde"] }
+erased-serde = "0.4.6"
 
 [profile.dev.package]
 insta.opt-level = 3
