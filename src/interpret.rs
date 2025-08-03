@@ -21,11 +21,8 @@ mod errno;
 mod field_type;
 mod mac_label;
 mod mode;
-<<<<<<< Updated upstream
-=======
 mod null;
 mod pam;
->>>>>>> Stashed changes
 mod perm;
 mod proctitle;
 mod result;
