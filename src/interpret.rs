@@ -338,7 +338,7 @@ mod tests {
     //
 
     #[rstest]
-    #[case::null_question_mark("?", FieldValue::Null)]
+    #[case::null("?", FieldValue::Null)]
     fn test_interpret_field_value(#[case] field_value: String, #[case] expected: FieldValue) {
         let result = interpret_field_value("test_type", "test_field_name", field_value);
         assert_eq!(result, expected);
