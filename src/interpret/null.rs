@@ -1,4 +1,4 @@
-/// This module provides a function to check if a given string is considered a "null" value.
+//! This module provides a function to check if a given string is considered a "null" value.
 
 const NULL_VALUES: [&str; 3] = ["?", "(none)", "(null)"];
 
