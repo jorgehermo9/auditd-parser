@@ -1,0 +1,38 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/test4.log:1"
+expression: result
+info: "type=SYSCALL msg=audit(1655465398.534:25618): arch=c000003e syscall=59 success=yes exit=0 a0=8c403a0 a1=8c3e8b0 a2=fffffb6cc5b0 a3=0 items=3 ppid=105182 pid=105183 auid=573 uid=583 gid=583 euid=583 suid=583 fsuid=583 egid=583 sgid=583 fsgid=583 tty=pts2 ses=2632 comm=\"ld\" exe=\"/bin/sh4\" key=(null)"
+---
+{
+  "record_type": "SYSCALL",
+  "timestamp": 1655465398534,
+  "id": 25618,
+  "fields": {
+    "a0": "8c403a0",
+    "a1": "8c3e8b0",
+    "a2": "fffffb6cc5b0",
+    "a3": "0",
+    "arch": "c000003e",
+    "auid": 573,
+    "comm": "ld",
+    "egid": 583,
+    "euid": 583,
+    "exe": "/bin/sh4",
+    "exit": 0,
+    "fsgid": 583,
+    "fsuid": 583,
+    "gid": 583,
+    "items": "3",
+    "key": "(null)",
+    "pid": "105183",
+    "ppid": "105182",
+    "ses": "2632",
+    "sgid": 583,
+    "success": true,
+    "suid": 583,
+    "syscall": "59",
+    "tty": "pts2",
+    "uid": 583
+  }
+}

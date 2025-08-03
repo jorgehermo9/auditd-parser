@@ -1,0 +1,15 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-execve.log:1"
+expression: result
+info: "type=EXECVE msg=audit(1614788539.386:13232): argc=0 a0=\"whoami\""
+---
+{
+  "record_type": "EXECVE",
+  "timestamp": 1614788539386,
+  "id": 13232,
+  "fields": {
+    "a0": "whoami",
+    "argc": "0"
+  }
+}

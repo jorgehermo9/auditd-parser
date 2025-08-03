@@ -1,44 +1,41 @@
-use auditd_parser::AuditdRecord;
+use std::{fs, path::PathBuf};
 
-const LOG_TEST_DATA: &[&str] = &[
-    "audit-rhel6.log",
-    "audit-rhel7.log",
-    "audit-ubuntu14.log",
-    "audit-ubuntu16.log",
-    "audit-ubuntu17.log",
-    "test2.log",
-    "test3.log",
-    "synthetic_perm.log", // TODO: https://github.com/jorgehermo9/auditd-parser/issues/41
-    "test4.log",
-    "synthetic_errno.log", // TODO: https://github.com/jorgehermo9/auditd-parser/issues/53
-];
-const BASE_DIR: &str = "tests/testdata";
+use auditd_parser::{AuditdRecord, ParserError};
+use erased_serde::Serialize;
+use rstest::rstest;
 
-#[test]
-fn test_log_data() {
-    for log_file in LOG_TEST_DATA {
-        let path = format!("{BASE_DIR}/{log_file}");
-        let data = std::fs::read_to_string(path).unwrap();
-        let logs = data
-            .lines()
-            .filter(|line| !line.is_empty() && !line.starts_with('#'))
-            .collect::<Vec<_>>();
+#[rstest]
+fn test_log_data(#[files("tests/data/**/*.log")] log_file: PathBuf) {
+    let log_file_path = log_file.to_string_lossy().into_owned();
+    let log_file_content = fs::read_to_string(log_file).unwrap();
+    let logs = log_file_content
+        .lines()
+        .enumerate()
+        .map(|(index, line)| (index + 1, line))
+        .filter(|(_line_number, line)| !line.is_empty() && !line.starts_with('#'))
+        .collect::<Vec<_>>();
 
-        for log in logs {
-            let record = log
-                .parse::<AuditdRecord>()
-                .unwrap_or_else(|_| panic!("Failed to parse record {log}"));
-            let log_identifier = get_log_identifier(log);
-            insta::with_settings!(
-                {
-                    info => &log,
-                    snapshot_suffix => log_identifier,
-                },
-                {
-                    insta::assert_json_snapshot!(record);
-                }
-            );
-        }
+    for (line_number, log) in logs {
+        let maybe_record = log.parse::<AuditdRecord>();
+        let log_identifier = get_log_identifier(log);
+
+        // Unwrap the Ok variant but leave the Err variant as-is
+        let result: Box<dyn Serialize> = match maybe_record {
+            Ok(record) => Box::new(record),
+            Err(error) => Box::new(Err::<AuditdRecord, ParserError>(error)),
+        };
+
+        let location = format!("{log_file_path}:{line_number}");
+        insta::with_settings!(
+            {
+                info => &log,
+                description => location,
+                snapshot_suffix => log_identifier,
+            },
+            {
+                insta::assert_json_snapshot!(result);
+            }
+        );
     }
 }
 

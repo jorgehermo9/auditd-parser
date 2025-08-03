@@ -1,0 +1,27 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-user-start.log:0"
+expression: result
+info: "type=USER_START msg=audit(1725004605.811:105663): pid=14548 uid=0 auid=4294967295 ses=4294967295 msg='op=PAM:session_open grantors=pam_keyinit,pam_keyinit,pam_limits,pam_systemd,pam_unix acct=\"root\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=/dev/pts/0 res=success'"
+---
+{
+  "record_type": "USER_START",
+  "timestamp": 1725004605811,
+  "id": 105663,
+  "fields": {
+    "auid": null,
+    "msg": {
+      "acct": "root",
+      "addr": "?",
+      "exe": "/usr/bin/sudo",
+      "grantors": "pam_keyinit,pam_keyinit,pam_limits,pam_systemd,pam_unix",
+      "hostname": "?",
+      "op": "PAM:session_open",
+      "res": "success",
+      "terminal": "/dev/pts/0"
+    },
+    "pid": "14548",
+    "ses": "4294967295",
+    "uid": "root"
+  }
+}

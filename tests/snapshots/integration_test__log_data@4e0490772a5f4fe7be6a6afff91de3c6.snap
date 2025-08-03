@@ -1,0 +1,27 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-daemon-start.log:1"
+expression: result
+info: "type=DAEMON_START msg=audit(1738069334.056:5999): op=start ver=2.8.1 format=enriched kernel=4.12.14-122.231-default auid=4294967295 pid=32004 uid=0 ses=4294967295 subj=unconfined  res=success\u001dAUID=\"unset\" UID=\"root\""
+---
+{
+  "record_type": "DAEMON_START",
+  "timestamp": 1738069334056,
+  "id": 5999,
+  "fields": {
+    "auid": null,
+    "format": "enriched",
+    "kernel": "4.12.14-122.231-default",
+    "op": "start",
+    "pid": "32004",
+    "res": "success",
+    "ses": "4294967295",
+    "subj": "unconfined",
+    "uid": "root",
+    "ver": "2.8.1"
+  },
+  "enrichment": {
+    "AUID": "unset",
+    "UID": "root"
+  }
+}

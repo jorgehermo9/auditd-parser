@@ -3,6 +3,7 @@ mod interpret;
 pub(crate) mod parser;
 mod record;
 
+pub use parser::ParserError;
 pub use record::AuditdRecord;
 pub use record::FieldValue;
 

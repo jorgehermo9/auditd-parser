@@ -1,0 +1,5 @@
+# TODO: This test line is synthetic until https://github.com/jorgehermo9/auditd-parser/issues/41 is addressed
+type=AVC msg=audit(1524662933.080:61207): perm=1
+type=AVC msg=audit(1524662933.080:61207): perm_mask=1
+type=AVC msg=audit(1524662933.080:61207): perm=9
+type=AVC msg=audit(1524662933.080:61207): perm=15

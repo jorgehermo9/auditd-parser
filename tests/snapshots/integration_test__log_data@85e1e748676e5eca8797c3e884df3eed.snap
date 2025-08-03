@@ -1,0 +1,51 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-syscall.log:1"
+expression: result
+info: "type=SYSCALL msg=audit(1615114232.375:15558): arch=c000003e syscall=59 success=yes exit=0 a0=63b29337fd18 a1=63b293387d58 a2=63b293375640 a3=fffffffffffff000 items=2 ppid=10883 pid=10884 auid=1000 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts1 ses=1 comm=\"whoami\" exe=\"/usr/bin/whoami\" key=(null)\u001dARCH=x86_64 SYSCALL=execve AUID=\"user\" UID=\"root\" GID=\"root\" EUID=\"root\" SUID=\"root\" FSUID=\"root\" EGID=\"root\" SGID=\"root\" FSGID=\"root\""
+---
+{
+  "record_type": "SYSCALL",
+  "timestamp": 1615114232375,
+  "id": 15558,
+  "fields": {
+    "a0": "63b29337fd18",
+    "a1": "63b293387d58",
+    "a2": "63b293375640",
+    "a3": "fffffffffffff000",
+    "arch": "c000003e",
+    "auid": 1000,
+    "comm": "whoami",
+    "egid": "root",
+    "euid": "root",
+    "exe": "/usr/bin/whoami",
+    "exit": 0,
+    "fsgid": "root",
+    "fsuid": "root",
+    "gid": "root",
+    "items": "2",
+    "key": "(null)",
+    "pid": "10884",
+    "ppid": "10883",
+    "ses": "1",
+    "sgid": "root",
+    "success": true,
+    "suid": "root",
+    "syscall": "59",
+    "tty": "pts1",
+    "uid": "root"
+  },
+  "enrichment": {
+    "ARCH": "x86_64",
+    "AUID": "user",
+    "EGID": "root",
+    "EUID": "root",
+    "FSGID": "root",
+    "FSUID": "root",
+    "GID": "root",
+    "SGID": "root",
+    "SUID": "root",
+    "SYSCALL": "execve",
+    "UID": "root"
+  }
+}
