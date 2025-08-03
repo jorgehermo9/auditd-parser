@@ -21,10 +21,7 @@ mod errno;
 mod field_type;
 mod mac_label;
 mod mode;
-<<<<<<< HEAD
 mod null;
-=======
->>>>>>> main
 mod pam;
 mod perm;
 mod proctitle;

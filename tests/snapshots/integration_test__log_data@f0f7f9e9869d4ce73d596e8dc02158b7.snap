@@ -14,17 +14,7 @@ info: "type=USER_ERR msg=audit(1489641207.587:518): pid=1560 uid=0 auid=42949672
       "acct": null,
       "addr": "190.48.233.76",
       "exe": "/usr/sbin/sshd",
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-      "grantors": "?",
-=======
       "grantors": null,
->>>>>>> Stashed changes
-=======
-      "grantors": [
-        "?"
-      ],
->>>>>>> main
       "hostname": "190.48.233.76",
       "op": "PAM:bad_ident",
       "res": "failed",

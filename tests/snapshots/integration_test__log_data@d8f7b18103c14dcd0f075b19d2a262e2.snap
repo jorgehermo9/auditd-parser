@@ -14,23 +14,11 @@ info: "type=CRED_REFR msg=audit(1489640461.198:480): pid=1402 uid=0 auid=0 ses=2
       "acct": "root",
       "addr": null,
       "exe": "/usr/sbin/crond",
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-      "grantors": "pam_env,pam_unix",
-=======
-      "grantors": [
-        "pam_env",
-        "pam_unix"
-      ],
->>>>>>> main
-      "hostname": "?",
-=======
       "grantors": [
         "pam_env",
         "pam_unix"
       ],
       "hostname": null,
->>>>>>> Stashed changes
       "op": "PAM:setcred",
       "res": "success",
       "terminal": "cron"
