@@ -5,6 +5,7 @@ pub fn parse_proctitle(bytes: &[u8]) -> String {
         .split(|&b| b == 0)
         .map(|arg| String::from_utf8_lossy(arg).to_string())
         .collect::<Vec<String>>()
+        // TODO: join or not?
         .join(" ")
 }
 
