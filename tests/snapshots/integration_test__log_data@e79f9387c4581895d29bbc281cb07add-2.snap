@@ -1,0 +1,14 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/test2.log:3"
+expression: result
+info: "type=CWD msg=audit(1170021493.977:283):  cwd=\"/var/spool/postfix\""
+---
+{
+  "record_type": "CWD",
+  "timestamp": 1170021493977,
+  "id": 283,
+  "fields": {
+    "cwd": "/var/spool/postfix"
+  }
+}

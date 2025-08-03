@@ -1,0 +1,11 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/test.log:1"
+expression: result
+info: "type=AVC msg=audit(1170021493.977:293): avc:  denied  { read write } for  pid=13010 comm=\"pickup\" name=\"maildrop\" dev=hda7 ino=14911367 scontext=system_u:system_r:postfix_pickup_t:s0 tcontext=system_u:object_r:postfix_spool_maildrop_t:s0 tclass=dir"
+---
+{
+  "Err": {
+    "Parse": "error Char at:   denied  { read write } for  pid=13010 comm=\"pickup\" name=\"maildrop\" dev=hda7 ino=14911367 scontext=system_u:system_r:postfix_pickup_t:s0 tcontext=system_u:object_r:postfix_spool_maildrop_t:s0 tclass=dir"
+  }
+}
