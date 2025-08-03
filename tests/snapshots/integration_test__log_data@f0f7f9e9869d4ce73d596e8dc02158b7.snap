@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-rhel7.log:36"
+expression: result
 info: "type=USER_ERR msg=audit(1489641207.587:518): pid=1560 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=PAM:bad_ident grantors=? acct=\"?\" exe=\"/usr/sbin/sshd\" hostname=190.48.233.76 addr=190.48.233.76 terminal=ssh res=failed'"
 ---
 {
@@ -13,11 +14,17 @@ info: "type=USER_ERR msg=audit(1489641207.587:518): pid=1560 uid=0 auid=42949672
       "acct": null,
       "addr": "190.48.233.76",
       "exe": "/usr/sbin/sshd",
+<<<<<<< HEAD
 <<<<<<< Updated upstream
       "grantors": "?",
 =======
       "grantors": null,
 >>>>>>> Stashed changes
+=======
+      "grantors": [
+        "?"
+      ],
+>>>>>>> main
       "hostname": "190.48.233.76",
       "op": "PAM:bad_ident",
       "res": "failed",

@@ -21,7 +21,10 @@ mod errno;
 mod field_type;
 mod mac_label;
 mod mode;
+<<<<<<< HEAD
 mod null;
+=======
+>>>>>>> main
 mod pam;
 mod perm;
 mod proctitle;
@@ -91,6 +94,7 @@ fn interpret_field_value(record_type: &str, field_name: &str, field_value: Strin
         FieldType::Success => interpret_success_field(field_value),
         FieldType::Errno => interpret_errno_field(field_value),
         FieldType::MacLabel => interpret_mac_label_field(field_value),
+        FieldType::PAMGrantors => interpret_pam_grantors_field(&field_value),
     }
 }
 
@@ -230,16 +234,19 @@ fn interpret_mode_field(field_value: String) -> FieldValue {
     map.insert("file_type".into(), mode.file_type.to_string().into());
     map.insert(
         "attributes".into(),
-        utils::into_string_to_field_value(&mode.attributes),
+        utils::into_string_array_to_field_value(&mode.attributes),
     );
-    map.insert("user".into(), utils::into_string_to_field_value(&mode.user));
+    map.insert(
+        "user".into(),
+        utils::into_string_array_to_field_value(&mode.user),
+    );
     map.insert(
         "group".into(),
-        utils::into_string_to_field_value(&mode.group),
+        utils::into_string_array_to_field_value(&mode.group),
     );
     map.insert(
         "other".into(),
-        utils::into_string_to_field_value(&mode.other),
+        utils::into_string_array_to_field_value(&mode.other),
     );
 
     map.into()
@@ -315,6 +322,12 @@ fn interpret_mac_label_field(field_value: String) -> FieldValue {
             map.into()
         }
     }
+}
+
+fn interpret_pam_grantors_field(field_value: &str) -> FieldValue {
+    let grantors = pam::parse_grantors(field_value);
+
+    utils::into_string_array_to_field_value(&grantors)
 }
 
 #[cfg(test)]
@@ -563,6 +576,18 @@ mod tests {
     #[case::not_a_mac_label("foo", "foo".into())]
     fn test_interpret_mac_label_field(#[case] input: String, #[case] expected: FieldValue) {
         let result = interpret_mac_label_field(input);
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case::no_grantors("", vec![].into())]
+    #[case::single_grantor("user1", vec!["user1".into()].into())]
+    #[case::multiple_grantors("user1,user2,user3", vec!["user1".into(), "user2".into(), "user3".into()].into())]
+    #[case::multiple_grantors_with_spaces("user1, user2, user3", vec!["user1".into(), " user2".into(), " user3".into()].into())]
+    #[case::empty_grantors("", vec![].into())]
+    #[case::whitespace_grantors(" ", vec![" ".into()].into())]
+    fn test_interpret_pam_grantors_field(#[case] input: &str, #[case] expected: FieldValue) {
+        let result = interpret_pam_grantors_field(input);
         assert_eq!(result, expected);
     }
 }
