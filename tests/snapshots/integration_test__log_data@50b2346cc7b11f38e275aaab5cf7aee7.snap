@@ -14,7 +14,13 @@ info: "type=USER_END msg=audit(1725004605.819:105664): pid=14548 uid=0 auid=4294
       "acct": "root",
       "addr": "?",
       "exe": "/usr/bin/sudo",
-      "grantors": "pam_keyinit,pam_keyinit,pam_limits,pam_systemd,pam_unix",
+      "grantors": [
+        "pam_keyinit",
+        "pam_keyinit",
+        "pam_limits",
+        "pam_systemd",
+        "pam_unix"
+      ],
       "hostname": "?",
       "op": "PAM:session_close",
       "res": "success",

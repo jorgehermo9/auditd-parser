@@ -98,11 +98,14 @@ pub enum FieldType {
     Mode,
     Signal,
     List,
-    // auparse does not interpet this field type,
-    // their `AUPARSE_TYPE_SUCCESS` is used for `res` and `result` fields
+    /// auparse does not interpet this field type,
+    /// their `AUPARSE_TYPE_SUCCESS` is used for `res` and `result` fields
     Success,
     Errno,
-    MacLabel, // Mandatory Access Control
+    /// Mandatory Access Control
+    MacLabel,
+    /// Userspace field logged by https://github.com/linux-pam/linux-pam
+    PAMGrantors,
 }
 
 impl FieldType {
@@ -138,6 +141,10 @@ impl FieldType {
 
         if field_name == "errno" {
             return Some(Self::Errno);
+        }
+
+        if field_name == "grantors" {
+            return Some(Self::PAMGrantors);
         }
 
         if ESCAPED_FIELD_NAMES.contains(&field_name) {
