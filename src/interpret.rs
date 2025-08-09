@@ -15,6 +15,7 @@ use crate::{
     record::Number,
 };
 
+mod arch;
 mod audit_flag;
 mod capability;
 mod errno;

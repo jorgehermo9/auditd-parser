@@ -2,7 +2,7 @@ use std::fmt::{self, Display, Formatter};
 
 // Constants are extracted from https://github.com/torvalds/linux/blob/4a95bc121ccdaee04c4d72f84dbfa6b880a514b6/include/uapi/asm-generic/signal.h#L11
 // More information about signals can be found in https://man7.org/linux/man-pages/man7/signal.7.html
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Signal {
     SIGHUP,

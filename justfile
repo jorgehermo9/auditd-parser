@@ -4,7 +4,7 @@ fmt:
  cargo fmt --check --all
 
 clippy:
-    cargo clippy --all-targets --all-features -- -Dwarnings -Dclippy::all -Dclippy::pedantic
+    cargo clippy --all-targets --all-features --fix -- -Dwarnings -Dclippy::all -Dclippy::pedantic
 
 test: unit-test integration-test doc-test
 
