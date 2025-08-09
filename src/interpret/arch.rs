@@ -1,4 +1,4 @@
-#![allow(clippy::dead_code)]
+#![allow(dead_code)]
 
 use std::fmt::{self, Display, Formatter};
 
@@ -54,10 +54,10 @@ const EM_S390_OLD: u32 = 0xA390;
 const EM_CYGNUS_MN10300: u32 = 0xbeef;
 
 // AUDIT_ARCH Constants are extracted from https://github.com/torvalds/linux/blob/561c80369df0733ba0574882a1635287b20f9de2/include/uapi/linux/audit.h#L387
-const AUDIT_ARCH_CONVENTION_MASK: u32 = 0x30000000;
-const AUDIT_ARCH_CONVENTION_MIPS64_N32: u32 = 0x20000000;
-const AUDIT_ARCH_64BIT: u32 = 0x80000000;
-const AUDIT_ARCH_LE: u32 = 0x40000000;
+const AUDIT_ARCH_CONVENTION_MASK: u32 = 0x3000_0000;
+const AUDIT_ARCH_CONVENTION_MIPS64_N32: u32 = 0x2000_0000;
+const AUDIT_ARCH_64BIT: u32 = 0x8000_0000;
+const AUDIT_ARCH_LE: u32 = 0x4000_0000;
 
 const AUDIT_ARCH_AARCH64: u32 = EM_AARCH64 | AUDIT_ARCH_64BIT | AUDIT_ARCH_LE;
 const AUDIT_ARCH_ALPHA: u32 = EM_ALPHA | AUDIT_ARCH_64BIT | AUDIT_ARCH_LE;
