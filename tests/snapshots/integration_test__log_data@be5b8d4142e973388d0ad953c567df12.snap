@@ -13,7 +13,7 @@ info: "type=SYSCALL msg=audit(1492000940.864:1095517): arch=c000003e syscall=62 
     "a1": "1",
     "a2": "0",
     "a3": "8",
-    "arch": "c000003e",
+    "arch": "x86_64",
     "auid": 1000,
     "comm": "bash",
     "egid": 1001,

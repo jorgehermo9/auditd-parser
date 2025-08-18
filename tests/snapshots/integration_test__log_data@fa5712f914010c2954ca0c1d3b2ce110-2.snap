@@ -1,6 +1,6 @@
 ---
 source: tests/integration_test.rs
-description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/test4.log:8"
+description: "/home/jorge/github/auditd-parser/tests/data/auparse/test4.log:8"
 expression: result
 info: "type=SYSCALL msg=audit(1655465404.819:27091): arch=c000003e syscall=59 success=yes exit=0 a0=1a407f50 a1=1a401cd0 a2=1a3ed090 a3=0 items=2 ppid=105932 pid=105933 auid=573 uid=583 gid=583 euid=583 suid=583 fsuid=583 egid=583 sgid=583 fsgid=583 tty=pts2 ses=2632 comm=\"m4\" exe=\"/usr/bin/m4\" key=(null)"
 ---
@@ -13,7 +13,7 @@ info: "type=SYSCALL msg=audit(1655465404.819:27091): arch=c000003e syscall=59 su
     "a1": "1a401cd0",
     "a2": "1a3ed090",
     "a3": "0",
-    "arch": "c000003e",
+    "arch": "x86_64",
     "auid": 573,
     "comm": "m4",
     "egid": 583,

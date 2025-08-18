@@ -175,7 +175,11 @@ pub enum AuditArch {
 
 impl Display for AuditArch {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{self:?}")
+        match self {
+            Self::X86_64 => write!(f, "x86_64"),
+            Self::I386 => write!(f, "i386"),
+            _ => write!(f, "{self:?}"),
+        }
     }
 }
 

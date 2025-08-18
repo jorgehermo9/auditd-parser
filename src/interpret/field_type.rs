@@ -106,6 +106,8 @@ pub enum FieldType {
     MacLabel,
     /// Userspace field logged by [Linux PAM](https://github.com/linux-pam/linux-pam)
     PAMGrantors,
+    /// Architecture of the machine
+    Arch,
 }
 
 impl FieldType {
@@ -145,6 +147,10 @@ impl FieldType {
 
         if field_name == "grantors" {
             return Some(Self::PAMGrantors);
+        }
+
+        if field_name == "arch" {
+            return Some(Self::Arch);
         }
 
         if ESCAPED_FIELD_NAMES.contains(&field_name) {

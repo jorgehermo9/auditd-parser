@@ -13,7 +13,7 @@ info: "type=SYSCALL msg=audit(1490801406.273:512226): arch=c000003e syscall=42 s
     "a1": "7ffeb50e4570",
     "a2": "10",
     "a3": "fe",
-    "arch": "c000003e",
+    "arch": "x86_64",
     "auid": null,
     "comm": "google_ip_forwa",
     "egid": "root",

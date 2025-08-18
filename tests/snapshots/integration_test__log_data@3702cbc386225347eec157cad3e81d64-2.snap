@@ -14,7 +14,7 @@ info: "node=auditdtest.a1959.org type=SYSCALL msg=audit(1451781471.394:194435): 
     "a1": "56420184ade0",
     "a2": "564201867510",
     "a3": "0",
-    "arch": "c000003e",
+    "arch": "x86_64",
     "auid": 1000,
     "comm": "sshd",
     "egid": 1000,

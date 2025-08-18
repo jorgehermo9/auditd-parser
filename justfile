@@ -39,3 +39,6 @@ insta-test-review:
     # Workaround as `--review` with `--unreferenced reject` does not work,
     # the review will not be shown and the snapshots will be auto-approved
     cargo insta test --test integration_test --all-features --unreferenced reject
+
+cli:
+  cargo run -p cli
