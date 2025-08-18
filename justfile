@@ -3,8 +3,11 @@ ci $CI="true": fmt clippy test build deny-check msrv-verify
 fmt:
  cargo fmt --check --all
 
-clippy:
-    cargo clippy --all-targets --all-features -- -Dwarnings -Dclippy::all -Dclippy::pedantic
+clippy *args:
+    cargo clippy --all-targets --all-features {{args}} -- -Dwarnings -Dclippy::all -Dclippy::pedantic
+
+clippy-fix:
+ just clippy --fix
 
 test: unit-test integration-test doc-test
 
