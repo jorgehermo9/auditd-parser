@@ -36,9 +36,10 @@ msrv-verify:
 insta-test-review:
     cargo insta test --test integration_test --all-features --review
     # TODO: Report bug to insta
-    # Workaround as `--review` with `--unreferenced reject` does not work,
+    # Workaround as `--review` with `--unreferenced delete` does not work,
     # the review will not be shown and the snapshots will be auto-approved
-    cargo insta test --test integration_test --all-features --unreferenced reject
+    # This does not work `cargo insta test --test integration_test --all-features --review --unreferenced delete`
+    cargo insta test --test integration_test --all-features --unreferenced delete
 
 cli:
   cargo run -p cli
