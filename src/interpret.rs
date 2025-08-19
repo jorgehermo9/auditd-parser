@@ -31,6 +31,7 @@ mod result;
 mod signal;
 mod socket;
 mod success;
+mod syscall;
 mod uid;
 mod utils;
 
@@ -94,7 +95,8 @@ fn interpret_field_value(record_type: &str, field_name: &str, field_value: Strin
         FieldType::Errno => interpret_errno_field(field_value),
         FieldType::MacLabel => interpret_mac_label_field(field_value),
         FieldType::PAMGrantors => interpret_pam_grantors_field(&field_value),
-        FieldType::Arch => interpret_arch_field(&field_value),
+        FieldType::Arch => interpret_arch_field(field_value),
+        FieldType::Syscall => interpret_syscall_field(field_value),
     }
 }
 
@@ -330,11 +332,11 @@ fn interpret_pam_grantors_field(field_value: &str) -> FieldValue {
     utils::into_string_array_to_field_value(&grantors)
 }
 
-fn interpret_arch_field(field_value: &str) -> FieldValue {
+fn interpret_arch_field(field_value: String) -> FieldValue {
     // Arch is a hex-encoded int. We assume that it is u32
     // Logging example https://github.com/torvalds/linux/blob/561c80369df0733ba0574882a1635287b20f9de2/kernel/auditsc.c#L1689
     // audit_context field: https://github.com/torvalds/linux/blob/c17b750b3ad9f45f2b6f7e6f7f4679844244f0b9/kernel/audit.h#L141
-    let Ok(arch) = u32::from_str_radix(field_value, 16) else {
+    let Ok(arch) = u32::from_str_radix(&field_value, 16) else {
         return field_value.into();
     };
 
@@ -343,6 +345,21 @@ fn interpret_arch_field(field_value: &str) -> FieldValue {
     };
 
     audit_arch.to_string().into()
+}
+
+fn interpret_syscall_field(field_value: String) -> FieldValue {
+    let Ok(syscall_number) = field_value.parse::<u64>() else {
+        return field_value.into();
+    };
+
+    // TODO: get AuditArch from the log
+    let Some(syscall_name) = syscall::resolve_syscall_name(AuditArch::X86_64, syscall_number)
+    else {
+        // TODO: should we return the integer or instead filter out the field?
+        return Number::UnsignedInteger(syscall_number).into();
+    };
+
+    syscall_name.into()
 }
 
 #[cfg(test)]
@@ -611,7 +628,7 @@ mod tests {
     #[case::x86_64("c000003e", "x86_64".into())]
     #[case::not_hex_encoded("foo", "foo".into())]
     #[case::unknown("9999", "9999".into())]
-    fn test_interpret_arch_field(#[case] input: &str, #[case] expected: FieldValue) {
+    fn test_interpret_arch_field(#[case] input: String, #[case] expected: FieldValue) {
         let result = interpret_arch_field(input);
         assert_eq!(result, expected);
     }

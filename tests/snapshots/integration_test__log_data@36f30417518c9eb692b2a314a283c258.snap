@@ -40,7 +40,7 @@ info: "type=SYSCALL msg=audit(1490801406.273:512226): arch=c000003e syscall=42 s
     },
     "success": false,
     "suid": "root",
-    "syscall": "42",
+    "syscall": "connect",
     "tty": null,
     "uid": "root"
   }

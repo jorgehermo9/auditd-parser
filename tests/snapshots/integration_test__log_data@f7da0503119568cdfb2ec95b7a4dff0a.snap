@@ -39,7 +39,7 @@ info: "type=SYSCALL msg=audit(1170021493.977:283): arch=c000003e syscall=2 succe
     },
     "success": false,
     "suid": 890,
-    "syscall": "2",
+    "syscall": "open",
     "tty": null,
     "uid": 890
   }

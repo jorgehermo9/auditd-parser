@@ -84,6 +84,8 @@ const SIGNAL_FIELD_NAMES: [&str; 2] = ["sig", "sigev_signo"];
 const MAC_LABEL_FIELD_NAMES: [&str; 6] =
     ["subj", "obj", "scontext", "tcontext", "vm-ctx", "img-ctx"];
 
+const SYSCALL_FIELD_NAMES: [&str; 2] = ["syscall", "uring_op"];
+
 pub enum FieldType {
     Msg,
     Exit,
@@ -108,6 +110,8 @@ pub enum FieldType {
     PAMGrantors,
     /// Architecture of the machine
     Arch,
+    /// Syscall number
+    Syscall,
 }
 
 impl FieldType {
@@ -183,6 +187,10 @@ impl FieldType {
 
         if MAC_LABEL_FIELD_NAMES.contains(&field_name) {
             return Some(Self::MacLabel);
+        }
+
+        if SYSCALL_FIELD_NAMES.contains(&field_name) {
+            return Some(Self::Syscall);
         }
 
         None

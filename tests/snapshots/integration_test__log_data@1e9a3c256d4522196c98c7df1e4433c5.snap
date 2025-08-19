@@ -1,6 +1,6 @@
 ---
 source: tests/integration_test.rs
-description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/test3.log:10"
+description: "/home/jorge/github/auditd-parser/tests/data/auparse/test3.log:10"
 expression: result
 info: "node=auditdtest.a1959.org type=SYSCALL msg=audit(1451781471.394:194439): arch=c000003e syscall=14 success=yes exit=0 a0=2 a1=7ffdac6fe920 a2=0 a3=8 items=0 ppid=1271 pid=1281 auid=1000 uid=1000 gid=1000 euid=1000 suid=1000 fsuid=1000 egid=1000 sgid=1000 fsgid=1000 tty=(none) ses=1 comm=\"sshd\" exe=\"/usr/sbin/sshd\" subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 key=(null)"
 ---
@@ -42,7 +42,7 @@ info: "node=auditdtest.a1959.org type=SYSCALL msg=audit(1451781471.394:194439): 
     },
     "success": true,
     "suid": 1000,
-    "syscall": "14",
+    "syscall": "rt_sigprocmask",
     "tty": null,
     "uid": 1000
   }
