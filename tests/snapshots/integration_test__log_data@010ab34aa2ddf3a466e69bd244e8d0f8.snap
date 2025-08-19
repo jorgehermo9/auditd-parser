@@ -1,0 +1,33 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-user-avc-1.log:1"
+expression: result
+info: "type=USER_AVC msg=audit(1725140575.109:3128): pid=854 uid=81 auid=4294967295 ses=4294967295 subj=system_u:system_r:system_dbusd_t:s0-s0:c0.c1023 msg='avc:  received policyload notice (seqno=2)  exe=2F7573722F62696E2F646275732D6461656D6F6E202864656C6574656429 sauid=81 hostname=? addr=? terminal=?'\u001dUID=\"dbus\" AUID=\"unset\" SAUID=\"dbus\""
+---
+{
+  "record_type": "USER_AVC",
+  "timestamp": 1725140575109,
+  "id": 3128,
+  "fields": {
+    "auid": null,
+    "msg": "avc:  received policyload notice (seqno=2)  exe=2F7573722F62696E2F646275732D6461656D6F6E202864656C6574656429 sauid=81 hostname=? addr=? terminal=?",
+    "pid": "854",
+    "ses": "4294967295",
+    "subj": {
+      "level": {
+        "category": "c0.c1023",
+        "sensitivity": "s0-s0"
+      },
+      "module": "SELinux",
+      "role": "system_r",
+      "type": "system_dbusd_t",
+      "user": "system_u"
+    },
+    "uid": 81
+  },
+  "enrichment": {
+    "AUID": "unset",
+    "SAUID": "dbus",
+    "UID": "dbus"
+  }
+}

@@ -1,0 +1,14 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/auparse/test4.log:13"
+expression: result
+info: "type=PROCTITLE msg=audit(1655465404.819:27091): proctitle=2F7573722F62696E2F6D34002D2D6E657374696E672D6C696D69743D31303234002D2D676E75002D2D696E636C7564653D2F7573722F73686172652F6175746F636F6E662D322E3630002D2D64656275673D61666C71002D2D666174616C2D7761726E696E67002D2D646562756766696C653D6175746F6D3474652E63616368"
+---
+{
+  "record_type": "PROCTITLE",
+  "timestamp": 1655465404819,
+  "id": 27091,
+  "fields": {
+    "proctitle": "/usr/bin/m4 --nesting-limit=1024 --gnu --include=/usr/share/autoconf-2.60 --debug=aflq --fatal-warning --debugfile=autom4te.cach"
+  }
+}
