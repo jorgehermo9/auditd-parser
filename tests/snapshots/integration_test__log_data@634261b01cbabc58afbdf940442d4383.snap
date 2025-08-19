@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-rhel7.log:23"
+expression: result
 info: "type=SOCKADDR msg=audit(1490816924.990:517643): saddr=100000000000000000000000"
 ---
 {

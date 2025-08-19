@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-rhel7.log:15"
+expression: result
 info: "type=EXECVE msg=audit(1481077231.371:479): argc=7 a0=\"auditctl\" a1=\"-a\" a2=\"exit,always\" a3=\"-F\" a4=\"arch=b32\" a5=\"-S\" a6=\"execve\""
 ---
 {

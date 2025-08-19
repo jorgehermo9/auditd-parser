@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-rhel7.log:34"
+expression: result
 info: "type=USER_CMD msg=audit(1481077231.363:475): pid=1382 uid=1000 auid=1000 ses=3 subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 msg='cwd=\"/home/andrew_kroh\" cmd=2E2F6D657472696362656174202D63206D622E6465762E796D6C terminal=pts/0 res=success'"
 ---
 {

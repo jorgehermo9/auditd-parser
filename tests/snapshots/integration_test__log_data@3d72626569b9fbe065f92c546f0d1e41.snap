@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-rhel7.log:3"
+expression: result
 info: "type=BPRM_FCAPS msg=audit(1481077308.360:529): fver=0 fp=0000000000000000 fi=0000000000000000 fe=0 old_pp=0000000000000000 old_pi=0000000000000000 old_pe=0000000000000000 new_pp=0000001fffffffff new_pi=0000000000000000 new_pe=0000001fffffffff"
 ---
 {

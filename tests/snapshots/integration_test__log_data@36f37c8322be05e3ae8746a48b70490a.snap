@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/auparse/test.log:4"
+expression: result
 info: "type=PATH msg=audit(1170021493.977:293): item=0 name=\"maildrop\" inode=14911367 dev=03:07 mode=040730 ouid=890 ogid=891 rdev=00:00 obj=system_u:object_r:postfix_spool_maildrop_t:s0"
 ---
 {

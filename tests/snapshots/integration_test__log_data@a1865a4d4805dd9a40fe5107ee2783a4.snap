@@ -13,7 +13,7 @@ info: "type=SYSCALL msg=audit(1634628127.584:166): arch=c000003e syscall=59 succ
     "a1": "55b26d44a878",
     "a2": "55b26d44a8e8",
     "a3": "7faeccab5850",
-    "arch": "c000003e",
+    "arch": "x86_64",
     "auid": null,
     "comm": "dhclient",
     "egid": "root",

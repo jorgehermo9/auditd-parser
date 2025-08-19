@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-rhel7.log:11"
+expression: result
 info: "type=CWD msg=audit(1500661699.656:1208725):  cwd=2F746D702F6120622063"
 ---
 {

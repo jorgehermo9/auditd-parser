@@ -1,6 +1,6 @@
 ---
 source: tests/integration_test.rs
-description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/test2.log:7"
+description: "/home/jorge/github/auditd-parser/tests/data/auparse/test2.log:7"
 expression: result
 info: "type=LOGIN msg=audit(1170021601.343:286): pid=2288 uid=0 subj=system_u:system_r:init_t:s0 old-auid=4294967295 auid=42 tty=(none) old-ses=4294967295 ses=1 res=1"
 ---

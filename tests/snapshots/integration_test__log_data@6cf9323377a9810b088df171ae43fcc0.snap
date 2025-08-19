@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-rhel7.log:44"
+expression: result
 info: "type=USER_TTY msg=audit(1491922671.974:1065045): pid=28202 uid=0 auid=1000 ses=762 subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 data=\"exit\""
 ---
 {

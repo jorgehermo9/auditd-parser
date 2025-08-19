@@ -3,8 +3,11 @@ ci $CI="true": fmt clippy test build deny-check msrv-verify
 fmt:
  cargo fmt --check --all
 
-clippy:
-    cargo clippy --all-targets --all-features -- -Dwarnings -Dclippy::all -Dclippy::pedantic
+clippy *args:
+    cargo clippy --all-targets --all-features {{args}} -- -Dwarnings -Dclippy::all -Dclippy::pedantic
+
+clippy-fix:
+ just clippy --fix
 
 test: unit-test integration-test doc-test
 
@@ -33,6 +36,10 @@ msrv-verify:
 insta-test-review:
     cargo insta test --test integration_test --all-features --review
     # TODO: Report bug to insta
-    # Workaround as `--review` with `--unreferenced reject` does not work,
+    # Workaround as `--review` with `--unreferenced delete` does not work,
     # the review will not be shown and the snapshots will be auto-approved
-    cargo insta test --test integration_test --all-features --unreferenced reject
+    # This does not work `cargo insta test --test integration_test --all-features --review --unreferenced delete`
+    cargo insta test --test integration_test --all-features --unreferenced delete
+
+cli:
+  cargo run -p cli

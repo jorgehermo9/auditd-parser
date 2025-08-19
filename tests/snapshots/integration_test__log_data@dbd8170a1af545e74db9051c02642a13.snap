@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-rhel7.log:10"
+expression: result
 info: "type=CWD msg=audit(1481077231.371:479):  cwd=\"/home/andrew_kroh\""
 ---
 {

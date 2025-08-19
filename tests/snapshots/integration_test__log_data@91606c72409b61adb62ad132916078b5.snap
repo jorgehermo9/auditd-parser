@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-ubuntu16.log:3"
+expression: result
 info: "type=AVC msg=audit(1524662933.080:61207): apparmor=\"DENIED\" operation=\"ptrace\" profile=\"docker-default\" pid=5571 comm=\"metricbeat\" requested_mask=\"trace\" denied_mask=\"trace\" peer=\"unconfined\""
 ---
 {

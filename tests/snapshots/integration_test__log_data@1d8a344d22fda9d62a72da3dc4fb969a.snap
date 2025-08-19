@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/auparse/test.log:3"
+expression: result
 info: "type=CWD msg=audit(1170021493.977:293):  cwd=\"/var/spool/postfix\""
 ---
 {

@@ -13,7 +13,7 @@ info: "type=SYSCALL msg=audit(1615114232.375:15558): arch=c000003e syscall=59 su
     "a1": "63b293387d58",
     "a2": "63b293375640",
     "a3": "fffffffffffff000",
-    "arch": "c000003e",
+    "arch": "x86_64",
     "auid": 1000,
     "comm": "whoami",
     "egid": "root",

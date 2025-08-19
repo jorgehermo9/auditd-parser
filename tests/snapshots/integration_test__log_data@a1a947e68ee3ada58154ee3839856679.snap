@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/test4.log:10"
+expression: result
 info: "type=CWD msg=audit(1655465404.819:27091): cwd=\"/usr/src/RPM/BUILD/zlib-1.2.11-alt1/contrib/minizip\""
 ---
 {

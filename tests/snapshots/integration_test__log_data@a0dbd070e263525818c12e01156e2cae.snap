@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/auparse/test4.log:3"
+expression: result
 info: "type=CWD msg=audit(1655465398.534:25618): cwd=\"/usr/src/RPM/BUILD/zlib-1.2.11-alt1\""
 ---
 {

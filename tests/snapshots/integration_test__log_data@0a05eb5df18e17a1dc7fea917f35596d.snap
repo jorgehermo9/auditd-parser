@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-rhel7.log:50"
+expression: result
 info: "type=CONFIG_CHANGE msg=audit(1492749467.018:1209): auid=4294967295 ses=4294967295 subj=system_u:system_r:unconfined_service_t:s0 op=\"add_rule\" key=\"pam\" list=4 res=1"
 ---
 {

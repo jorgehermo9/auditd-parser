@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/synthetic/errno.log:2"
+expression: result
 info: "type=AUDIT_INTEGRITY_PCR msg=audit(1524662933.080:61207): errno=1"
 ---
 {

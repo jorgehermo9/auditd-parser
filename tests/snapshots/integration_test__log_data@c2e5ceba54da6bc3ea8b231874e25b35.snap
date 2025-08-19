@@ -1,6 +1,6 @@
 ---
 source: tests/integration_test.rs
-description: "/home/jorge/github/auditd-parser/tests/data/auparse/test2.log:6"
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/test2.log:6"
 expression: result
 info: "type=CRED_ACQ msg=audit(1170021601.342:285): user pid=13015 uid=0 auid=4294967295 subj=system_u:system_r:crond_t:s0-s0:c0.c1023 msg='PAM: setcred acct=root : exe=\"/usr/sbin/crond\" hostname=? addr=? terminal=cron res=success'"
 ---

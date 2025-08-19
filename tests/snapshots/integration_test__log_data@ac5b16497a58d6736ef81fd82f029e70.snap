@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-rhel7.log:18"
+expression: result
 info: "type=NETFILTER_CFG msg=audit(1481076984.827:17): table=filter family=2 entries=0"
 ---
 {

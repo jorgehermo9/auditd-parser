@@ -13,7 +13,7 @@ info: "type=SYSCALL msg=audit(1481076984.827:17): arch=c000003e syscall=313 succ
     "a1": "41a15c",
     "a2": "0",
     "a3": "0",
-    "arch": "c000003e",
+    "arch": "x86_64",
     "auid": null,
     "comm": "modprobe",
     "egid": "root",

@@ -13,7 +13,7 @@ info: "type=SYSCALL msg=audit(1515619721.392:106081): arch=c000003e syscall=59 s
     "a1": "55df1048ec38",
     "a2": "55df1048ec58",
     "a3": "1",
-    "arch": "c000003e",
+    "arch": "x86_64",
     "auid": null,
     "comm": "grep",
     "egid": "root",

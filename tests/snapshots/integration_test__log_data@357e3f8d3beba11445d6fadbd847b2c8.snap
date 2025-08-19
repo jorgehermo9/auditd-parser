@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-ubuntu16.log:2"
+expression: result
 info: "type=USER_LOGIN msg=audit(1492810797.778:12651): pid=11396 uid=0 auid=1001 ses=36 msg='op=login id=1001 exe=\"/usr/sbin/sshd\" hostname=72.83.230.100 addr=72.83.230.100 terminal=/dev/pts/1 res=success'"
 ---
 {

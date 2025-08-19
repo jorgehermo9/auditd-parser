@@ -7,6 +7,10 @@ license = "MIT OR Apache-2.0"
 # so more people can use this
 rust-version = "1.85"
 
+[workspace]
+resolver = "3"
+members = ["crates/cli"]
+
 [features]
 serde = ["dep:serde"]
 

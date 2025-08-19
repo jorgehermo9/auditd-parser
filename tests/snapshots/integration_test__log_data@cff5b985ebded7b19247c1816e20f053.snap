@@ -1,6 +1,7 @@
 ---
 source: tests/integration_test.rs
-expression: record
+description: "/home/jorge/github/auditd-parser/tests/data/auparse/test4.log:2"
+expression: result
 info: "type=EXECVE msg=audit(1655465398.534:25618): argc=48 a0=\"/bin/sh\" a1=\"-efu\" a2=\"/usr/bin/ld\" a3=\"-plugin\" a4=\"/usr/libexec/gcc/aarch64-alt-linux/8/liblto_plugin.so\" a5=\"-plugin-opt=/usr/libexec/gcc/aarch64-alt-linux/8/lto-wrapper\" a6=\"-plugin-opt=-fresolution=/usr/src/tmp/cchyHiZN.res\" a7=\"-plugin-opt=-pass-through=-lgcc\" a8=\"-plugin-opt=-pass-through=-lgcc_s\" a9=\"-plugin-opt=-pass-through=-lc\" a10=\"-plugin-opt=-pass-through=-lgcc\" a11=\"-plugin-opt=-pass-through=-lgcc_s\" a12=\"--build-id\" a13=\"--no-add-needed\" a14=\"--eh-frame-hdr\" a15=\"--hash-style=gnu\" a16=\"--as-needed\" a17=\"-shared\" a18=\"-X\" a19=\"-EL\" a20=\"-maarch64linux\" a21=\"-o\" a22=\"ztest105133.so\" a23=\"/usr/lib64/gcc/aarch64-alt-linux/8/../../../../lib64/crti.o\" a24=\"/usr/lib64/gcc/aarch64-alt-linux/8/crtbeginS.o\" a25=\"-L/usr/lib64/gcc/aarch64-alt-linux/8\" a26=\"-L/usr/lib64/gcc/aarch64-alt-linux/8/../../../../lib64\" a27=\"-L/lib/../lib64\" a28=\"-L/usr/lib/../lib64\" a29=\"-L/usr/lib64/gcc/aarch64-alt-linux/8/../../..\" a30=\"-soname\" a31=\"libz.so.1\" a32=\"--version-script\" a33=\"zlib.map\" a34=\"ztest105133.o\" a35=\"-lgcc\" a36=\"--push-state\" a37=\"--as-needed\" a38=\"-lgcc_s\" a39=\"--pop-state\" a40=\"-lc\" a41=\"-lgcc\" a42=\"--push-state\" a43=\"--as-needed\" a44=\"-lgcc_s\" a45=\"--pop-state\" a46=\"/usr/lib64/gcc/aarch64-alt-linux/8/crtendS.o\" a47=\"/usr/lib64/gcc/aarch64-alt-linux/8/../../../../lib64/crtn.o\""
 ---
 {
