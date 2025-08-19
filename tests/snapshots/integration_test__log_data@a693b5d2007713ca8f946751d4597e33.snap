@@ -1,0 +1,15 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-unknown.log:1"
+expression: result
+info: "type=UNKNOWN[1334] msg=audit(1626883065.201:216697): prog-id=45 op=UNLOAD"
+---
+{
+  "record_type": "UNKNOWN[1334]",
+  "timestamp": 1626883065201,
+  "id": 216697,
+  "fields": {
+    "op": "UNLOAD",
+    "prog-id": "45"
+  }
+}

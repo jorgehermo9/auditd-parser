@@ -17,8 +17,7 @@ fn test_log_data(#[files("tests/data/**/*.log")] log_file: PathBuf) {
 
     for (line_number, log) in logs {
         let maybe_record = log.parse::<AuditdRecord>();
-        let location = format!("{log_file_path}:{line_number}");
-        let log_identifier = get_log_identifier(log, &location);
+        let log_identifier = get_log_identifier(log);
 
         // Unwrap the Ok variant but leave the Err variant as-is
         let result: Box<dyn Serialize> = match maybe_record {
@@ -26,6 +25,7 @@ fn test_log_data(#[files("tests/data/**/*.log")] log_file: PathBuf) {
             Err(error) => Box::new(Err::<AuditdRecord, ParserError>(error)),
         };
 
+        let location = format!("{log_file_path}:{line_number}");
         insta::with_settings!(
             {
                 info => &log,
@@ -39,7 +39,7 @@ fn test_log_data(#[files("tests/data/**/*.log")] log_file: PathBuf) {
     }
 }
 
-fn get_log_identifier(log: &str, location: &str) -> String {
-    let log_md5 = md5::compute(format!("{log}{location}"));
+fn get_log_identifier(log: &str) -> String {
+    let log_md5 = md5::compute(log);
     format!("{log_md5:x}")
 }

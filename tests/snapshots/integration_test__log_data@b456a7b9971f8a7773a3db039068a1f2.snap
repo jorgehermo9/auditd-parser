@@ -1,0 +1,43 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/test4.log:5"
+expression: result
+info: "type=PATH msg=audit(1655465398.534:25618): item=1 name=\"/bin/sh\" inode=33238 dev=00:30 mode=0100755 ouid=582 ogid=582 rdev=00:00 nametype=NORMAL cap_fp=0 cap_fi=0 cap_fe=0 cap_fver=0 cap_frootid=0"
+---
+{
+  "record_type": "PATH",
+  "timestamp": 1655465398534,
+  "id": 25618,
+  "fields": {
+    "cap_fe": "0",
+    "cap_fi": [],
+    "cap_fp": [],
+    "cap_frootid": "0",
+    "cap_fver": "0",
+    "dev": "00:30",
+    "inode": "33238",
+    "item": "1",
+    "mode": {
+      "attributes": [],
+      "file_type": "regular-file",
+      "group": [
+        "read",
+        "exec"
+      ],
+      "other": [
+        "read",
+        "exec"
+      ],
+      "user": [
+        "read",
+        "write",
+        "exec"
+      ]
+    },
+    "name": "/bin/sh",
+    "nametype": "NORMAL",
+    "ogid": 582,
+    "ouid": 582,
+    "rdev": "00:00"
+  }
+}

@@ -1,0 +1,33 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-user-end.log:1"
+expression: result
+info: "type=USER_END msg=audit(1725004605.819:105664): pid=14548 uid=0 auid=4294967295 ses=4294967295 msg='op=PAM:session_close grantors=pam_keyinit,pam_keyinit,pam_limits,pam_systemd,pam_unix acct=\"root\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=/dev/pts/0 res=success'"
+---
+{
+  "record_type": "USER_END",
+  "timestamp": 1725004605819,
+  "id": 105664,
+  "fields": {
+    "auid": null,
+    "msg": {
+      "acct": "root",
+      "addr": null,
+      "exe": "/usr/bin/sudo",
+      "grantors": [
+        "pam_keyinit",
+        "pam_keyinit",
+        "pam_limits",
+        "pam_systemd",
+        "pam_unix"
+      ],
+      "hostname": null,
+      "op": "PAM:session_close",
+      "res": "success",
+      "terminal": "/dev/pts/0"
+    },
+    "pid": "14548",
+    "ses": "4294967295",
+    "uid": "root"
+  }
+}

@@ -1,0 +1,11 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-eoe.log:1"
+expression: result
+info: "type=EOE msg=audit(1615225617.302:25836):"
+---
+{
+  "Err": {
+    "Parse": "error Tag at: :"
+  }
+}

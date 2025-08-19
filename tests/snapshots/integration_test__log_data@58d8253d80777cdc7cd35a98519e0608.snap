@@ -1,0 +1,18 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/audit-rhel7.log:46"
+expression: result
+info: "type=EXECVE msg=audit(1491930997.196:1068053): argc=4 a0=\"cat\" a1=\"btest=test\" a2=\"-f\" a3=\"regex=8\""
+---
+{
+  "record_type": "EXECVE",
+  "timestamp": 1491930997196,
+  "id": 1068053,
+  "fields": {
+    "a0": "cat",
+    "a1": "btest=test",
+    "a2": "-f",
+    "a3": "regex=8",
+    "argc": "4"
+  }
+}

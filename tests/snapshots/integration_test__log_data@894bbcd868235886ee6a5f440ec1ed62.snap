@@ -1,0 +1,31 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-user-login.log:1"
+expression: result
+info: "type=USER_LOGIN msg=audit(1725003193.327:117286): pid=1712 uid=0 auid=1000 ses=764 msg='op=login id=1000 exe=\"/usr/sbin/sshd\" hostname=other-host.invalid addr=10.10.10.10 terminal=ssh res=success'\u001dUID=\"root\" AUID=\"ec2-user\" ID=\"ec2-user\""
+---
+{
+  "record_type": "USER_LOGIN",
+  "timestamp": 1725003193327,
+  "id": 117286,
+  "fields": {
+    "auid": 1000,
+    "msg": {
+      "addr": "10.10.10.10",
+      "exe": "/usr/sbin/sshd",
+      "hostname": "other-host.invalid",
+      "id": 1000,
+      "op": "login",
+      "res": "success",
+      "terminal": "ssh"
+    },
+    "pid": "1712",
+    "ses": "764",
+    "uid": "root"
+  },
+  "enrichment": {
+    "AUID": "ec2-user",
+    "ID": "ec2-user",
+    "UID": "root"
+  }
+}

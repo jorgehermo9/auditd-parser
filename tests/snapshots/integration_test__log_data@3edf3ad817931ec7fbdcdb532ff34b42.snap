@@ -1,0 +1,33 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-chgrp-id.log:1"
+expression: result
+info: "type=CHGRP_ID msg=audit(1723948962.207:28220): pid=11159 uid=0 auid=4294967295 ses=4294967295 msg='op=changing new_gid=4550 id=0 exe=\"/usr/bin/newgrp\" hostname=? addr=? terminal=? res=success'\u001dUID=\"root\" AUID=\"unset\" NEW_GID=\"somegroup\" ID=\"root\""
+---
+{
+  "record_type": "CHGRP_ID",
+  "timestamp": 1723948962207,
+  "id": 28220,
+  "fields": {
+    "auid": null,
+    "msg": {
+      "addr": null,
+      "exe": "/usr/bin/newgrp",
+      "hostname": null,
+      "id": "root",
+      "new_gid": 4550,
+      "op": "changing",
+      "res": "success",
+      "terminal": null
+    },
+    "pid": "11159",
+    "ses": "4294967295",
+    "uid": "root"
+  },
+  "enrichment": {
+    "AUID": "unset",
+    "ID": "root",
+    "NEW_GID": "somegroup",
+    "UID": "root"
+  }
+}

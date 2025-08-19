@@ -1,0 +1,31 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-user-err.log:1"
+expression: result
+info: "type=USER_ERR msg=audit(1724985521.124:28189957): pid=164518 uid=0 auid=4294967295 ses=4294967295 msg='op=PAM:bad_ident grantors=? acct=\"?\" exe=\"/usr/sbin/sshd\" hostname=10.105.231.56 addr=10.105.231.56 terminal=ssh res=failed'\u001dUID=\"root\" AUID=\"unset\""
+---
+{
+  "record_type": "USER_ERR",
+  "timestamp": 1724985521124,
+  "id": 28189957,
+  "fields": {
+    "auid": null,
+    "msg": {
+      "acct": null,
+      "addr": "10.105.231.56",
+      "exe": "/usr/sbin/sshd",
+      "grantors": null,
+      "hostname": "10.105.231.56",
+      "op": "PAM:bad_ident",
+      "res": "failed",
+      "terminal": "ssh"
+    },
+    "pid": "164518",
+    "ses": "4294967295",
+    "uid": "root"
+  },
+  "enrichment": {
+    "AUID": "unset",
+    "UID": "root"
+  }
+}

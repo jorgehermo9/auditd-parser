@@ -1,0 +1,46 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/auparse/test.log:2"
+expression: result
+info: "type=SYSCALL msg=audit(1170021493.977:293): arch=c000003e syscall=2 success=no exit=-13 a0=5555665d91b0 a1=10800 a2=5555665d91b8 a3=0 items=1 ppid=2013 pid=13010 auid=4294967295 uid=890 gid=890 euid=890 suid=890 fsuid=890 egid=890 sgid=890 fsgid=890 tty=(none) comm=\"pickup\" exe=\"/usr/libexec/postfix/pickup\" subj=system_u:system_r:postfix_pickup_t:s0 key=(null)"
+---
+{
+  "record_type": "SYSCALL",
+  "timestamp": 1170021493977,
+  "id": 293,
+  "fields": {
+    "a0": "5555665d91b0",
+    "a1": "10800",
+    "a2": "5555665d91b8",
+    "a3": "0",
+    "arch": "x86_64",
+    "auid": null,
+    "comm": "pickup",
+    "egid": 890,
+    "euid": 890,
+    "exe": "/usr/libexec/postfix/pickup",
+    "exit": -13,
+    "fsgid": 890,
+    "fsuid": 890,
+    "gid": 890,
+    "items": "1",
+    "key": null,
+    "pid": "13010",
+    "ppid": "2013",
+    "sgid": 890,
+    "subj": {
+      "level": {
+        "sensitivity": "s0"
+      },
+      "module": "SELinux",
+      "role": "system_r",
+      "type": "postfix_pickup_t",
+      "user": "system_u"
+    },
+    "success": false,
+    "suid": 890,
+    "syscall": "2",
+    "tty": null,
+    "uid": 890
+  }
+}

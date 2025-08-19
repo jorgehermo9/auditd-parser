@@ -1,0 +1,29 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/linux-audit-parser-rs/line-uringop.log:1"
+expression: result
+info: "type=URINGOP msg=audit(1737533617.373:12266329): uring_op=18 success=yes exit=0 items=0 ppid=140504 pid=3178806 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 subj=unconfined key=(null)"
+---
+{
+  "record_type": "URINGOP",
+  "timestamp": 1737533617373,
+  "id": 12266329,
+  "fields": {
+    "egid": "root",
+    "euid": "root",
+    "exit": 0,
+    "fsgid": "root",
+    "fsuid": "root",
+    "gid": "root",
+    "items": "0",
+    "key": null,
+    "pid": "3178806",
+    "ppid": "140504",
+    "sgid": "root",
+    "subj": "unconfined",
+    "success": true,
+    "suid": "root",
+    "uid": "root",
+    "uring_op": "18"
+  }
+}

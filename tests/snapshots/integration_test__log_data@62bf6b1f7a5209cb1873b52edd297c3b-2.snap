@@ -1,0 +1,47 @@
+---
+source: tests/integration_test.rs
+description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/test.log:8"
+expression: result
+info: "type=SYSCALL msg=audit(1170021601.343:296): arch=c000003e syscall=1 success=yes exit=2 a0=8 a1=7fffa7aede20 a2=2 a3=0 items=0 ppid=1 pid=2288 auid=42 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=1 comm=\"(systemd)\" exe=\"/usr/lib/systemd/systemd\" subj=system_u:system_r:init_t:s0 key=(null)"
+---
+{
+  "record_type": "SYSCALL",
+  "timestamp": 1170021601343,
+  "id": 296,
+  "fields": {
+    "a0": "8",
+    "a1": "7fffa7aede20",
+    "a2": "2",
+    "a3": "0",
+    "arch": "x86_64",
+    "auid": 42,
+    "comm": "(systemd)",
+    "egid": "root",
+    "euid": "root",
+    "exe": "/usr/lib/systemd/systemd",
+    "exit": 2,
+    "fsgid": "root",
+    "fsuid": "root",
+    "gid": "root",
+    "items": "0",
+    "key": null,
+    "pid": "2288",
+    "ppid": "1",
+    "ses": "1",
+    "sgid": "root",
+    "subj": {
+      "level": {
+        "sensitivity": "s0"
+      },
+      "module": "SELinux",
+      "role": "system_r",
+      "type": "init_t",
+      "user": "system_u"
+    },
+    "success": true,
+    "suid": "root",
+    "syscall": "1",
+    "tty": null,
+    "uid": "root"
+  }
+}
