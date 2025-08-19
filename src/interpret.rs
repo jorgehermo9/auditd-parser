@@ -605,4 +605,14 @@ mod tests {
         let result = interpret_pam_grantors_field(input);
         assert_eq!(result, expected);
     }
+
+    #[rstest]
+    #[case::aarch64("c00000b7", "AArch64".into())]
+    #[case::x86_64("c000003e", "x86_64".into())]
+    #[case::not_hex_encoded("foo", "foo".into())]
+    #[case::unknown("9999", "9999".into())]
+    fn test_interpret_arch_field(#[case] input: &str, #[case] expected: FieldValue) {
+        let result = interpret_arch_field(input);
+        assert_eq!(result, expected);
+    }
 }

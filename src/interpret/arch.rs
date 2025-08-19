@@ -177,6 +177,7 @@ impl Display for AuditArch {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
             Self::X86_64 => write!(f, "x86_64"),
+            Self::AARCH64 => write!(f, "AArch64"),
             Self::I386 => write!(f, "i386"),
             _ => write!(f, "{self:?}"),
         }
@@ -244,5 +245,22 @@ impl TryFrom<u32> for AuditArch {
             _ => return Err(()),
         };
         Ok(arch)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use rstest::rstest;
+
+    use super::*;
+
+    #[rstest]
+    #[case::aarch64(AUDIT_ARCH_AARCH64, Some(AuditArch::AARCH64))]
+    #[case::x86_64(AUDIT_ARCH_X86_64, Some(AuditArch::X86_64))]
+    #[case::i386(AUDIT_ARCH_I386, Some(AuditArch::I386))]
+    #[case::unknown(9999, None)]
+    fn test_audit_arch(#[case] input: u32, #[case] expected: Option<AuditArch>) {
+        let result = AuditArch::try_from(input).ok();
+        assert_eq!(result, expected);
     }
 }
