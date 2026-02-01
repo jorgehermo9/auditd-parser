@@ -41,18 +41,18 @@ mod utils;
 type InterpretResult = Result<Option<FieldValue>, ()>;
 
 fn handle_fallback(
-    _original: String,
+    original: String,
     config: InterpretConfig,
 ) -> InterpretResult {
     match config.mode {
         InterpretMode::Strict => Err(()),
         InterpretMode::Ignore => Ok(None),
-        InterpretMode::Fallback => Ok(Some(_original.into())),
+        InterpretMode::Fallback => Ok(Some(original.into())),
     }
 }
 
 fn handle_fallback_with_number(
-    _original: String,
+    original: String,
     number: Number,
     config: InterpretConfig,
 ) -> InterpretResult {
@@ -186,7 +186,9 @@ fn interpret_msg_field(record_type: &str, field_value: String, config: Interpret
     Ok(Some(nested_field_value_map.into()))
 }
 
-fn interpret_escaped_field(field_value: String, _config: InterpretConfig) -> InterpretResult {
+fn interpret_escaped_field(field_value: String, config: InterpretConfig) -> InterpretResult {
+    // Escaped fields always succeed - they can't have unknown values
+    let _ = config; // unused but kept for consistency
     // TODO handle `au_unescape` correctly (for example, see the parenthesis and (null))
     // https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/auparse/interpret.c#L343
     let hex_decoded =
@@ -276,11 +278,15 @@ fn interpret_perm_field(field_value: String, config: InterpretConfig) -> Interpr
     Ok(Some(perms.into()))
 }
 
-fn interpret_result_field(field_value: &str, _config: InterpretConfig) -> InterpretResult {
+fn interpret_result_field(field_value: &str, config: InterpretConfig) -> InterpretResult {
+    // Result field always resolves to a valid string, so config is unused
+    let _ = config; // unused but kept for consistency
     Ok(Some(result::resolve_result(field_value).to_string().into()))
 }
 
-fn interpret_proctitle_field(field_value: String, _config: InterpretConfig) -> InterpretResult {
+fn interpret_proctitle_field(field_value: String, config: InterpretConfig) -> InterpretResult {
+    // Proctitle fields always succeed - they can't have unknown values
+    let _ = config; // unused but kept for consistency
     let Ok(bytes) = hex::decode(&field_value) else {
         // If the field is not encoded as a hexstring, we assume that
         // it does not contain arguments separated by `\x00` and we return the field as is
@@ -390,7 +396,9 @@ fn interpret_mac_label_field(field_value: String, config: InterpretConfig) -> In
     }
 }
 
-fn interpret_pam_grantors_field(field_value: &str, _config: InterpretConfig) -> InterpretResult {
+fn interpret_pam_grantors_field(field_value: &str, config: InterpretConfig) -> InterpretResult {
+    // PAM grantors fields always succeed - they can't have unknown values
+    let _ = config; // unused but kept for consistency
     let grantors = pam::parse_grantors(field_value);
 
     Ok(Some(utils::into_string_array_to_field_value(&grantors)))
