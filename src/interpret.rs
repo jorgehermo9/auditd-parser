@@ -11,7 +11,7 @@ use socket::SocketAddr;
 use uid::Uid;
 
 use crate::{
-    AuditdRecord, FieldValue,
+    AuditdRecord, FieldValue, InterpretConfig, InterpretError, InterpretMode,
     parser::{self, RawAuditdRecord},
     record::Number,
 };
@@ -34,18 +34,67 @@ mod success;
 mod uid;
 mod utils;
 
+/// Helper type to represent interpretation results.
+/// - Ok(Some(value)): Successfully interpreted
+/// - Ok(None): Field should be ignored (Ignore mode)
+/// - Err(()): Interpretation failed (Strict mode should error)
+type InterpretResult = Result<Option<FieldValue>, ()>;
+
+fn handle_fallback(
+    _original: String,
+    config: InterpretConfig,
+) -> InterpretResult {
+    match config.mode {
+        InterpretMode::Strict => Err(()),
+        InterpretMode::Ignore => Ok(None),
+        InterpretMode::Fallback => Ok(Some(_original.into())),
+    }
+}
+
+fn handle_fallback_with_number(
+    _original: String,
+    number: Number,
+    config: InterpretConfig,
+) -> InterpretResult {
+    match config.mode {
+        InterpretMode::Strict => Err(()),
+        InterpretMode::Ignore => Ok(None),
+        InterpretMode::Fallback => Ok(Some(number.into())),
+    }
+}
+
 impl From<RawAuditdRecord> for AuditdRecord {
     fn from(value: RawAuditdRecord) -> Self {
-        let fields = value
-            .fields
-            .into_iter()
-            .map(|(field_name, field_value)| {
-                let field_value =
-                    interpret_field_value(&value.record_type, &field_name, field_value);
+        // Use default config (fallback mode) for backward compatibility
+        Self::from_raw_with_config(value, InterpretConfig::default())
+            .expect("fallback mode should never fail")
+    }
+}
 
-                (field_name, field_value)
-            })
-            .collect();
+impl AuditdRecord {
+    /// Creates an AuditdRecord from a RawAuditdRecord with the specified interpretation configuration.
+    pub fn from_raw_with_config(
+        value: RawAuditdRecord,
+        config: InterpretConfig,
+    ) -> Result<Self, InterpretError> {
+        let record_type = value.record_type.clone();
+        let mut fields = BTreeMap::new();
+
+        for (field_name, field_value) in value.fields {
+            match interpret_field_value_with_config(
+                &record_type,
+                &field_name,
+                field_value,
+                config,
+            )? {
+                Some(interpreted_value) => {
+                    fields.insert(field_name, interpreted_value);
+                }
+                None => {
+                    // Field was ignored, don't insert it
+                }
+            }
+        }
 
         let enrichment = value.enrichment.map(|enrichment| {
             enrichment
@@ -54,58 +103,76 @@ impl From<RawAuditdRecord> for AuditdRecord {
                 .collect()
         });
 
-        Self {
+        Ok(Self {
             record_type: value.record_type,
             timestamp: value.timestamp,
             id: value.id,
             node: value.node,
             fields,
             enrichment,
-        }
+        })
     }
 }
 
 // Based on https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/auparse/interpret.c#L3325
 fn interpret_field_value(record_type: &str, field_name: &str, field_value: String) -> FieldValue {
+    interpret_field_value_with_config(
+        record_type,
+        field_name,
+        field_value,
+        InterpretConfig::default(),
+    )
+    .expect("fallback mode should never fail")
+    .expect("fallback mode should never return None")
+}
+
+fn interpret_field_value_with_config(
+    record_type: &str,
+    field_name: &str,
+    field_value: String,
+    config: InterpretConfig,
+) -> Result<Option<FieldValue>, InterpretError> {
     if null::is_null_value(&field_value) {
-        return FieldValue::Null;
+        return Ok(Some(FieldValue::Null));
     }
 
     let Some(field_type) = FieldType::resolve(field_name) else {
         // Defaults to leave the field uninterpreted
         // TODO: should we default to `FieldValue::Escaped`?
-        return field_value.into();
+        return Ok(Some(field_value.into()));
     };
 
-    match field_type {
-        FieldType::Escaped => interpret_escaped_field(field_value),
-        FieldType::Msg => interpret_msg_field(record_type, field_value),
-        FieldType::Uid | FieldType::Gid => interpret_uid_field(field_value),
-        FieldType::Exit => interpret_exit_field(field_value),
-        FieldType::CapabilityBitmap => interpret_cap_bitmap_field(field_value),
-        FieldType::SocketAddr => interpret_socket_addr_field(field_value),
-        FieldType::Perm => interpret_perm_field(field_value),
-        FieldType::Result => interpret_result_field(&field_value),
-        FieldType::Proctitle => interpret_proctitle_field(field_value),
-        FieldType::Mode => interpret_mode_field(field_value),
-        FieldType::Signal => interpret_signal_field(field_value),
-        FieldType::List => interpret_list_field(field_value),
-        FieldType::Success => interpret_success_field(field_value),
-        FieldType::Errno => interpret_errno_field(field_value),
-        FieldType::MacLabel => interpret_mac_label_field(field_value),
-        FieldType::PAMGrantors => interpret_pam_grantors_field(&field_value),
-        FieldType::Arch => interpret_arch_field(&field_value),
-    }
+    let result = match field_type {
+        FieldType::Escaped => interpret_escaped_field(field_value.clone(), config),
+        FieldType::Msg => interpret_msg_field(record_type, field_value.clone(), config),
+        FieldType::Uid | FieldType::Gid => interpret_uid_field(field_value.clone(), config),
+        FieldType::Exit => interpret_exit_field(field_value.clone(), config),
+        FieldType::CapabilityBitmap => interpret_cap_bitmap_field(field_value.clone(), config),
+        FieldType::SocketAddr => interpret_socket_addr_field(field_value.clone(), config),
+        FieldType::Perm => interpret_perm_field(field_value.clone(), config),
+        FieldType::Result => interpret_result_field(&field_value, config),
+        FieldType::Proctitle => interpret_proctitle_field(field_value.clone(), config),
+        FieldType::Mode => interpret_mode_field(field_value.clone(), config),
+        FieldType::Signal => interpret_signal_field(field_value.clone(), config),
+        FieldType::List => interpret_list_field(field_value.clone(), config),
+        FieldType::Success => interpret_success_field(field_value.clone(), config),
+        FieldType::Errno => interpret_errno_field(field_value.clone(), config),
+        FieldType::MacLabel => interpret_mac_label_field(field_value.clone(), config),
+        FieldType::PAMGrantors => interpret_pam_grantors_field(&field_value, config),
+        FieldType::Arch => interpret_arch_field(&field_value, config),
+    };
+
+    result.map_err(|_| InterpretError::unknown_value(record_type, field_name, field_value))
 }
 
 // TODO: move this to a msg.rs inside interpret module
-fn interpret_msg_field(record_type: &str, field_value: String) -> FieldValue {
+fn interpret_msg_field(record_type: &str, field_value: String, config: InterpretConfig) -> InterpretResult {
     let Ok((_, key_value_list)) =
         // TODO: maybe we should refactor this so this doesn't use parser module functions...
         all_consuming(parser::body::parse_key_value_list)
             .parse(field_value.as_str())
     else {
-        return field_value.into();
+        return handle_fallback(field_value, config);
     };
     let nested_field_value_map = key_value_list
         .into_iter()
@@ -116,57 +183,57 @@ fn interpret_msg_field(record_type: &str, field_value: String) -> FieldValue {
         })
         .collect::<BTreeMap<String, FieldValue>>();
 
-    nested_field_value_map.into()
+    Ok(Some(nested_field_value_map.into()))
 }
 
-fn interpret_escaped_field(field_value: String) -> FieldValue {
+fn interpret_escaped_field(field_value: String, _config: InterpretConfig) -> InterpretResult {
     // TODO handle `au_unescape` correctly (for example, see the parenthesis and (null))
     // https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/auparse/interpret.c#L343
     let hex_decoded =
         hex::decode(&field_value).map(|bytes| String::from_utf8_lossy(&bytes).to_string());
-    hex_decoded.unwrap_or(field_value).into()
+    Ok(Some(hex_decoded.unwrap_or(field_value).into()))
 }
 
-fn interpret_uid_field(field_value: String) -> FieldValue {
+fn interpret_uid_field(field_value: String, config: InterpretConfig) -> InterpretResult {
     let Ok(uid) = field_value.parse::<i64>() else {
-        return field_value.into();
+        return handle_fallback(field_value, config);
     };
 
     let uid = uid::resolve_uid(uid);
 
     match uid {
-        Uid::Root => "root".to_string().into(),
-        Uid::User(uid) => Number::SignedInteger(uid).into(),
-        Uid::Unset => FieldValue::Null,
+        Uid::Root => Ok(Some("root".to_string().into())),
+        Uid::User(uid) => Ok(Some(Number::SignedInteger(uid).into())),
+        Uid::Unset => Ok(Some(FieldValue::Null)),
     }
 }
 
-fn interpret_exit_field(field_value: String) -> FieldValue {
+fn interpret_exit_field(field_value: String, config: InterpretConfig) -> InterpretResult {
     let Ok(exit_code) = field_value.parse::<i64>() else {
-        return field_value.into();
+        return handle_fallback(field_value, config);
     };
-    Number::SignedInteger(exit_code).into()
+    Ok(Some(Number::SignedInteger(exit_code).into()))
 }
 
-fn interpret_cap_bitmap_field(field_value: String) -> FieldValue {
+fn interpret_cap_bitmap_field(field_value: String, config: InterpretConfig) -> InterpretResult {
     // Capabilities are encoded as a 64-bit hexadecimal string
     let Ok(cap_bitmap) = u64::from_str_radix(&field_value, 16) else {
-        return field_value.into();
+        return handle_fallback(field_value, config);
     };
 
     let capabilities = capability::resolve_capability_bitmap(cap_bitmap);
 
-    capabilities.into()
+    Ok(Some(capabilities.into()))
 }
 
-fn interpret_socket_addr_field(field_value: String) -> FieldValue {
+fn interpret_socket_addr_field(field_value: String, config: InterpretConfig) -> InterpretResult {
     let Ok(byte_vec) = hex::decode(&field_value) else {
-        return field_value.into();
+        return handle_fallback(field_value, config);
     };
     let bytes = Bytes::from(byte_vec);
 
     let Some(socket_address) = socket::parse_sockaddr(bytes) else {
-        return field_value.into();
+        return handle_fallback(field_value, config);
     };
 
     let mut map = BTreeMap::new();
@@ -194,39 +261,38 @@ fn interpret_socket_addr_field(field_value: String) -> FieldValue {
         }
     }
 
-    map.into()
+    Ok(Some(map.into()))
 }
 
-fn interpret_perm_field(field_value: String) -> FieldValue {
+fn interpret_perm_field(field_value: String, config: InterpretConfig) -> InterpretResult {
     // Perm is parsed as a long (usually 32 bits)
     // Ref: https://github.com/linux-audit/audit-userspace/blob/747f67994b933fd70deed7d6f7cb0c40601f5bd1/auparse/interpret.c#L1023
     let Ok(perm_mask) = field_value.parse::<u32>() else {
-        return field_value.into();
+        return handle_fallback(field_value, config);
     };
 
     let perms = perm::resolve_perm_mask(perm_mask);
 
-    perms.into()
+    Ok(Some(perms.into()))
 }
 
-fn interpret_result_field(field_value: &str) -> FieldValue {
-    result::resolve_result(field_value).to_string().into()
+fn interpret_result_field(field_value: &str, _config: InterpretConfig) -> InterpretResult {
+    Ok(Some(result::resolve_result(field_value).to_string().into()))
 }
 
-fn interpret_proctitle_field(field_value: String) -> FieldValue {
+fn interpret_proctitle_field(field_value: String, _config: InterpretConfig) -> InterpretResult {
     let Ok(bytes) = hex::decode(&field_value) else {
         // If the field is not encoded as a hexstring, we assume that
         // it does not contain arguments separated by `\x00` and we return the field as is
-        return field_value.into();
+        return Ok(Some(field_value.into()));
     };
 
-    proctitle::parse_proctitle(&bytes).into()
+    Ok(Some(proctitle::parse_proctitle(&bytes).into()))
 }
 
-fn interpret_mode_field(field_value: String) -> FieldValue {
+fn interpret_mode_field(field_value: String, config: InterpretConfig) -> InterpretResult {
     let Some(mode) = mode::resolve_mode(&field_value) else {
-        // TODO: this default is kind of weird
-        return field_value.into();
+        return handle_fallback(field_value, config);
     };
 
     let mut map = BTreeMap::new();
@@ -249,56 +315,56 @@ fn interpret_mode_field(field_value: String) -> FieldValue {
         utils::into_string_array_to_field_value(&mode.other),
     );
 
-    map.into()
+    Ok(Some(map.into()))
 }
 
-fn interpret_signal_field(field_value: String) -> FieldValue {
+fn interpret_signal_field(field_value: String, config: InterpretConfig) -> InterpretResult {
     let Ok(signal_number) = field_value.parse::<u64>() else {
-        return field_value.into();
+        return handle_fallback(field_value, config);
     };
 
     let Ok(signal) = Signal::try_from(signal_number) else {
-        return Number::UnsignedInteger(signal_number).into();
+        return handle_fallback_with_number(field_value, Number::UnsignedInteger(signal_number), config);
     };
 
-    signal.to_string().into()
+    Ok(Some(signal.to_string().into()))
 }
 
-fn interpret_list_field(field_value: String) -> FieldValue {
+fn interpret_list_field(field_value: String, config: InterpretConfig) -> InterpretResult {
     let Ok(audit_flag_number) = field_value.parse::<u64>() else {
-        return field_value.into();
+        return handle_fallback(field_value, config);
     };
 
     let Some(audit_flag) = audit_flag::resolve_audit_flag(audit_flag_number) else {
-        return Number::UnsignedInteger(audit_flag_number).into();
+        return handle_fallback_with_number(field_value, Number::UnsignedInteger(audit_flag_number), config);
     };
 
-    audit_flag.to_string().into()
+    Ok(Some(audit_flag.to_string().into()))
 }
 
-fn interpret_success_field(field_value: String) -> FieldValue {
+fn interpret_success_field(field_value: String, config: InterpretConfig) -> InterpretResult {
     let Some(success) = success::resolve_success(&field_value) else {
-        return field_value.into();
+        return handle_fallback(field_value, config);
     };
 
-    success.into()
+    Ok(Some(success.into()))
 }
 
-fn interpret_errno_field(field_value: String) -> FieldValue {
+fn interpret_errno_field(field_value: String, config: InterpretConfig) -> InterpretResult {
     let Ok(errno_number) = field_value.parse::<u64>() else {
-        return field_value.into();
+        return handle_fallback(field_value, config);
     };
 
     let Ok(errno) = Errno::try_from(errno_number) else {
-        return Number::UnsignedInteger(errno_number).into();
+        return handle_fallback_with_number(field_value, Number::UnsignedInteger(errno_number), config);
     };
 
-    errno.to_string().into()
+    Ok(Some(errno.to_string().into()))
 }
 
-fn interpret_mac_label_field(field_value: String) -> FieldValue {
+fn interpret_mac_label_field(field_value: String, config: InterpretConfig) -> InterpretResult {
     let Some(mac_label) = mac_label::resolve_mac_label(&field_value) else {
-        return field_value.into();
+        return handle_fallback(field_value, config);
     };
 
     let mut map = BTreeMap::new();
@@ -319,30 +385,30 @@ fn interpret_mac_label_field(field_value: String) -> FieldValue {
                 map.insert("level".into(), level_map.into());
             }
 
-            map.into()
+            Ok(Some(map.into()))
         }
     }
 }
 
-fn interpret_pam_grantors_field(field_value: &str) -> FieldValue {
+fn interpret_pam_grantors_field(field_value: &str, _config: InterpretConfig) -> InterpretResult {
     let grantors = pam::parse_grantors(field_value);
 
-    utils::into_string_array_to_field_value(&grantors)
+    Ok(Some(utils::into_string_array_to_field_value(&grantors)))
 }
 
-fn interpret_arch_field(field_value: &str) -> FieldValue {
+fn interpret_arch_field(field_value: &str, config: InterpretConfig) -> InterpretResult {
     // Arch is a hex-encoded int. We assume that it is u32
     // Logging example https://github.com/torvalds/linux/blob/561c80369df0733ba0574882a1635287b20f9de2/kernel/auditsc.c#L1689
     // audit_context field: https://github.com/torvalds/linux/blob/c17b750b3ad9f45f2b6f7e6f7f4679844244f0b9/kernel/audit.h#L141
     let Ok(arch) = u32::from_str_radix(field_value, 16) else {
-        return field_value.into();
+        return handle_fallback(field_value.to_string(), config);
     };
 
     let Ok(audit_arch) = AuditArch::try_from(arch) else {
-        return field_value.into();
+        return handle_fallback(field_value.to_string(), config);
     };
 
-    audit_arch.to_string().into()
+    Ok(Some(audit_arch.to_string().into()))
 }
 
 #[cfg(test)]
@@ -367,7 +433,7 @@ mod tests {
     #[case::not_encoded_fallbacks_to_input("foo", "foo".into())]
     #[case::hex_encoded_with_trailing_data_fallbacks_to_input("666f6fbar", "666f6fbar".into())]
     fn test_interpret_escaped_field(#[case] input: String, #[case] expected: FieldValue) {
-        let result = interpret_escaped_field(input);
+        let result = interpret_escaped_field(input, InterpretConfig::default()).unwrap().unwrap();
         assert_eq!(result, expected);
     }
 
@@ -379,7 +445,7 @@ mod tests {
     #[case::negative_integer("-123", Number::SignedInteger(-123).into())]
     #[case::not_integer_fallbacks_to_input("foo", "foo".into())]
     fn test_interpret_uid_field(#[case] input: String, #[case] expected: FieldValue) {
-        let result = interpret_uid_field(input);
+        let result = interpret_uid_field(input, InterpretConfig::default()).unwrap().unwrap();
         assert_eq!(result, expected);
     }
 
@@ -389,7 +455,7 @@ mod tests {
     #[case::negative_integer("-123", Number::SignedInteger(-123).into())]
     #[case::not_integer_fallbacks_to_input("foo","foo".into())]
     fn test_interpret_exit_field(#[case] input: String, #[case] expected: FieldValue) {
-        let result = interpret_exit_field(input);
+        let result = interpret_exit_field(input, InterpretConfig::default()).unwrap().unwrap();
         assert_eq!(result, expected);
     }
 
@@ -426,7 +492,7 @@ mod tests {
     #[case::incomplete_hexstring_fallbacks_to_input("012", "012".into())]
     #[case::parse_sockaddr_fail_fallbacks_to_input("FFFF0000", "FFFF0000".into())]
     fn test_interpret_socket_addr_field(#[case] input: String, #[case] expected: FieldValue) {
-        let result = interpret_socket_addr_field(input);
+        let result = interpret_socket_addr_field(input, InterpretConfig::default()).unwrap().unwrap();
         assert_eq!(result, expected);
     }
 
@@ -445,7 +511,7 @@ mod tests {
     #[case::none_perms("16", vec![].into())]
     #[case::resolve_perm_mask_fail_fallbacks_to_input("foo", "foo".into())]
     fn test_interpret_perm_field(#[case] input: String, #[case] expected: FieldValue) {
-        let result = interpret_perm_field(input);
+        let result = interpret_perm_field(input, InterpretConfig::default()).unwrap().unwrap();
         assert_eq!(result, expected);
     }
 
@@ -457,7 +523,7 @@ mod tests {
     #[case::success_string("success", "success".into())]
     #[case::foo("foo", "unset".into())]
     fn test_interpret_result_field(#[case] input: &str, #[case] expected: FieldValue) {
-        let result = interpret_result_field(input);
+        let result = interpret_result_field(input, InterpretConfig::default()).unwrap().unwrap();
         assert_eq!(result, expected);
     }
 
@@ -469,7 +535,7 @@ mod tests {
     #[case::non_utf8_hexstring("666f6f0062ff6172", "foo b�ar".into())]
     #[case::empty("", "".into())]
     fn test_interpret_proctitle_field(#[case] input: String, #[case] expected: FieldValue) {
-        let result = interpret_proctitle_field(input);
+        let result = interpret_proctitle_field(input, InterpretConfig::default()).unwrap().unwrap();
         assert_eq!(result, expected);
     }
 
@@ -506,7 +572,7 @@ mod tests {
     #[case::empty("", "".into())]
     #[case::foo("foo", "foo".into())]
     fn test_interpret_mode_field(#[case] input: String, #[case] expected: FieldValue) {
-        let result = interpret_mode_field(input);
+        let result = interpret_mode_field(input, InterpretConfig::default()).unwrap().unwrap();
         assert_eq!(result, expected);
     }
 
@@ -518,7 +584,7 @@ mod tests {
     #[case::sigunused("32", "SIGUNUSED".into())]
     #[case::unknown("33", Number::UnsignedInteger(33).into())]
     fn test_interpret_signal_field(#[case] input: String, #[case] expected: FieldValue) {
-        let result = interpret_signal_field(input);
+        let result = interpret_signal_field(input, InterpretConfig::default()).unwrap().unwrap();
         assert_eq!(result, expected);
     }
 
@@ -535,7 +601,7 @@ mod tests {
     #[case::io_uring_exit("7", "io-uring-exit".into())]
     #[case::unknown("8", Number::UnsignedInteger(8).into())]
     fn test_interpret_list_field(#[case] input: String, #[case] expected: FieldValue) {
-        let result = interpret_list_field(input);
+        let result = interpret_list_field(input, InterpretConfig::default()).unwrap().unwrap();
         assert_eq!(result, expected);
     }
 
@@ -544,7 +610,7 @@ mod tests {
     #[case::no("no", false.into())]
     #[case::unknown("foo", "foo".into())]
     fn test_interpret_success_field(#[case] input: String, #[case] expected: FieldValue) {
-        let result = interpret_success_field(input);
+        let result = interpret_success_field(input, InterpretConfig::default()).unwrap().unwrap();
         assert_eq!(result, expected);
     }
 
@@ -555,7 +621,7 @@ mod tests {
     #[case::enoent("2", "ENOENT".into())]
     #[case::enomem("12", "ENOMEM".into())]
     fn test_interpret_errno_field(#[case] input: String, #[case] expected: FieldValue) {
-        let result = interpret_errno_field(input);
+        let result = interpret_errno_field(input, InterpretConfig::default()).unwrap().unwrap();
         assert_eq!(result, expected);
     }
 
@@ -590,7 +656,7 @@ mod tests {
     )]
     #[case::not_a_mac_label("foo", "foo".into())]
     fn test_interpret_mac_label_field(#[case] input: String, #[case] expected: FieldValue) {
-        let result = interpret_mac_label_field(input);
+        let result = interpret_mac_label_field(input, InterpretConfig::default()).unwrap().unwrap();
         assert_eq!(result, expected);
     }
 
@@ -602,7 +668,7 @@ mod tests {
     #[case::empty_grantors("", vec![].into())]
     #[case::whitespace_grantors(" ", vec![" ".into()].into())]
     fn test_interpret_pam_grantors_field(#[case] input: &str, #[case] expected: FieldValue) {
-        let result = interpret_pam_grantors_field(input);
+        let result = interpret_pam_grantors_field(input, InterpretConfig::default()).unwrap().unwrap();
         assert_eq!(result, expected);
     }
 
@@ -612,7 +678,7 @@ mod tests {
     #[case::not_hex_encoded("foo", "foo".into())]
     #[case::unknown("9999", "9999".into())]
     fn test_interpret_arch_field(#[case] input: &str, #[case] expected: FieldValue) {
-        let result = interpret_arch_field(input);
+        let result = interpret_arch_field(input, InterpretConfig::default()).unwrap().unwrap();
         assert_eq!(result, expected);
     }
 }

@@ -3,7 +3,10 @@ use std::{collections::BTreeMap, str::FromStr};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-use crate::parser::{self, ParserError};
+use crate::{
+    parser::{self, ParserError},
+    InterpretConfig, InterpretError,
+};
 
 #[derive(Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -107,12 +110,55 @@ impl From<i64> for Number {
     }
 }
 
+impl AuditdRecord {
+    /// Parses an auditd log line with the specified interpretation configuration.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use auditd_parser::{AuditdRecord, InterpretConfig, InterpretMode};
+    ///
+    /// let line = "type=USER_AUTH msg=audit(1234567890.123:456): pid=123 uid=0 sig=33";
+    ///
+    /// // Fallback mode (default): Unknown values fallback to their original representation
+    /// let record = AuditdRecord::parse_with_config(line, InterpretConfig::fallback()).unwrap();
+    /// assert!(record.fields.contains_key("sig"));
+    ///
+    /// // Strict mode: Fails if unknown values are encountered
+    /// let result = AuditdRecord::parse_with_config(line, InterpretConfig::strict());
+    /// assert!(result.is_err()); // sig=33 is unknown
+    ///
+    /// // Ignore mode: Omits fields with unknown values
+    /// let record = AuditdRecord::parse_with_config(line, InterpretConfig::ignore()).unwrap();
+    /// assert!(!record.fields.contains_key("sig")); // Field is omitted
+    /// ```
+    pub fn parse_with_config(
+        input: &str,
+        config: InterpretConfig,
+    ) -> Result<Self, AuditdParseError> {
+        let raw_record = parser::parse_record(input)?;
+        Ok(Self::from_raw_with_config(raw_record, config)?)
+    }
+}
+
+/// Error type for parsing auditd records.
+#[derive(Debug, thiserror::Error)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum AuditdParseError {
+    /// Error during parsing
+    #[error(transparent)]
+    Parser(#[from] ParserError),
+
+    /// Error during interpretation
+    #[error(transparent)]
+    Interpret(#[from] InterpretError),
+}
+
 impl FromStr for AuditdRecord {
-    // TODO: use thiserror instead of anyhow (or use snafu)
-    type Err = ParserError;
+    type Err = AuditdParseError;
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
-        let raw_record = parser::parse_record(input)?;
-        Ok(Self::from(raw_record))
+        // Use fallback mode for backward compatibility
+        Self::parse_with_config(input, InterpretConfig::default())
     }
 }

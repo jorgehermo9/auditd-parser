@@ -1,11 +1,17 @@
 mod interpret;
+mod interpret_error;
+mod interpret_mode;
 // TODO: remove this pub(crate) once refactor `interpret_key_value_field`
 pub(crate) mod parser;
 mod record;
 
+pub use interpret_error::InterpretError;
+pub use interpret_mode::{InterpretConfig, InterpretMode};
 pub use parser::ParserError;
+pub use record::AuditdParseError;
 pub use record::AuditdRecord;
 pub use record::FieldValue;
+pub use record::Number;
 
 #[cfg(test)]
 mod tests {
