@@ -1,7 +1,41 @@
+#![allow(dead_code)]
+
 use std::fmt::{self, Display, Formatter};
 
 // Constants are extracted from https://github.com/torvalds/linux/blob/4a95bc121ccdaee04c4d72f84dbfa6b880a514b6/include/uapi/asm-generic/signal.h#L11
 // More information about signals can be found in https://man7.org/linux/man-pages/man7/signal.7.html
+const SIGHUP: u64 = 1;
+const SIGINT: u64 = 2;
+const SIGQUIT: u64 = 3;
+const SIGILL: u64 = 4;
+const SIGTRAP: u64 = 5;
+const SIGABRT: u64 = 6;
+const SIGBUS: u64 = 7;
+const SIGFPE: u64 = 8;
+const SIGKILL: u64 = 9;
+const SIGUSR1: u64 = 10;
+const SIGSEGV: u64 = 11;
+const SIGUSR2: u64 = 12;
+const SIGPIPE: u64 = 13;
+const SIGALRM: u64 = 14;
+const SIGTERM: u64 = 15;
+const SIGSTKFLT: u64 = 16;
+const SIGCHLD: u64 = 17;
+const SIGCONT: u64 = 18;
+const SIGSTOP: u64 = 19;
+const SIGTSTP: u64 = 20;
+const SIGTTIN: u64 = 21;
+const SIGTTOU: u64 = 22;
+const SIGURG: u64 = 23;
+const SIGXCPU: u64 = 24;
+const SIGXFSZ: u64 = 25;
+const SIGVTALRM: u64 = 26;
+const SIGPROF: u64 = 27;
+const SIGWINCH: u64 = 28;
+const SIGPOLL: u64 = 29;
+const SIGPWR: u64 = 30;
+const SIGSYS: u64 = 31;
+const SIGUNUSED: u64 = 32;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Signal {
@@ -53,46 +87,41 @@ impl TryFrom<u64> for Signal {
     type Error = ();
 
     fn try_from(value: u64) -> Result<Self, Self::Error> {
-        // Constants are extracted from linux/include/uapi/asm-generic/signal.h
-        // Some architectures may have different signal numbers
-        // (as described by https://man7.org/linux/man-pages/man7/signal.7.html)
-        // But for now we will support only the generic and POSIX-compatible ones
         let signal = match value {
-            1 => Signal::SIGHUP,
-            2 => Signal::SIGINT,
-            3 => Signal::SIGQUIT,
-            4 => Signal::SIGILL,
-            5 => Signal::SIGTRAP,
-            6 => Signal::SIGABRT,
-            7 => Signal::SIGBUS,
-            8 => Signal::SIGFPE,
-            9 => Signal::SIGKILL,
-            10 => Signal::SIGUSR1,
-            11 => Signal::SIGSEGV,
-            12 => Signal::SIGUSR2,
-            13 => Signal::SIGPIPE,
-            14 => Signal::SIGALRM,
-            15 => Signal::SIGTERM,
-            16 => Signal::SIGSTKFLT,
-            17 => Signal::SIGCHLD,
-            18 => Signal::SIGCONT,
-            19 => Signal::SIGSTOP,
-            20 => Signal::SIGTSTP,
-            21 => Signal::SIGTTIN,
-            22 => Signal::SIGTTOU,
-            23 => Signal::SIGURG,
-            24 => Signal::SIGXCPU,
-            25 => Signal::SIGXFSZ,
-            26 => Signal::SIGVTALRM,
-            27 => Signal::SIGPROF,
-            28 => Signal::SIGWINCH,
-            29 => Signal::SIGPOLL,
-            30 => Signal::SIGPWR,
-            31 => Signal::SIGSYS,
-            32 => Signal::SIGUNUSED,
+            SIGHUP => Signal::SIGHUP,
+            SIGINT => Signal::SIGINT,
+            SIGQUIT => Signal::SIGQUIT,
+            SIGILL => Signal::SIGILL,
+            SIGTRAP => Signal::SIGTRAP,
+            SIGABRT => Signal::SIGABRT,
+            SIGBUS => Signal::SIGBUS,
+            SIGFPE => Signal::SIGFPE,
+            SIGKILL => Signal::SIGKILL,
+            SIGUSR1 => Signal::SIGUSR1,
+            SIGSEGV => Signal::SIGSEGV,
+            SIGUSR2 => Signal::SIGUSR2,
+            SIGPIPE => Signal::SIGPIPE,
+            SIGALRM => Signal::SIGALRM,
+            SIGTERM => Signal::SIGTERM,
+            SIGSTKFLT => Signal::SIGSTKFLT,
+            SIGCHLD => Signal::SIGCHLD,
+            SIGCONT => Signal::SIGCONT,
+            SIGSTOP => Signal::SIGSTOP,
+            SIGTSTP => Signal::SIGTSTP,
+            SIGTTIN => Signal::SIGTTIN,
+            SIGTTOU => Signal::SIGTTOU,
+            SIGURG => Signal::SIGURG,
+            SIGXCPU => Signal::SIGXCPU,
+            SIGXFSZ => Signal::SIGXFSZ,
+            SIGVTALRM => Signal::SIGVTALRM,
+            SIGPROF => Signal::SIGPROF,
+            SIGWINCH => Signal::SIGWINCH,
+            SIGPOLL => Signal::SIGPOLL,
+            SIGPWR => Signal::SIGPWR,
+            SIGSYS => Signal::SIGSYS,
+            SIGUNUSED => Signal::SIGUNUSED,
             _ => return Err(()),
         };
-
         Ok(signal)
     }
 }
