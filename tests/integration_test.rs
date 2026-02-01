@@ -1,6 +1,6 @@
 use std::{fs, path::PathBuf};
 
-use auditd_parser::{AuditdRecord, ParserError};
+use auditd_parser::{AuditdParseError, AuditdRecord};
 use erased_serde::Serialize;
 use rstest::rstest;
 
@@ -22,7 +22,7 @@ fn test_log_data(#[files("tests/data/**/*.log")] log_file: PathBuf) {
         // Unwrap the Ok variant but leave the Err variant as-is
         let result: Box<dyn Serialize> = match maybe_record {
             Ok(record) => Box::new(record),
-            Err(error) => Box::new(Err::<AuditdRecord, ParserError>(error)),
+            Err(error) => Box::new(Err::<AuditdRecord, AuditdParseError>(error)),
         };
 
         let location = format!("{log_file_path}:{line_number}");
