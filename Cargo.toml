@@ -22,6 +22,9 @@ serde = { version = "1.0.219", optional = true, features = ["derive"] }
 static_assertions = "1.1.0"
 thiserror = "2.0.16"
 
+[build-dependencies]
+bindgen = "0.71"
+
 [dev-dependencies]
 insta = { version = "1.43.1", features = ["json"] }
 maplit = "1.0.2"
