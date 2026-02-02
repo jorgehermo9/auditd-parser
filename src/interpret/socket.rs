@@ -2,10 +2,13 @@ use std::net::{Ipv4Addr, Ipv6Addr, SocketAddrV4, SocketAddrV6};
 
 use bytes::{Buf, Bytes};
 
-const AF_UNIX: u16 = 1;
-const AF_INET: u16 = 2;
-const AF_INET6: u16 = 10;
-const AF_NETLINK: u16 = 16;
+use crate::kernel_bindings;
+
+// Socket address family constants are now imported from kernel headers via bindgen
+const AF_UNIX: u16 = kernel_bindings::AF_UNIX as u16;
+const AF_INET: u16 = kernel_bindings::AF_INET as u16;
+const AF_INET6: u16 = kernel_bindings::AF_INET6 as u16;
+const AF_NETLINK: u16 = kernel_bindings::AF_NETLINK as u16;
 
 #[derive(Debug, PartialEq)]
 pub enum SocketAddr {

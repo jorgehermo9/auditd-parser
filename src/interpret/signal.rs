@@ -2,39 +2,42 @@
 
 use std::fmt::{self, Display, Formatter};
 
-// Constants are extracted from https://github.com/torvalds/linux/blob/4a95bc121ccdaee04c4d72f84dbfa6b880a514b6/include/uapi/asm-generic/signal.h#L11
-// More information about signals can be found in https://man7.org/linux/man-pages/man7/signal.7.html
-const SIGHUP: u64 = 1;
-const SIGINT: u64 = 2;
-const SIGQUIT: u64 = 3;
-const SIGILL: u64 = 4;
-const SIGTRAP: u64 = 5;
-const SIGABRT: u64 = 6;
-const SIGBUS: u64 = 7;
-const SIGFPE: u64 = 8;
-const SIGKILL: u64 = 9;
-const SIGUSR1: u64 = 10;
-const SIGSEGV: u64 = 11;
-const SIGUSR2: u64 = 12;
-const SIGPIPE: u64 = 13;
-const SIGALRM: u64 = 14;
-const SIGTERM: u64 = 15;
-const SIGSTKFLT: u64 = 16;
-const SIGCHLD: u64 = 17;
-const SIGCONT: u64 = 18;
-const SIGSTOP: u64 = 19;
-const SIGTSTP: u64 = 20;
-const SIGTTIN: u64 = 21;
-const SIGTTOU: u64 = 22;
-const SIGURG: u64 = 23;
-const SIGXCPU: u64 = 24;
-const SIGXFSZ: u64 = 25;
-const SIGVTALRM: u64 = 26;
-const SIGPROF: u64 = 27;
-const SIGWINCH: u64 = 28;
-const SIGPOLL: u64 = 29;
-const SIGPWR: u64 = 30;
-const SIGSYS: u64 = 31;
+use crate::kernel_bindings;
+
+// Signal constants are now imported from kernel headers via bindgen
+// See kernel_bindings module for details
+const SIGHUP: u64 = kernel_bindings::SIGHUP as u64;
+const SIGINT: u64 = kernel_bindings::SIGINT as u64;
+const SIGQUIT: u64 = kernel_bindings::SIGQUIT as u64;
+const SIGILL: u64 = kernel_bindings::SIGILL as u64;
+const SIGTRAP: u64 = kernel_bindings::SIGTRAP as u64;
+const SIGABRT: u64 = kernel_bindings::SIGABRT as u64;
+const SIGBUS: u64 = kernel_bindings::SIGBUS as u64;
+const SIGFPE: u64 = kernel_bindings::SIGFPE as u64;
+const SIGKILL: u64 = kernel_bindings::SIGKILL as u64;
+const SIGUSR1: u64 = kernel_bindings::SIGUSR1 as u64;
+const SIGSEGV: u64 = kernel_bindings::SIGSEGV as u64;
+const SIGUSR2: u64 = kernel_bindings::SIGUSR2 as u64;
+const SIGPIPE: u64 = kernel_bindings::SIGPIPE as u64;
+const SIGALRM: u64 = kernel_bindings::SIGALRM as u64;
+const SIGTERM: u64 = kernel_bindings::SIGTERM as u64;
+const SIGSTKFLT: u64 = kernel_bindings::SIGSTKFLT as u64;
+const SIGCHLD: u64 = kernel_bindings::SIGCHLD as u64;
+const SIGCONT: u64 = kernel_bindings::SIGCONT as u64;
+const SIGSTOP: u64 = kernel_bindings::SIGSTOP as u64;
+const SIGTSTP: u64 = kernel_bindings::SIGTSTP as u64;
+const SIGTTIN: u64 = kernel_bindings::SIGTTIN as u64;
+const SIGTTOU: u64 = kernel_bindings::SIGTTOU as u64;
+const SIGURG: u64 = kernel_bindings::SIGURG as u64;
+const SIGXCPU: u64 = kernel_bindings::SIGXCPU as u64;
+const SIGXFSZ: u64 = kernel_bindings::SIGXFSZ as u64;
+const SIGVTALRM: u64 = kernel_bindings::SIGVTALRM as u64;
+const SIGPROF: u64 = kernel_bindings::SIGPROF as u64;
+const SIGWINCH: u64 = kernel_bindings::SIGWINCH as u64;
+const SIGPOLL: u64 = kernel_bindings::SIGPOLL as u64;
+const SIGPWR: u64 = kernel_bindings::SIGPWR as u64;
+const SIGSYS: u64 = kernel_bindings::SIGSYS as u64;
+// Note: SIGUNUSED is typically the same as SIGSYS on Linux
 const SIGUNUSED: u64 = 32;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(clippy::upper_case_acronyms)]
