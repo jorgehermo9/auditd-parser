@@ -109,9 +109,14 @@ impl Display for Attribute {
 pub fn resolve_mode(mode: &str) -> Option<Mode> {
     let mode = u32::from_str_radix(mode, 8).ok()?;
 
+    // Extract file type and attribute bits using masks
     let file_type_bits = mode & FILE_TYPE_MASK;
     let attributes_bits = mode & ATTRIBUTES_MASK;
 
+    // Note: We pass the full mode value to permission functions instead of
+    // pre-shifted bit values. This allows each function to directly use the
+    // kernel-defined permission masks (S_IRUSR, S_IWUSR, etc.) which are
+    // already positioned correctly in the mode value.
     Some(Mode {
         file_type: resolve_file_type(file_type_bits),
         attributes: resolve_attributes(attributes_bits),
@@ -343,7 +348,8 @@ mod tests {
 
     #[rstest]
     #[case::unknown(0, FileType::Unknown)]
-    #[case::unknown(0o150000, FileType::Unknown)]
+    // Test with an invalid file type value (not matching any S_IF* constant)
+    #[case::unknown_invalid(0o150000, FileType::Unknown)]
     #[case::socket(FILE_TYPE_SOCKET_MASK, FileType::Socket)]
     #[case::symlink(FILE_TYPE_SYMLINK_MASK, FileType::Symlink)]
     #[case::regular_file(FILE_TYPE_REGULAR_FILE_MASK, FileType::RegularFile)]
