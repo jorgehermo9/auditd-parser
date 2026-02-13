@@ -40,7 +40,7 @@ info: "type=SYSCALL msg=audit(1170021601.343:296): arch=c000003e syscall=1 succe
     },
     "success": true,
     "suid": "root",
-    "syscall": "1",
+    "syscall": "write",
     "tty": null,
     "uid": "root"
   }

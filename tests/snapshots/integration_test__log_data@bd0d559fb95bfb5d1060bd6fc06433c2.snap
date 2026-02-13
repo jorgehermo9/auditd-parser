@@ -24,6 +24,6 @@ info: "type=URINGOP msg=audit(1737533617.373:12266329): uring_op=18 success=yes 
     "success": true,
     "suid": "root",
     "uid": "root",
-    "uring_op": "18"
+    "uring_op": "pwrite64"
   }
 }

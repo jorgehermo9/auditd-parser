@@ -41,7 +41,7 @@ info: "type=SYSCALL msg=audit(1492000940.864:1095517): arch=c000003e syscall=62 
     },
     "success": true,
     "suid": 1000,
-    "syscall": "62",
+    "syscall": "kill",
     "tty": null,
     "uid": 1000
   }

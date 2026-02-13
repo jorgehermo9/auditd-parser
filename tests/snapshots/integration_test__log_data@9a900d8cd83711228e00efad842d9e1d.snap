@@ -40,7 +40,7 @@ info: "type=SYSCALL msg=audit(1481076984.827:17): arch=c000003e syscall=313 succ
     },
     "success": true,
     "suid": "root",
-    "syscall": "313",
+    "syscall": "finit_module",
     "tty": null,
     "uid": "root"
   }

@@ -32,7 +32,7 @@ info: "type=SYSCALL msg=audit(1634628127.584:166): arch=c000003e syscall=59 succ
     "subj": "/{,usr/}sbin/dhclient",
     "success": true,
     "suid": "root",
-    "syscall": "59",
+    "syscall": "execve",
     "tty": null,
     "uid": "root"
   }

@@ -1,6 +1,6 @@
 ---
 source: tests/integration_test.rs
-description: "/home/jorge/github/auditd-parser/tests/data/go-libaudit/test2.log:8"
+description: "/home/jorge/github/auditd-parser/tests/data/auparse/test2.log:8"
 expression: result
 info: "type=SYSCALL msg=audit(1170021601.343:286): arch=c000003e syscall=1 success=yes exit=2 a0=8 a1=7fffa7aede20 a2=2 a3=0 items=0 ppid=1 pid=2288 auid=42 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=1 comm=\"(systemd)\" exe=\"/usr/lib/systemd/systemd\" subj=system_u:system_r:init_t:s0 key=(null)"
 ---
@@ -40,7 +40,7 @@ info: "type=SYSCALL msg=audit(1170021601.343:286): arch=c000003e syscall=1 succe
     },
     "success": true,
     "suid": "root",
-    "syscall": "1",
+    "syscall": "write",
     "tty": null,
     "uid": "root"
   }

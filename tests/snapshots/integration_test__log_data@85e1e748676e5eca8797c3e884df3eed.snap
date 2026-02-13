@@ -31,7 +31,7 @@ info: "type=SYSCALL msg=audit(1615114232.375:15558): arch=c000003e syscall=59 su
     "sgid": "root",
     "success": true,
     "suid": "root",
-    "syscall": "59",
+    "syscall": "execve",
     "tty": "pts1",
     "uid": "root"
   },
